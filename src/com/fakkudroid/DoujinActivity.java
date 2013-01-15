@@ -37,7 +37,6 @@ import com.fakkudroid.R;
 public class DoujinActivity extends Activity {
 
 	private FakkuDroidApplication app;
-	public final static String INTENT_VAR_URL = "intentVarUrl";
 	private View mFormView;
 	private View mStatusView;
 

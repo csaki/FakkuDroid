@@ -3,6 +3,7 @@ package com.fakkudroid;
 import java.util.LinkedList;
 
 import com.fakkudroid.adapter.URLListAdapter;
+import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
@@ -70,8 +71,9 @@ public class MenuActivity extends ListActivity {
 		}else if(url.equals(site + Constants.RANDOM)){
 			it = new Intent(MenuActivity.this,
 					DoujinActivity.class);
-			it.putExtra(MenuActivity.INTENT_VAR_URL, url);
-			app.setCurrent(null);			
+			DoujinBean bean = new DoujinBean();
+			bean.setUrl(url);
+			app.setCurrent(bean);			
 		}else{
 			it = new Intent(MenuActivity.this,
 					DoujinListActivity.class);	
