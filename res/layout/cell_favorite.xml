@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+	android:layout_height="match_parent"
+    android:background="@drawable/stroke"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:scaleType="fitXY" >
+
+    <TextView
+        android:id="@+id/tvDoujin"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="@string/fail_load_title_doujin"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/main_color" 
+        android:gravity="center_horizontal"/>
+
+    <WebView
+        android:id="@+id/wvTitle"
+        android:layout_width="100dp"
+        android:layout_height="140dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/loading" />
+
+</LinearLayout>

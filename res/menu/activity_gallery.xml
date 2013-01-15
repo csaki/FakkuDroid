@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_reading_japanese"
+        android:orderInCategory="101"
+        android:title="@string/reading_japanese">
+    </item>
+    <item
+        android:id="@+id/menu_reading_occidental"
+        android:orderInCategory="102"
+        android:title="@string/reading_occidental">
+    </item>
+
+</menu>
