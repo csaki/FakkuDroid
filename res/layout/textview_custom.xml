@@ -5,6 +5,6 @@
     android:layout_height="wrap_content"
     android:text="@string/fail_load_tags_doujin"
     android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textColor="@android:color/darker_gray" >
+    android:textColor="@color/url_color" >
 
 </TextView>

@@ -7,6 +7,7 @@ import com.fakkudroid.util.Util;
 import com.fakkudroid.R;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +47,7 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		holder.tvDoujin.setText(Util.limitString(s.getTitle(), 36, "..."));
 		holder.tvArtist.setText(Util.limitString(s.getArtist().getDescription(), 36, "..."));
 		holder.tvSerie.setText(s.getSerie().getDescription());
-		holder.tvDescription.setText(s.getDescription());
+		holder.tvDescription.setText(Html.fromHtml(s.getDescription().replace("<br>", "<br/>")));;
 		holder.tvTags.setText(s.getTags());
 		
 		holder.wvTitle.setFocusable(false);

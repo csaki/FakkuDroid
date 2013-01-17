@@ -33,6 +33,10 @@ public class FakkuConnection {
 		return cookiesStore!=null;
 	}
 	
+	public static void disconnect(){
+		cookiesStore = null;
+	}
+	
 	public static boolean connect(String user, String password)
 			throws ClientProtocolException, IOException {
 		if(cookiesStore!=null)
@@ -342,7 +346,7 @@ public class FakkuConnection {
 		// description
 		token = "<b>Description:</b>";
 		idxStart = html.indexOf(token) + token.length();
-		idxEnd = html.indexOf("<", idxStart);
+		idxEnd = html.indexOf("</div>", idxStart);
 		s = html.substring(idxStart, idxEnd);
 		bean.setDescription(s.trim());
 		

@@ -45,6 +45,14 @@ public class DoujinBean {
 		
 		return urlFavorite + url.substring(idxStart);
 	}
+	
+	public String urlRelated(int nroPage){
+		int idxStart = url.lastIndexOf("/");
+		idxStart = url.substring(0, idxStart).lastIndexOf("/") + 1;
+		
+		return Constants.SITERELATED + url.substring(idxStart) + "/"  + ((nroPage-1)*10);
+	}
+	
 	public boolean isAddedInFavorite() {
 		return addedInFavorite;
 	}

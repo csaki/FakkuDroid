@@ -4,6 +4,7 @@ public class Constants {
 
 	public static String SITEADDFAVORITE = "http://www.fakku.net/get/favorite/add/";
 	public static String SITEREMOVEFAVORITE = "http://www.fakku.net/get/favorite/remove/";
+	public static String SITERELATED = "http://www.fakku.net/get/related/";
 	public static String SITELOGIN = "http://www.fakku.net/login";
 	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html"; 
 	public static String SITEABOUT = "http://fakkudroid.blogspot.com/2013/01/about-fakkudroid.html"; 

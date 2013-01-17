@@ -44,6 +44,6 @@ public class FakkuDroidApplication extends Application {
 		return url;
 	}
 	public String getUrlFavorite(int nroPage, String user) {
-		return Util.escapeURL(Constants.SITEFAVORITE.replace("usr", user) + ((nroPage-1)*15));
+		return Util.escapeURL(Constants.SITEFAVORITE.replace("usr", user) + ((nroPage-1)*30));
 	}
 }

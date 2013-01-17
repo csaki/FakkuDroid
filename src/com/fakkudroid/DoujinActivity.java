@@ -15,6 +15,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -68,6 +72,15 @@ public class DoujinActivity extends Activity {
 	public void readOnline(View view) {
 		Intent it = new Intent(DoujinActivity.this, GallerySwipeActivity.class);
 		DoujinActivity.this.startActivity(it);
+	}
+	
+	public void relatedContent(View view) {
+		Intent it = new Intent(DoujinActivity.this, RelatedContentListActivity.class);
+		DoujinActivity.this.startActivity(it);
+	}
+	
+	public void comments(View view) {
+		Toast.makeText(this, getResources().getString(R.string.in_construction), Toast.LENGTH_LONG).show();
 	}
 
 	public void addOrRemoveFavorite(View view) {
@@ -125,15 +138,33 @@ public class DoujinActivity extends Activity {
 
 		s = s.replace("rpc1", app.getCurrent().getUploader().getDescription());
 		s = s.replace("rpc2", app.getCurrent().getFecha());
+		
+		SpannableString content = new SpannableString(s);
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvUploader.setText(content);
 
-		tvUploader.setText(s);
-
-		tvDescription.setText(app.getCurrent().getDescription());
-		tvDoujin.setText(app.getCurrent().getTitle());
-		tvArtist.setText(app.getCurrent().getArtist().getDescription());
-		tvSerie.setText(app.getCurrent().getSerie().getDescription());
-		tvLanguage.setText(app.getCurrent().getLanguage().getDescription());
-		tvTranslator.setText(app.getCurrent().getTranslator().getDescription());
+		tvDescription.setText(Html.fromHtml(app.getCurrent().getDescription().replace("<br>", "<br/>")));
+		tvDescription.setMovementMethod(LinkMovementMethod.getInstance());
+		
+		content = new SpannableString(app.getCurrent().getTitle());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvDoujin.setText(content);
+		
+		content = new SpannableString(app.getCurrent().getArtist().getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvArtist.setText(content);
+		
+		content = new SpannableString(app.getCurrent().getSerie().getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvSerie.setText(content);
+		
+		content = new SpannableString(app.getCurrent().getLanguage().getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvLanguage.setText(content);
+		
+		content = new SpannableString(app.getCurrent().getTranslator().getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvTranslator.setText(content);
 
 		wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
 				.getCurrent().getUrlImageTitle(), 100), "text/html", "utf-8",
@@ -165,7 +196,9 @@ public class DoujinActivity extends Activity {
 		for (URLBean urlBean : app.getCurrent().getLstTags()) {
 			TextView tv = (TextView) getLayoutInflater().inflate(
 					R.layout.textview_custom, null);
-			tv.setText(urlBean.getDescription());
+			content = new SpannableString(urlBean.getDescription());			
+			content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+			tv.setText(content);
 
 			tv.setOnClickListener(new URLListener(urlBean, R.string.tile_tag));
 			llTags.addView(tv);
@@ -176,9 +209,11 @@ public class DoujinActivity extends Activity {
 		if (app.getCurrent() != null)
 			if (app.getCurrent().isAddedInFavorite()) {
 				btnAddToFavorite.setImageResource(R.drawable.rating_important);
+				btnAddToFavorite.setContentDescription(getResources().getString(R.string.remove_favorite));
 			} else {
 				btnAddToFavorite
 				.setImageResource(R.drawable.rating_not_important);
+				btnAddToFavorite.setContentDescription(getResources().getString(R.string.add_favorite));
 			}
 	}
 

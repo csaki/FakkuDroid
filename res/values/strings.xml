@@ -54,6 +54,7 @@
     <string name="remove_favorite">Remove from favorite</string>
     <string name="my_favorites">My favorites</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="login_please">Your are not logged. Do you want to log in?</string>
     <string name="view_browser">View in Browser</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -68,10 +69,14 @@
     <string name="page_1">Page 1</string>
     <string name="browse">Browse</string>
     <string name="tutorial_change_reading_mode">Press and hold to change reading mode</string>
-    <string name="logged">You are logged.</string>
+    <string name="logged">You are logged in.</string>
     <string name="added_favorite">Added to Favorite</string>
     <string name="removed_favorite">Removed from Favorite</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="about">About FakkuDroid</string>
+    <string name="loggedout">You are logged out.</string>
+    <string name="comments">Comments</string>
+    <string name="related_content">Related Content</string>
+    <string name="in_construction">In Construction</string>
 
 </resources>

@@ -10,6 +10,12 @@
         android:orderInCategory="1"
         android:showAsAction="never"
         android:title="@string/my_favorites"/>
+    
+    <item
+        android:id="@+id/menu_logout"
+        android:orderInCategory="2"
+        android:showAsAction="never"
+        android:title="@string/logout"/>
     <item
         android:id="@+id/menu_browser"
         android:orderInCategory="30"

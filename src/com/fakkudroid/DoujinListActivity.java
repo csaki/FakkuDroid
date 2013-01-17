@@ -8,6 +8,8 @@ import org.apache.http.client.ClientProtocolException;
 
 import com.fakkudroid.adapter.DoujinListAdapter;
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.bean.SettingBean;
+import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
@@ -144,9 +146,11 @@ public class DoujinListActivity extends ListActivity {
 			isConnected = FakkuConnection.isConnected();
 		if (isConnected) {
 			menu.findItem(R.id.menu_login).setVisible(false);
+			menu.findItem(R.id.menu_logout).setVisible(true);
 			menu.findItem(R.id.menu_myfavorites).setVisible(true);
 		} else {
 			menu.findItem(R.id.menu_login).setVisible(true);
+			menu.findItem(R.id.menu_logout).setVisible(false);
 			menu.findItem(R.id.menu_myfavorites).setVisible(false);
 		}
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
@@ -158,6 +162,13 @@ public class DoujinListActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.menu_logout:
+			SettingBean sb = app.getSettingBean();
+			sb.setChecked(false);
+			new DataBaseHandler(this).updateSetting(sb);
+			FakkuConnection.disconnect();
+			Toast.makeText(this, getResources().getString(R.string.loggedout), Toast.LENGTH_SHORT).show();
+			break;
 		case R.id.menu_login:
 			Intent itLogin = new Intent(this, LoginActivity.class);
 			this.startActivity(itLogin);

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fakkudroid"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.1" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -29,6 +29,10 @@
         <activity
             android:name="com.fakkudroid.DoujinActivity"
             android:label="@string/title_activity_doujin" >
+        </activity>
+        <activity
+            android:name="com.fakkudroid.RelatedContentListActivity"
+            android:label="@string/related_content" >
         </activity>
         <activity
             android:name="com.fakkudroid.MenuActivity"

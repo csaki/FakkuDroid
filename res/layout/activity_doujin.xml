@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center_horizontal"
-        android:orientation="vertical" >
+        android:orientation="vertical"  >
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
@@ -33,7 +33,7 @@
         android:id="@+id/view_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/ll2"
@@ -46,10 +46,11 @@
             android:padding="2dp" 
             android:gravity="center">
 
-            <ImageButton
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnAddToFavorite"
                 android:layout_width="0dp"
-                android:layout_weight="0.25"
+                android:layout_weight="0.2"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/add_favorite"
@@ -57,10 +58,11 @@
                 android:scaleType="center"
                 android:src="@drawable/rating_not_important" />
             
-            <ImageButton
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnRefresh"
                 android:layout_width="0dp"
-                android:layout_weight="0.25"
+                android:layout_weight="0.2"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/button_refresh"
@@ -68,10 +70,11 @@
                 android:scaleType="center"
                 android:src="@drawable/navigation_refresh" />
 
-            <ImageButton
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnViewInBrowser"
                 android:layout_width="0dp"
-                android:layout_weight="0.25"
+                android:layout_weight="0.2"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/view_browser"
@@ -79,10 +82,35 @@
                 android:scaleType="center"
                 android:src="@drawable/location_web_site" />
             
-            <ImageButton
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
+                android:id="@+id/btnComments"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/comments"
+                android:onClick="comments"
+                android:scaleType="center"
+                android:src="@drawable/social_chat" />
+
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
+                android:id="@+id/btnRelatedContent"
+                android:layout_width="0dp"
+                android:layout_weight="0.2"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/related_content"
+                android:onClick="relatedContent"
+                android:scaleType="center"
+                android:src="@drawable/collections_labels" />
+            
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnReadOnline"
                 android:layout_width="0dp"
-                android:layout_weight="0.25"
+                android:layout_weight="0.2"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/read_online"
@@ -157,7 +185,7 @@
                         android:gravity="center"
                         android:text="@string/fail_load_uploader_doujin"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@android:color/darker_gray" />
+                        android:textColor="@color/url_color" />
 
                     <TextView
                         android:id="@+id/tvQtyPages"
@@ -182,7 +210,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/fail_load_serie_doujin"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/darker_gray" />
+                        android:textColor="@color/url_color"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -197,7 +225,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/fail_load_artist_doujin"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/darker_gray" />
+                        android:textColor="@color/url_color"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -227,7 +255,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/fail_load_language_doujin"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/darker_gray" />
+                        android:textColor="@color/url_color"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -242,7 +270,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/fail_load_translator_doujin"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/darker_gray" />
+                        android:textColor="@color/url_color"/>
 
                     <TextView
                         android:layout_width="wrap_content"
