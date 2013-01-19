@@ -63,7 +63,7 @@
     <string name="title_activity_favorite">FavoriteActivity</string>
     <string name="favorite">Favorite of usr</string>
     <string name="reading_japanese">Reading: Japanese</string>
-    <string name="reading_occidental">Reading: Occidental</string>
+    <string name="reading_western">Reading: Western</string>
     <string name="next_page">Next Page</string>
     <string name="previous_page">Previous Page</string>
     <string name="page_1">Page 1</string>

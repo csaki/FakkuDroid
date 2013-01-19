@@ -70,7 +70,15 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/location_web_site" />
         </LinearLayout>
-
+		
+        <WebView android:id="@+id/wvTrampa"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/ll"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"/>
+        
         <ListView
             android:id="@android:id/list"
             android:layout_width="match_parent"
