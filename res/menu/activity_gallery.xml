@@ -1,6 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
+        android:id="@+id/go_to"
+        android:orderInCategory="1"
+        android:title="@string/go_to">
+    </item>
+    <item
+        android:id="@+id/go_to_first"
+        android:orderInCategory="2"
+        android:title="@string/go_to_first">
+    </item>
+    <item
+        android:id="@+id/go_to_last"
+        android:orderInCategory="3"
+        android:title="@string/go_to_last">
+    </item>
+    <item
         android:id="@+id/menu_reading_japanese"
         android:orderInCategory="101"
         android:title="@string/reading_japanese">

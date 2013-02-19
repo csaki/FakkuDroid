@@ -270,14 +270,20 @@ public class FakkuConnection {
 		
 		html = Util.getHTML(url);
 		// Qty Pages
-		String token = " pages ";
+		String token = "</b> pages";
 		int idxStart = html.indexOf(token);
 		token = "<b>";
-		idxStart = html.lastIndexOf(token, idxStart) + token.length();
+		idxStart = html.substring(0, idxStart).lastIndexOf(token) + token.length();
 		int idxEnd = html.indexOf("<", idxStart);
 		String s = html.substring(idxStart, idxEnd);
 
-		int c = Integer.parseInt(s.replace(",", "").trim());
+		int c = 0;
+		try
+		{			
+			c = Integer.parseInt(s.replace(",", "").trim());
+		}catch(Exception e){
+			
+		}
 
 		bean.setQtyPages(c);
 

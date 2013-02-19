@@ -3,13 +3,16 @@ package com.fakkudroid;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -17,12 +20,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.fakkudroid.bean.SettingBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.R;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -47,19 +50,21 @@ public class GallerySwipeActivity extends Activity {
 		mViewPager = (ViewPager) findViewById(R.id.viewPager);
 		mViewPager.setAdapter(adapter);
 
-		if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE)
+		SettingBean sb = app.getSettingBean();
+		if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
 			mViewPager.setCurrentItem(app.getCurrent().getImages().size() - 1);
 
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 			@Override
 			public void onPageSelected(int page) {
-				if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE)
+				SettingBean sb = app.getSettingBean();
+				if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
 					showToast("Page "
 							+ (app.getCurrent().getImages().size() - page)
-							+ "/" + app.getCurrent().getImages().size(),false);
+							+ "/" + app.getCurrent().getImages().size(), false);
 				else
 					showToast("Page " + (page + 1) + "/"
-							+ app.getCurrent().getImages().size(),false);
+							+ app.getCurrent().getImages().size(), false);
 			}
 
 			@Override
@@ -70,57 +75,119 @@ public class GallerySwipeActivity extends Activity {
 			public void onPageScrollStateChanged(int arg0) {
 			}
 		});
-		
+
 		registerForContextMenu(mViewPager);
-				
-		showToast(getResources().getString(R.string.tutorial_change_reading_mode),true);		
+
+		showToast(
+				getResources().getString(R.string.tutorial_change_reading_mode),
+				true);
 	}
 
 	void showToast(String txt, boolean isLongPress) {
 		if (toast != null)
 			toast.cancel();
 
-		if(isLongPress)
+		if (isLongPress)
 			toast = Toast.makeText(this, txt, Toast.LENGTH_LONG);
 		else
 			toast = Toast.makeText(this, txt, Toast.LENGTH_SHORT);
 		toast.show();
 	}
-	
+
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
-	                                ContextMenuInfo menuInfo) {
-	    super.onCreateContextMenu(menu, v, menuInfo);
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_gallery, menu);
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.activity_gallery, menu);
 	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		int selectOption = -1;
+		SettingBean sb = app.getSettingBean();
 		switch (item.getItemId()) {
 		case R.id.menu_reading_japanese:
-			selectOption = SettingBean.JAPANESE_MODE;			
+			selectOption = SettingBean.JAPANESE_MODE;
 			break;
 		case R.id.menu_reading_occidental:
 			selectOption = SettingBean.OCCIDENTAL_MODE;
 			break;
+		case R.id.go_to:
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("Go to...");
+			alert.setMessage("Page");
+
+			// Set an EditText view to get user input
+			final EditText input = new EditText(this);
+			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+			alert.setView(input);
+
+			alert.setPositiveButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							String value = input.getText().toString();
+							if (!value.equals("")) {
+								int page = Integer.parseInt(value)-1;
+								if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE) {
+									page = app.getCurrent().getImages().size() - page - 1;
+								}								
+								if(page>=0&&page<=app.getCurrent().getQtyPages()-1){
+									mViewPager.setCurrentItem(page);									
+								}else{
+									showToast(getResources().getString(com.fakkudroid.R.string.error_page_out), false);
+								}
+							}
+						}
+					});
+
+			alert.setNegativeButton("Cancel",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							// Canceled.
+						}
+					});
+
+			alert.show();
+
+			return true;
+		case R.id.go_to_first:
+			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE) {
+				mViewPager.setCurrentItem(app.getCurrent().getQtyPages() - 1);
+			} else {
+				mViewPager.setCurrentItem(0);
+			}
+			;
+			return true;
+		case R.id.go_to_last:
+			if (sb.getReading_mode() == SettingBean.OCCIDENTAL_MODE) {
+				mViewPager.setCurrentItem(app.getCurrent().getQtyPages() - 1);
+			} else {
+				mViewPager.setCurrentItem(0);
+			}
+			;
+			return true;
 		}
-		if(app.getSettingBean().getReading_mode()==selectOption){
-			showToast("You are already in this mode.",false);
-		}else{
-			int currentItem = Math.abs(app.getCurrent().getQtyPages() - 1 - mViewPager.getCurrentItem());
-			app.getSettingBean().setReading_mode(selectOption);
+		if (sb.getReading_mode() == selectOption) {
+			showToast("You are already in this mode.", false);
+		} else {
+			int currentItem = Math.abs(app.getCurrent().getQtyPages() - 1
+					- mViewPager.getCurrentItem());
+			sb.setReading_mode(selectOption);
 			adapter.inverseOrder();
 			mViewPager.setAdapter(adapter);
 			mViewPager.setCurrentItem(currentItem);
-			new DataBaseHandler(this).updateSetting(app.getSettingBean());
+			new DataBaseHandler(this).updateSetting(sb);
+			app.setSettingBean(null);
 		}
 		return true;
 	}
-	
+
 	@Override
-	 public void onConfigurationChanged(Configuration newConfig) {
+	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		adapter.resizeImage();
 	}
@@ -153,7 +220,8 @@ public class GallerySwipeActivity extends Activity {
 			views = new ArrayList<WebViewImageLayout>();
 
 			this.context = context;
-			if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE) {
+			SettingBean sb = app.getSettingBean();
+			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE) {
 				for (int i = app.getCurrent().getImages().size() - 1; i >= 0; i--) {
 					String strImageFile = app.getCurrent().getImages().get(i);
 					WebViewImageLayout wv = new WebViewImageLayout(
@@ -219,12 +287,13 @@ public class GallerySwipeActivity extends Activity {
 			int height = display.getHeight();
 
 			WebViewImageLayout wv = null;
-			
-			
-			if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE)
+
+			SettingBean sb = app.getSettingBean();
+
+			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
 				for (int i = views.size() - 1; i >= 0; i--) {
 					wv = views.get(i);
-					wv.startLoader(width, height,true);
+					wv.startLoader(width, height, true);
 				}
 			else
 				for (int i = 0; i < views.size(); i++) {
@@ -236,14 +305,15 @@ public class GallerySwipeActivity extends Activity {
 		@SuppressWarnings("deprecation")
 		public void resizeImage() {
 			WebViewImageLayout wv = null;
-			
+
 			WindowManager wm = (WindowManager) context
 					.getSystemService(Context.WINDOW_SERVICE);
 			Display display = wm.getDefaultDisplay();
 			int width = display.getWidth();
 			int height = display.getHeight();
-			
-			if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE)
+
+			SettingBean sb = app.getSettingBean();
+			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
 				for (int i = views.size() - 1; i >= 0; i--) {
 					wv = views.get(i);
 					wv.resizeImage(width, height);
@@ -254,18 +324,20 @@ public class GallerySwipeActivity extends Activity {
 					wv.resizeImage(width, height);
 				}
 		}
-		
-		public void inverseOrder(){
+
+		public void inverseOrder() {
 			ArrayList<WebViewImageLayout> result = new ArrayList<WebViewImageLayout>();
+
+			SettingBean sb = app.getSettingBean();
 			for (int i = views.size() - 1; i >= 0; i--) {
-				if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE)
+				if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
 					views.get(i).changeJapaneseMode(true);
 				else
 					views.get(i).changeJapaneseMode(false);
 				result.add(views.get(i));
 			}
 			views = result;
-			
+
 		}
 	}
 }

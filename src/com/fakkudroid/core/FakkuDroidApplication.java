@@ -14,10 +14,13 @@ public class FakkuDroidApplication extends Application {
 	private SettingBean settingBean = null;
 	
 	public SettingBean getSettingBean() {
-		DataBaseHandler db = new DataBaseHandler(this.getApplicationContext());
-		settingBean = db.getSetting();
-		if(settingBean==null)
-			settingBean = db.addSetting();
+		if(settingBean==null){
+			DataBaseHandler db = new DataBaseHandler(this.getApplicationContext());
+			settingBean = db.getSetting();
+
+			if(settingBean==null)
+				settingBean = db.addSetting();
+		}
 		
 		return settingBean;
 	}

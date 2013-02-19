@@ -78,5 +78,8 @@
     <string name="comments">Comments</string>
     <string name="related_content">Related Content</string>
     <string name="in_construction">In Construction</string>
-
+    <string name="go_to">Go to&#8230;</string>
+	<string name="go_to_first">Go to First Page</string>
+	<string name="go_to_last">Go to Last Page</string>
+	<string name="error_page_out">Error: Number Page</string>
 </resources>

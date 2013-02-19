@@ -241,6 +241,7 @@ public class DoujinActivity extends Activity {
 				SettingBean s = app.getSettingBean(); 
 				s.setChecked(false);
 				new DataBaseHandler(DoujinActivity.this).updateSetting(s);
+				app.setSettingBean(null);
 			} else {
 				Boolean b = bool[0];
 				try {

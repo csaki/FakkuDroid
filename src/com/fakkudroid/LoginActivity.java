@@ -203,6 +203,7 @@ public class LoginActivity extends Activity {
 				s.setChecked(result);
 				
 				new DataBaseHandler(LoginActivity.this).updateSetting(s);
+				app.setSettingBean(null);
 			} catch (ClientProtocolException e) {
 				Log.e(this.getClass().toString(), e.getMessage(), e);
 			} catch (IOException e) {

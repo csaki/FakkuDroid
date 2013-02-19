@@ -99,7 +99,8 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 			result.setReading_mode(cursor.getInt(4));
 			result.setPin(cursor.getString(5));
 		}
-
+		
+		db.close();
 		// return contact list
 		return result;
 	}

@@ -84,9 +84,6 @@ public class DoujinListActivity extends ListActivity{
 
 		app = (FakkuDroidApplication) getApplication();
 		ListView list = (ListView) findViewById(android.R.id.list);
-		WebView wvTrampa = (WebView) findViewById(R.id.wvTrampa);
-		wvTrampa.loadUrl(Constants.SITEDOWNLOAD);
-		wvTrampa.setWebViewClient(new WebViewClient());
 		loadPage();
 	}
 
@@ -173,6 +170,7 @@ public class DoujinListActivity extends ListActivity{
 			SettingBean sb = app.getSettingBean();
 			sb.setChecked(false);
 			new DataBaseHandler(this).updateSetting(sb);
+			app.setSettingBean(null);
 			FakkuConnection.disconnect();
 			Toast.makeText(this, getResources().getString(R.string.loggedout), Toast.LENGTH_SHORT).show();
 			break;
