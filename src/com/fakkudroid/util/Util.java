@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
@@ -17,8 +18,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import com.fakkudroid.R;
+
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.view.View;
 
 public class Util {
 
@@ -127,58 +132,23 @@ public class Util {
 		return ret;
 	}
 
-	public static String createHTMLImage(String url, float width, float height, boolean japaneseMode) {
+	public static String createHTMLImage(String url, float width, float height, boolean japaneseMode, Resources res) {
 		url = Util.escapeURL(url);
-		StringBuilder html = new StringBuilder("<html><head><script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js\"></script>");
-		html.append("</head><body style=\"margin: 0 0 0 0;\">");
-		StringBuilder js = new StringBuilder();
-		js.append("<script type=\"text/javascript\">");
-		js.append("$(window).load(function() {resizeAll(");
-		js.append(width);
-		js.append(",");
-		js.append(height);
-		js.append(");});");
-		js.append("$(window).bind(\"resize\", resizeWindow);function resizeWindow( e ) {if(first){");
-		js.append("if(japaneseMode)");
-		js.append("$('body').scrollLeft(5000);else $('body').scrollLeft(0);}first = false;}");
-		js.append("var japaneseMode = " + japaneseMode + ";var first = true;");
-		js.append("function resizeAll(maxWidth, maxHeight){");
-		js.append("$('.resized').each(function() {\n");
+		String html = res.getString(R.string.image_html);
+		html = html.replace("@width", width + "");
+		html = html.replace("@height", height + "");
+		html = html.replace("@japaneseMode", japaneseMode + "");
+		html = html.replace("@url", url);		
 		
-		js.append("var ratio = 0;var width = $(this).width();var height = $(this).height();\n");
-		js.append("if(width<=height||maxWidth>maxHeight){\n");
-		js.append("ratio = maxWidth / width;\n");
-		js.append("$(this).css(\"width\", maxWidth);\n");
-		js.append("$(this).css(\"height\", height * ratio);\n");
-		js.append("height = height * ratio;\n");
-		js.append("width = width * ratio;\n");
-		js.append("}else{\n");
-		js.append("ratio = maxHeight / height;\n");
-		js.append("$(this).css(\"height\", maxHeight);\n");
-		js.append("$(this).css(\"width\", width * ratio);\n");
-		js.append("width = width * ratio;}});");
-		js.append("if(japaneseMode)");
-		js.append("$('body').scrollLeft(5000);else $('body').scrollLeft(0);");
-		js.append("}\n");
-		
-		js.append("</script>");
-		
-		html.append(js);
-		String result = "<img class=\"resized\" src = \"" + url + "\" style=\"padding:0px;\"/>";
-
-		html.append(result);
-		html.append("</body></html>");
-
-		return html.toString();
+		return html;
 	}
 
-	public static String createHTMLImagePercentage(String url, int pct) {
+	public static String createHTMLImagePercentage(String url, int pct, Resources res) {
 		url = Util.escapeURL(url);
-
-		String result = "<html><body style=\"margin: 0 0 0 0;\"><img style=\"width:percentage%;\" src =\""
-				+ url + "\" style=\"padding:0px;\"/></body></html>";
-		result = result.replace("width:percentage", "width:" + pct);
-		return result;
+		String html = res.getString(R.string.image_html_percent);
+		html = html.replace("@percentage", pct + "");		
+		html = html.replace("@url", url);		
+		return html;
 	}
 	
 }

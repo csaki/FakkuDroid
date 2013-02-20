@@ -9,7 +9,7 @@ public class Constants {
 	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html"; 
 	public static String SITEABOUT = "http://fakkudroid.blogspot.com/2013/01/about-fakkudroid.html"; 
 	public static String SITEROOT = "http://www.fakku.net"; 
-	public static String SITEIMAGE = "http://cdn.fakku.net/8041E1/c/";
+	public static String SITEIMAGE = "http://cdn.fakku.net/8041E1/c";
 	public static String SITEFAVORITE = "http://www.fakku.net/users/usr/favorites?mode=viewfavorites&u=2&start=";
 	public static String PAGE = "/page/";
 

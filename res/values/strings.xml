@@ -81,5 +81,68 @@
     <string name="go_to">Go to&#8230;</string>
 	<string name="go_to_first">Go to First Page</string>
 	<string name="go_to_last">Go to Last Page</string>
-	<string name="error_page_out">Error: Number Page</string>
+	<string name="error_page_out">Error: Number Page</string>	
+	<string name="image_html">
+	    <![CDATA[
+	    	<html>
+	    		<head>
+	    			<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js\"></script>
+	    		</head>
+	    		<body style=\"margin: 0 0 0 0;\">
+	    			<script type=\"text/javascript\">
+	    				$(window).load(function() {resizeAll(@width,@height);});
+	    				$(window).bind(\'resize\', resizeWindow);
+	    				
+	    				function resizeWindow(e) {
+	    					if(first){
+	    						if(japaneseMode)
+	    							$(\'body\').scrollLeft(5000);
+	    						else 
+	    							$(\'body\').scrollLeft(0);
+	    					}
+	    					first = false;
+	    				}
+	    				
+	    				var japaneseMode = @japaneseMode;
+	    				var first = true;
+	    				
+	    				function resizeAll(maxWidth, maxHeight){
+	    					$(\'.resized\').each(function() {
+	    						var ratio = 0;
+	    						var width = $(this).width();
+	    						var height = $(this).height();
+	    						if(width<=height||maxWidth>maxHeight){
+	    							ratio = maxWidth / width;
+	    							$(this).css(\'width\', maxWidth);
+	    							$(this).css(\'height\', height * ratio);
+	    							height = height * ratio;
+	    							width = width * ratio;
+	    						}else{
+	    							ratio = maxHeight / height;
+	    							$(this).css(\'height\', maxHeight);
+	    							$(this).css(\'width\', width * ratio);
+	    							width = width * ratio;
+	    						}
+	    					});
+	    					if(japaneseMode)
+	    						$(\'body\').scrollLeft(5000);
+	    					else 
+	    						$(\'body\').scrollLeft(0);
+	    							
+	    				}	
+	    			</script>
+	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\"/>
+	    		</body>
+	    	</html>
+	    ]]>	    
+	</string>
+	<string name="image_html_percent">
+	    <![CDATA[
+	    	<html>
+	    		<body style=\"margin: 0 0 0 0;\">
+	    			<img style=\"width:@percentage%;\" src =\"@url\" style=\"padding:0px;\"/>
+	    		</body>
+	    	</html>
+	    ]]>
+	</string>
 </resources>

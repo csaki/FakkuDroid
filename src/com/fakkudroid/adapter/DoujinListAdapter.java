@@ -60,8 +60,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		holder.wvPage.setClickable(false);
 		holder.wvPage.setFocusableInTouchMode(false);
 		
-		holder.wvTitle.loadDataWithBaseURL(null,Util.createHTMLImagePercentage(s.getUrlImageTitle(),100),"text/html", "utf-8",null);		
-		holder.wvPage.loadDataWithBaseURL(null,Util.createHTMLImagePercentage(s.getUrlImagePage(),100),"text/html", "utf-8",null);		
+		holder.wvTitle.loadDataWithBaseURL(null,Util.createHTMLImagePercentage(s.getUrlImageTitle(),100,parent.getResources()),"text/html", "utf-8",null);		
+		holder.wvPage.loadDataWithBaseURL(null,Util.createHTMLImagePercentage(s.getUrlImagePage(),100,parent.getResources()),"text/html", "utf-8",null);		
 		return convertView;
 	}
 	

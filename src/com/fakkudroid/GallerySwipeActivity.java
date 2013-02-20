@@ -1,6 +1,7 @@
 package com.fakkudroid;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -222,8 +223,9 @@ public class GallerySwipeActivity extends Activity {
 			this.context = context;
 			SettingBean sb = app.getSettingBean();
 			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE) {
-				for (int i = app.getCurrent().getImages().size() - 1; i >= 0; i--) {
-					String strImageFile = app.getCurrent().getImages().get(i);
+				List<String> lstImages= app.getCurrent().getImages();
+				for (int i = lstImages.size() - 1; i >= 0; i--) {
+					String strImageFile = lstImages.get(i);
 					WebViewImageLayout wv = new WebViewImageLayout(
 							strImageFile, GallerySwipeActivity.this);
 					views.add(wv);

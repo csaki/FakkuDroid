@@ -167,10 +167,10 @@ public class DoujinActivity extends Activity {
 		tvTranslator.setText(content);
 
 		wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-				.getCurrent().getUrlImageTitle(), 100), "text/html", "utf-8",
+				.getCurrent().getUrlImageTitle(), 100, this.getResources()), "text/html", "utf-8",
 				null);
 		wvPage.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-				.getCurrent().getUrlImagePage(), 100), "text/html", "utf-8",
+				.getCurrent().getUrlImagePage(), 100,this.getResources()), "text/html", "utf-8",
 				null);
 
 		tvUploader.setOnClickListener(new OnClickListener() {

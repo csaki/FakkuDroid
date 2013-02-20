@@ -74,7 +74,7 @@ public class WebViewImageLayout extends RelativeLayout{
 	public void startLoader(int width, int height, boolean japaneseMode){
 		height-= getBarHeight();
 		wb.loadDataWithBaseURL(null,
-				Util.createHTMLImage(imageFile, width/wb.getScale(), height/wb.getScale(), japaneseMode),
+				Util.createHTMLImage(imageFile, width/wb.getScale(), height/wb.getScale(), japaneseMode, this.getResources()),
 				"text/html", "utf-8", null);
 	}
 	
