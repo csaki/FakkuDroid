@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/darker_gray" >
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.52"
+            android:background="@android:color/darker_gray"
+            android:orientation="vertical" >
+			
+            <LinearLayout 
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+	            <TextView
+	                android:id="@+id/tvUser"
+	                android:layout_width="wrap_content"
+	                android:layout_height="25dp"
+	                android:layout_gravity="center_vertical"
+	                android:text="User"
+	                android:textAppearance="?android:attr/textAppearanceSmall" 
+	                android:textColor="@color/url_color" />
+	            <TextView
+	                android:id="@+id/tvRank"
+	                android:layout_width="wrap_content"
+	                android:layout_height="25dp"
+	                android:layout_gravity="center_vertical"
+	                android:text="Rank"
+	                android:layout_marginLeft="10dp"
+	                android:textAppearance="?android:attr/textAppearanceSmall" 
+	                android:textColor="@color/rank_color" />                
+            </LinearLayout>
+            
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:text="Date"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </LinearLayout>
+
+        <view
+            android:id="@+id/btnReply"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="0.16"
+            class="com.fakkudroid.util.ActionImageButton2"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/reply"
+            android:scaleType="center"
+            android:src="@drawable/social_reply" />
+        
+        <view
+            android:id="@+id/btnLike"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="0.16"
+            class="com.fakkudroid.util.ActionImageButton2"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/like"
+            android:scaleType="center"
+            android:src="@drawable/navigation_collapse" />
+
+        <view
+            android:id="@+id/btnDisLike"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="0.16"
+            class="com.fakkudroid.util.ActionImageButton2"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/dislike"
+            android:scaleType="center"
+            android:src="@drawable/navigation_expand" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlComment"
+        android:background="@android:color/darker_gray" >
+
+        <TextView
+            android:id="@+id/tvComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:text="User comment"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </RelativeLayout>
+	<Button 
+	    android:id="@+id/btnLoadMore"
+	    android:text="@string/load_more"
+	    android:background="@android:color/white"
+	    android:layout_width="match_parent"
+	    android:layout_height="50dp"
+	    android:textColor="@color/main_color"
+	    android:visibility="gone"/>
+</LinearLayout>

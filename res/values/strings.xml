@@ -68,7 +68,6 @@
     <string name="previous_page">Previous Page</string>
     <string name="page_1">Page 1</string>
     <string name="browse">Browse</string>
-    <string name="tutorial_change_reading_mode">Press and hold to change reading mode</string>
     <string name="logged">You are logged in.</string>
     <string name="added_favorite">Added to Favorite</string>
     <string name="removed_favorite">Removed from Favorite</string>
@@ -82,6 +81,12 @@
 	<string name="go_to_first">Go to First Page</string>
 	<string name="go_to_last">Go to Last Page</string>
 	<string name="error_page_out">Error: Number Page</string>	
+	<string name="reply">Reply</string>	
+	<string name="like">Like +1</string>	
+	<string name="dislike">Dislike -1</string>	
+	<string name="come_back">Come back</string>	
+	<string name="soon">Soon</string>	
+	<string name="load_more">Load more&#8230;</string>	
 	<string name="image_html">
 	    <![CDATA[
 	    	<html>

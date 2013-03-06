@@ -39,7 +39,12 @@
         <LinearLayout
             style="@style/LoginFormContainer"
             android:orientation="vertical" >
-
+			
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/logofakku" />
+            
             <EditText
                 android:id="@+id/user"
                 android:layout_width="match_parent"

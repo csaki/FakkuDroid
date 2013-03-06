@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.fakkudroid.util.NoZoomControllWebView;
 import com.fakkudroid.util.Util;
 import com.fakkudroid.R;
 
@@ -17,7 +18,7 @@ public class WebViewImageLayout extends RelativeLayout{
 
 	String imageFile;
 	ProgressBar bar;
-	WebView wb;
+	NoZoomControllWebView wb;
 	
 	private WebViewImageLayout(Context context){
 		super(context);
@@ -36,8 +37,7 @@ public class WebViewImageLayout extends RelativeLayout{
 		bar.setId(R.id.view_status);
 		bar.setMax(100);
 		
-		wb = new WebView(getContext());
-		wb.getSettings().setBuiltInZoomControls(true);
+		wb = new NoZoomControllWebView(getContext());
 		wb.getSettings().setJavaScriptEnabled(true);
 		
 		this.bar.setProgress(0);

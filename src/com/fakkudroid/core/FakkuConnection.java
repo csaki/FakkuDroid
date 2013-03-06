@@ -2,9 +2,13 @@ package com.fakkudroid.core;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,6 +24,7 @@ import org.apache.http.protocol.HTTP;
 
 import android.util.Log;
 
+import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.util.Constants;
@@ -95,25 +100,127 @@ public class FakkuConnection {
 			cookiesStore = cookies;
 		return result;
 	}
-
-	public static void removeFromFavorites(DoujinBean doujinBean) throws ExceptionNotLoggedIn, IOException{
+	
+	public static void transaction(String url) throws ExceptionNotLoggedIn, IOException{
 		if(cookiesStore==null)
 			throw new ExceptionNotLoggedIn();
 		
-		String html = Util.getHTML(doujinBean.urlFavorite(Constants.SITEREMOVEFAVORITE), cookiesStore);
+		String html = Util.getHTML(url, cookiesStore);
 		
 		if(html.contains("Please enter your username and password to login"))
 			throw new ExceptionNotLoggedIn();
 	}
+	
+	public static LinkedList<CommentBean> parseComments(String url, Object[] moreComments)
+			throws ClientProtocolException, IOException, URISyntaxException {
+		LinkedList<CommentBean> result = new LinkedList<CommentBean>();
+		
+		String html = Util.getHTML(url, cookiesStore);
+		
+		String token = "<div class=\"manga_ comment-row\">|<div class=\"reply_ comment-row\">|<div class=\"tree_ comment-row\">";
+		html = html.replaceAll("<div class=\"manga_ comment-row\">", "<div class=\"manga_ comment-row\">manga");
+		html = html.replaceAll("<div class=\"reply_ comment-row\">", "<div class=\"reply_ comment-row\">reply");
+		html = html.replaceAll("<div class=\"tree_ comment-row\">", "<div class=\"tree_ comment-row\">tree");
+		String[] sections = html.split(token);
+		moreComments[0] = html.contains(">View More<");
+		
+		for(int i = 1; i<sections.length; i++) {
+			String section = sections[i];
+			int level = 0;
+			if(section.startsWith("manga")){
+				level = 0;
+			}else if(section.startsWith("reply")){
+				level = 1;
+			}else if(section.startsWith("tree")){
+				level = 2;
+			}else{
+				continue;
+			}
+			CommentBean c = new CommentBean();
+			c.setLevel(level);
+			
+			token = "<a id=\"";
+			String value = "";
+			int idxStart = section.indexOf(token) + token.length();
+			int idxEnd = section.indexOf("\"", idxStart);
+			value = section.substring(idxStart, idxEnd);			
+			
+			c.setId(value);
 
-	public static void addToFavorites(DoujinBean doujinBean) throws ExceptionNotLoggedIn, IOException{
-		if(cookiesStore==null)
-			throw new ExceptionNotLoggedIn();
+			URLBean user = new URLBean();
+			
+			token = "<a href=\"";
+			idxStart = section.indexOf(token) + token.length();
+			idxEnd = section.indexOf("\"", idxStart);
+			value = section.substring(idxStart, idxEnd);
+			
+			user.setUrl(Constants.SITEROOT+value);
+			
+			token = ">";
+			idxStart = section.indexOf(token, idxStart) + token.length();
+			idxEnd = section.indexOf("<", idxStart);
+			value = section.substring(idxStart, idxEnd);
+			
+			user.setDescription(value);
+			
+			c.setUser(user);
+			
+			token = "<span itemprop=\"commentTime\">";
+			idxStart = section.indexOf(token) + token.length();
+			idxEnd = section.indexOf("<", idxStart);
+			value = section.substring(idxStart, idxEnd);
+			
+			c.setDate(value);
+			
+			idxStart = section.indexOf("class=\"rank\"");
+			
+			token = "href=\"";
+			idxStart = section.indexOf(token,idxStart) + token.length();
+			idxEnd = section.indexOf("\"", idxStart);
+			value = section.substring(idxStart, idxEnd);
+			
+			c.setUrlLike(value);
+			
+			token = "href=\"";
+			idxStart = section.indexOf(token,idxStart) + token.length();
+			idxEnd = section.indexOf("\"", idxStart);
+			value = section.substring(idxStart, idxEnd);
+			
+			c.setUrlDislike(value);
+			
+			if(section.contains("class=\"arrow selected like\"")){
+				c.setSelectLike(1);
+			}else if(section.contains("class=\"arrow selected dislike\"")){
+				c.setSelectLike(-1);
+			}
+			
+			token = "<i class=\"plus\">";
+			if(!section.contains(token)){
+				token = "<i class=\"minus\">";
+			}
+			if(section.contains(token)){
+				idxStart = section.indexOf(token) + token.length();
+				idxEnd = section.indexOf(" ", idxStart);
+				value = section.substring(idxStart, idxEnd);
+				
+				if(value.startsWith("+"))
+					c.setRank(Integer.parseInt(value.substring(1)));
+				else
+					c.setRank(Integer.parseInt(value));
+			}
+			
+			
+			token = "comment_text\" itemprop=\"commentText\">";
+			idxStart = section.indexOf(token) + token.length();
+			idxEnd = section.indexOf("</div>", idxStart);
+			value = section.substring(idxStart, idxEnd);
+			
+			c.setComment(value);
+			
+			result.add(c);
+		}
 		
-		String html = Util.getHTML(doujinBean.urlFavorite(Constants.SITEADDFAVORITE), cookiesStore);
-		
-		if(html.contains("Please enter your username and password to login"))
-			throw new ExceptionNotLoggedIn();
+		return result;
 	}
 	
 	public static LinkedList<DoujinBean> parseHTMLCatalog(String url)

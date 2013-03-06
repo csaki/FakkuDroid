@@ -14,10 +14,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.InputType;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
-import android.view.MenuInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,7 +37,7 @@ public class GallerySwipeActivity extends Activity {
 	FakkuDroidApplication app;
 	ViewPager mViewPager;
 	Toast toast;
-	MyPagerAdapter adapter;
+	GalleryPagerAdapter adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +45,7 @@ public class GallerySwipeActivity extends Activity {
 		setContentView(R.layout.activity_gallery_swipe);
 
 		app = (FakkuDroidApplication) getApplication();
-		adapter = new MyPagerAdapter(this);
+		adapter = new GalleryPagerAdapter(this);
 		mViewPager = (ViewPager) findViewById(R.id.viewPager);
 		mViewPager.setAdapter(adapter);
 
@@ -76,12 +74,6 @@ public class GallerySwipeActivity extends Activity {
 			public void onPageScrollStateChanged(int arg0) {
 			}
 		});
-
-		registerForContextMenu(mViewPager);
-
-		showToast(
-				getResources().getString(R.string.tutorial_change_reading_mode),
-				true);
 	}
 
 	void showToast(String txt, boolean isLongPress) {
@@ -94,17 +86,16 @@ public class GallerySwipeActivity extends Activity {
 			toast = Toast.makeText(this, txt, Toast.LENGTH_SHORT);
 		toast.show();
 	}
-
+	
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.activity_gallery, menu);
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.activity_gallery, menu);
+		return true;
 	}
-
+	
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(MenuItem item) {
 		int selectOption = -1;
 		SettingBean sb = app.getSettingBean();
 		switch (item.getItemId()) {
@@ -174,7 +165,7 @@ public class GallerySwipeActivity extends Activity {
 		}
 		if (sb.getReading_mode() == selectOption) {
 			showToast("You are already in this mode.", false);
-		} else {
+		} else if (SettingBean.JAPANESE_MODE == selectOption||SettingBean.OCCIDENTAL_MODE == selectOption){
 			int currentItem = Math.abs(app.getCurrent().getQtyPages() - 1
 					- mViewPager.getCurrentItem());
 			sb.setReading_mode(selectOption);
@@ -200,24 +191,13 @@ public class GallerySwipeActivity extends Activity {
 			adapter.load();
 		}
 	}
-
-	/**
-	 * This is a helper class that implements the management of tabs and all
-	 * details of connecting a ViewPager with associated TabHost. It relies on a
-	 * trick. Normally a tab host has a simple API for supplying a View or
-	 * Intent that each tab will show. This is not sufficient for switching
-	 * between pages. So instead we make the content part of the tab host 0dp
-	 * high (it is not shown) and the TabsAdapter supplies its own dummy view to
-	 * show as the tab content. It listens to changes in tabs, and takes care of
-	 * switch to the correct paged in the ViewPager whenever the selected tab
-	 * changes.
-	 */
-	public class MyPagerAdapter extends PagerAdapter {
+	
+	class GalleryPagerAdapter extends PagerAdapter {
 
 		private ArrayList<WebViewImageLayout> views;
 		Context context;
 
-		public MyPagerAdapter(Context context) {
+		public GalleryPagerAdapter(Context context) {
 			views = new ArrayList<WebViewImageLayout>();
 
 			this.context = context;

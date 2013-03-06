@@ -1,6 +1,5 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".DoujinActivity" >
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <!-- Login progress -->
 
@@ -10,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center_horizontal"
-        android:orientation="vertical"  >
+        android:orientation="vertical" >
 
         <ProgressBar
             style="?android:attr/progressBarStyleLarge"
@@ -26,14 +25,11 @@
             android:text="@string/loading"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
-	
-    <!-- Login form -->
 
     <RelativeLayout
         android:id="@+id/view_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/ll2"
@@ -42,28 +38,28 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:background="@android:color/white"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:padding="2dp" 
-            android:gravity="center">
+            android:padding="2dp" >
 
             <view
-                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnAddToFavorite"
                 android:layout_width="0dp"
-                android:layout_weight="0.2"
                 android:layout_height="50dp"
+                android:layout_weight="0.2"
+                class="com.fakkudroid.util.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/add_favorite"
                 android:onClick="addOrRemoveFavorite"
                 android:scaleType="center"
                 android:src="@drawable/rating_not_important" />
-            
+
             <view
-                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnRefresh"
                 android:layout_width="0dp"
-                android:layout_weight="0.2"
                 android:layout_height="50dp"
+                android:layout_weight="0.2"
+                class="com.fakkudroid.util.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/button_refresh"
                 android:onClick="refresh"
@@ -71,23 +67,23 @@
                 android:src="@drawable/navigation_refresh" />
 
             <view
-                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnViewInBrowser"
                 android:layout_width="0dp"
-                android:layout_weight="0.2"
                 android:layout_height="50dp"
+                android:layout_weight="0.2"
+                class="com.fakkudroid.util.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/view_browser"
                 android:onClick="viewInBrowser"
                 android:scaleType="center"
                 android:src="@drawable/location_web_site" />
-            
+
             <view
-                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnComments"
                 android:layout_width="0dp"
-                android:layout_weight="0.2"
                 android:layout_height="50dp"
+                android:layout_weight="0.2"
+                class="com.fakkudroid.util.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/comments"
                 android:onClick="comments"
@@ -95,199 +91,35 @@
                 android:src="@drawable/social_chat" />
 
             <view
-                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnRelatedContent"
                 android:layout_width="0dp"
-                android:layout_weight="0.2"
                 android:layout_height="50dp"
+                android:layout_weight="0.2"
+                class="com.fakkudroid.util.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/related_content"
                 android:onClick="relatedContent"
                 android:scaleType="center"
                 android:src="@drawable/collections_labels" />
-            
+
             <view
-                class="com.fakkudroid.util.ActionImageButton"
                 android:id="@+id/btnReadOnline"
                 android:layout_width="0dp"
-                android:layout_weight="0.2"
                 android:layout_height="50dp"
+                android:layout_weight="0.2"
+                class="com.fakkudroid.util.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/read_online"
                 android:onClick="readOnline"
                 android:scaleType="center"
                 android:src="@drawable/av_play" />
-
         </LinearLayout>
 
-        <ScrollView
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/ll2"
-            android:fillViewport="true" >
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    android:id="@+id/tvDoujin"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:gravity="center"
-                    android:padding="10dp"
-                    android:text="@string/fail_load_title_doujin"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/main_color" />
-
-                <LinearLayout
-                    android:id="@+id/ll"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/tvDoujin"
-                    android:orientation="horizontal"
-                    android:padding="10dp" 
-                    android:gravity="center"
-                    android:background="@android:color/white">
-
-                    <WebView
-                        android:id="@+id/wvTitle"
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
-                        android:scrollbars="none"
-            			android:scaleType="fitXY"
-                        android:layout_marginRight="2dp"
-                        android:src="@drawable/loading" />
-
-                    <WebView
-                        android:id="@+id/wvPage"
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
-                        android:scrollbars="none"
-                        android:layout_marginLeft="2dp"
-            			android:scaleType="fitXY"
-                        android:src="@drawable/loading" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/ll"
-                    android:orientation="vertical"
-                    android:padding="10dp" >
-
-                    <TextView
-                        android:id="@+id/tvUploader"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/fail_load_uploader_doujin"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@color/url_color" />
-
-                    <TextView
-                        android:id="@+id/tvQtyPages"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="@string/fail_load_page_doujin"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="@android:color/darker_gray" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/label_serie"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvSerie"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fail_load_serie_doujin"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_artist"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvArtist"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fail_load_artist_doujin"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_description"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fail_load_description_doujin"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/darker_gray" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_language"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvLanguage"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fail_load_language_doujin"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_translator"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvTranslator"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/fail_load_translator_doujin"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_tags"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/llTags"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" >
-                    </LinearLayout>
-                </LinearLayout>
-            </RelativeLayout>
-        </ScrollView>
+            android:layout_above="@+id/ll2" />
     </RelativeLayout>
 
 </merge>

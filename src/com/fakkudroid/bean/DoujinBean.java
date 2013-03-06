@@ -46,6 +46,13 @@ public class DoujinBean {
 		return urlFavorite + url.substring(idxStart);
 	}
 	
+	public String urlComments(int page){
+		int idxStart = url.lastIndexOf("/");
+		idxStart = url.substring(0, idxStart).lastIndexOf("/") + 1;
+		
+		return Constants.SITECOMMENTS.replace("@id",url.substring(idxStart)).replace("@page", page*20+"");
+	}
+	
 	public String urlRelated(int nroPage){
 		int idxStart = url.lastIndexOf("/");
 		idxStart = url.substring(0, idxStart).lastIndexOf("/") + 1;

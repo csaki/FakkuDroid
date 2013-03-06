@@ -7,7 +7,6 @@ import org.apache.http.client.ClientProtocolException;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,47 +14,72 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Html;
-import android.text.SpannableString;
-import android.text.method.LinkMovementMethod;
-import android.text.style.UnderlineSpan;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.webkit.WebView;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.SettingBean;
-import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Util;
-import com.fakkudroid.R;
+import com.fakkudroid.fragment.CommentListFragment;
+import com.fakkudroid.fragment.DoujinDetailFragment;
+import com.fakkudroid.util.ActionImageButton;
+import com.fakkudroid.util.Constants;
 
-public class DoujinActivity extends Activity {
+public class DoujinActivity extends FragmentActivity {
 
 	private FakkuDroidApplication app;
+	ViewPager mViewPager;
+	DoujinPagerAdapter adapter;
 	private View mFormView;
 	private View mStatusView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.activity_doujin);
-
-		mFormView = findViewById(R.id.view_form);
-		mStatusView = findViewById(R.id.view_status);
 
 		app = (FakkuDroidApplication) getApplication();
 
-		new CompleteDoujin().execute(app.getCurrent());
+		mFormView = findViewById(R.id.view_form);
+		mStatusView = findViewById(R.id.view_status);
+		adapter = new DoujinPagerAdapter(getSupportFragmentManager());
+		mViewPager = (ViewPager) findViewById(R.id.viewPager);
+		mViewPager.setAdapter(adapter);
+		final ActionImageButton btnComments = (ActionImageButton) findViewById(R.id.btnComments);
+		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+			}
+
+			@Override
+			public void onPageSelected(int arg0) {
+				if (arg0 == 1){
+					if (!adapter.getCommentList().isListCharged()) {
+						adapter.getCommentList().refresh();
+					}
+					btnComments.setImageResource(R.drawable.navigation_previous_item);
+					btnComments.setContentDescription(getResources().getString(R.string.come_back));
+				}else{
+					btnComments.setImageResource(R.drawable.social_chat);
+					btnComments.setContentDescription(getResources().getString(R.string.comments));
+				}
+			}
+		});
 	}
 
 	public void viewInBrowser(View view) {
@@ -65,24 +89,23 @@ public class DoujinActivity extends Activity {
 	}
 
 	public void refresh(View view) {
-		showProgress(true);
-		new CompleteDoujin().execute(app.getCurrent());
+		if (adapter.getCurrentPosition() == 0) {
+			adapter.getDoujinDetail().refresh();
+		} else {
+			adapter.getCommentList().refresh();
+		}
 	}
 
 	public void readOnline(View view) {
-		Intent it = new Intent(DoujinActivity.this, GallerySwipeActivity.class);
-		DoujinActivity.this.startActivity(it);
-	}
-	
-	public void relatedContent(View view) {
-		Intent it = new Intent(DoujinActivity.this, RelatedContentListActivity.class);
-		DoujinActivity.this.startActivity(it);
-	}
-	
-	public void comments(View view) {
-		Toast.makeText(this, getResources().getString(R.string.in_construction), Toast.LENGTH_LONG).show();
+		Intent it = new Intent(this, GallerySwipeActivity.class);
+		this.startActivity(it);
 	}
 
+	public void relatedContent(View view) {
+		Intent it = new Intent(this, RelatedContentListActivity.class);
+		this.startActivity(it);
+	}
+	
 	public void addOrRemoveFavorite(View view) {
 
 		if (!app.getSettingBean().isChecked()) {
@@ -114,192 +137,18 @@ public class DoujinActivity extends Activity {
 			}
 	}
 
-	private void setComponents() {
-		TextView tvDescription = (TextView) findViewById(R.id.tvDescription);
-		TextView tvDoujin = (TextView) findViewById(R.id.tvDoujin);
-		TextView tvArtist = (TextView) findViewById(R.id.tvArtist);
-		WebView wvTitle = (WebView) findViewById(R.id.wvTitle);
-		WebView wvPage = (WebView) findViewById(R.id.wvPage);
-		TextView tvSerie = (TextView) findViewById(R.id.tvSerie);
-		TextView tvQtyPages = (TextView) findViewById(R.id.tvQtyPages);
-		TextView tvUploader = (TextView) findViewById(R.id.tvUploader);
-		TextView tvLanguage = (TextView) findViewById(R.id.tvLanguage);
-		TextView tvTranslator = (TextView) findViewById(R.id.tvTranslator);
-		LinearLayout llTags = (LinearLayout) findViewById(R.id.llTags);
-
-		String s = getResources().getString(R.string.content_pages);
-
-		s = s.replace("rpc1", "" + app.getCurrent().getQtyPages());
-		s = s.replace("rpc2", "" + app.getCurrent().getQtyFavorites());
-
-		tvQtyPages.setText(s);
-
-		s = getResources().getString(R.string.content_uploader);
-
-		s = s.replace("rpc1", app.getCurrent().getUploader().getDescription());
-		s = s.replace("rpc2", app.getCurrent().getFecha());
-		
-		SpannableString content = new SpannableString(s);
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		tvUploader.setText(content);
-
-		tvDescription.setText(Html.fromHtml(app.getCurrent().getDescription().replace("<br>", "<br/>")));
-		tvDescription.setMovementMethod(LinkMovementMethod.getInstance());
-		
-		content = new SpannableString(app.getCurrent().getTitle());
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		tvDoujin.setText(content);
-		
-		content = new SpannableString(app.getCurrent().getArtist().getDescription());
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		tvArtist.setText(content);
-		
-		content = new SpannableString(app.getCurrent().getSerie().getDescription());
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		tvSerie.setText(content);
-		
-		content = new SpannableString(app.getCurrent().getLanguage().getDescription());
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		tvLanguage.setText(content);
-		
-		content = new SpannableString(app.getCurrent().getTranslator().getDescription());
-		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-		tvTranslator.setText(content);
-
-		wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-				.getCurrent().getUrlImageTitle(), 100, this.getResources()), "text/html", "utf-8",
-				null);
-		wvPage.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-				.getCurrent().getUrlImagePage(), 100,this.getResources()), "text/html", "utf-8",
-				null);
-
-		tvUploader.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent itFavorites = new Intent(DoujinActivity.this,
-						FavoriteActivity.class);
-				itFavorites.putExtra(FavoriteActivity.INTENT_VAR_USER, app
-						.getCurrent().getUploader().getDescription());
-				DoujinActivity.this.startActivity(itFavorites);
-			}
-		});
-		tvArtist.setOnClickListener(new URLListener(app.getCurrent()
-				.getArtist(), R.string.tile_artist));
-		tvLanguage.setOnClickListener(new URLListener(app.getCurrent()
-				.getLanguage(), R.string.tile_language));
-		tvSerie.setOnClickListener(new URLListener(app.getCurrent().getSerie(),
-				R.string.tile_serie));
-		tvTranslator.setOnClickListener(new URLListener(app.getCurrent()
-				.getTranslator(), R.string.tile_translator));
-
-		for (URLBean urlBean : app.getCurrent().getLstTags()) {
-			TextView tv = (TextView) getLayoutInflater().inflate(
-					R.layout.textview_custom, null);
-			content = new SpannableString(urlBean.getDescription());			
-			content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-			tv.setText(content);
-
-			tv.setOnClickListener(new URLListener(urlBean, R.string.tile_tag));
-			llTags.addView(tv);
-		}
-
-		ImageButton btnAddToFavorite = (ImageButton) findViewById(R.id.btnAddToFavorite);
-
-		if (app.getCurrent() != null)
-			if (app.getCurrent().isAddedInFavorite()) {
-				btnAddToFavorite.setImageResource(R.drawable.rating_important);
-				btnAddToFavorite.setContentDescription(getResources().getString(R.string.remove_favorite));
-			} else {
-				btnAddToFavorite
-				.setImageResource(R.drawable.rating_not_important);
-				btnAddToFavorite.setContentDescription(getResources().getString(R.string.add_favorite));
-			}
-	}
-
-	class FavoriteDoujin extends AsyncTask<Boolean, Float, Boolean> {
-
-		protected void onPreExecute() {
-			showProgress(true);
-		}
-
-		protected Boolean doInBackground(Boolean... bool) {
-			boolean isConnected = false;
-			if (app.getSettingBean().isChecked())
-				try {
-					isConnected = FakkuConnection.connect(app.getSettingBean()
-							.getUser(), app.getSettingBean().getPassword());
-				} catch (ClientProtocolException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
-				} catch (IOException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
-				}
-
-			if (!isConnected) {
-				SettingBean s = app.getSettingBean(); 
-				s.setChecked(false);
-				new DataBaseHandler(DoujinActivity.this).updateSetting(s);
-				app.setSettingBean(null);
-			} else {
-				Boolean b = bool[0];
-				try {
-					if (b)
-						FakkuConnection.addToFavorites(app.getCurrent());
-					else
-						FakkuConnection.removeFromFavorites(app.getCurrent());
-				} catch (ExceptionNotLoggedIn e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
-				} catch (IOException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
-				}
-				app.getCurrent().setAddedInFavorite(b);
-			}
-			return isConnected;
-		}
-
-		protected void onPostExecute(Boolean bytes) {
-			showProgress(false);
-			if(bytes){
-				setComponents();
-				String text = null;
-				
-				if(app.getCurrent().isAddedInFavorite())
-					text = getResources().getString(R.string.added_favorite);
-				else
-					text = getResources().getString(R.string.removed_favorite);
-				Toast.makeText(DoujinActivity.this, text, Toast.LENGTH_SHORT).show();
-			}else{
-				AlertDialog.Builder builder = new AlertDialog.Builder(DoujinActivity.this);
-				builder.setMessage(R.string.login_please)
-						.setPositiveButton(R.string.login,
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										Intent it = new Intent(DoujinActivity.this,
-												LoginActivity.class);
-										DoujinActivity.this.startActivity(it);
-									}
-								})
-						.setNegativeButton(R.string.cancel,
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										return;
-									}
-								}).create().show();
-			}
-		}
+	public void comments(View view) {
+		if (mViewPager.getCurrentItem() == 0)
+			mViewPager.setCurrentItem(1);
+		else
+			mViewPager.setCurrentItem(0);
 	}
 
 	/**
 	 * Shows the progress UI and hides the login form.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-	private void showProgress(final boolean show) {
+	public void showProgress(final boolean show) {
 		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
 		// for very easy animations. If available, use these APIs to fade-in
 		// the progress spinner.
@@ -335,17 +184,18 @@ public class DoujinActivity extends Activity {
 		}
 	}
 
-	class CompleteDoujin extends AsyncTask<DoujinBean, Float, DoujinBean> {
+	class FavoriteDoujin extends AsyncTask<Boolean, Float, Boolean> {
 
 		protected void onPreExecute() {
+			showProgress(true);
 		}
 
-		protected DoujinBean doInBackground(DoujinBean... beans) {
-
+		protected Boolean doInBackground(Boolean... bool) {
+			boolean isConnected = false;
 			if (app.getSettingBean().isChecked())
 				try {
-					FakkuConnection.connect(app.getSettingBean().getUser(), app
-							.getSettingBean().getPassword());
+					isConnected = FakkuConnection.connect(app.getSettingBean()
+							.getUser(), app.getSettingBean().getPassword());
 				} catch (ClientProtocolException e) {
 					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
 							e);
@@ -353,44 +203,106 @@ public class DoujinActivity extends Activity {
 					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
 							e);
 				}
-			DoujinBean bean = beans[0];
 
-			try {
-				FakkuConnection.parseHTMLDoujin(bean);
-			} catch (ClientProtocolException e) {
-				Log.e(CompleteDoujin.class.toString(), "Exception", e);
-			} catch (IOException e) {
-				Log.e(CompleteDoujin.class.toString(), "Exception", e);
+			if (!isConnected) {
+				SettingBean s = app.getSettingBean();
+				s.setChecked(false);
+				new DataBaseHandler(DoujinActivity.this).updateSetting(s);
+				app.setSettingBean(null);
+			} else {
+				Boolean b = bool[0];
+				try {
+					if (b)
+						FakkuConnection.transaction(app.getCurrent().urlFavorite(Constants.SITEADDFAVORITE));
+					else
+						FakkuConnection.transaction(app.getCurrent().urlFavorite(Constants.SITEREMOVEFAVORITE));
+				} catch (ExceptionNotLoggedIn e) {
+					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
+							e);
+				} catch (IOException e) {
+					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
+							e);
+				}
+				app.getCurrent().setAddedInFavorite(b);
 			}
-			return bean;
+			return isConnected;
 		}
 
-		protected void onPostExecute(DoujinBean bytes) {
-			setComponents();
+		protected void onPostExecute(Boolean bytes) {
 			showProgress(false);
+			if (bytes) {
+				adapter.getDoujinDetail().setComponents();
+				String text = null;
+
+				if (app.getCurrent().isAddedInFavorite())
+					text = getResources().getString(R.string.added_favorite);
+				else
+					text = getResources().getString(R.string.removed_favorite);
+				Toast.makeText(DoujinActivity.this, text, Toast.LENGTH_SHORT)
+						.show();
+			} else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						DoujinActivity.this);
+				builder.setMessage(R.string.login_please)
+						.setPositiveButton(R.string.login,
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										Intent it = new Intent(
+												DoujinActivity.this,
+												LoginActivity.class);
+										DoujinActivity.this.startActivity(it);
+									}
+								})
+						.setNegativeButton(R.string.cancel,
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										return;
+									}
+								}).create().show();
+			}
 		}
 	}
 
-	class URLListener implements OnClickListener {
+	class DoujinPagerAdapter extends FragmentPagerAdapter {
 
-		URLBean urlBean;
-		int rID;
+		DoujinDetailFragment doujinDetail;
+		CommentListFragment commentList;
+		int currentPosition = 0;
 
-		public URLListener(URLBean urlBean, int rID) {
-			this.urlBean = urlBean;
-			this.rID = rID;
+		public DoujinPagerAdapter(FragmentManager fm) {
+			super(fm);
+
+			doujinDetail = new DoujinDetailFragment(DoujinActivity.this);
+			commentList = new CommentListFragment(DoujinActivity.this);
 		}
 
 		@Override
-		public void onClick(View v) {
+		public int getCount() {
+			return 2;
+		}
 
-			Intent it = new Intent(DoujinActivity.this,
-					DoujinListActivity.class);
-			it.putExtra(DoujinListActivity.INTENT_VAR_TITLE,
-					urlBean.getDescription());
-			it.putExtra(DoujinListActivity.INTENT_VAR_URL, urlBean.getUrl());
-			DoujinActivity.this.startActivity(it);
+		@Override
+		public Fragment getItem(int arg0) {
+			currentPosition = arg0;
+			if (currentPosition == 0) {
+				return doujinDetail;
+			} else {
+				return commentList;
+			}
+		}
 
+		public DoujinDetailFragment getDoujinDetail() {
+			return doujinDetail;
+		}
+
+		public int getCurrentPosition() {
+			return currentPosition;
+		}
+
+		public CommentListFragment getCommentList() {
+			return commentList;
 		}
 	}
 }

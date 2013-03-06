@@ -1,0 +1,171 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true" >
+
+    <RelativeLayout
+        android:id="@+id/doujinDetail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvDoujin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/fail_load_title_doujin"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/main_color" />
+
+        <LinearLayout
+            android:id="@+id/ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tvDoujin"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp" >
+
+            <WebView
+                android:id="@+id/wvTitle"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginRight="2dp"
+                android:scaleType="fitXY"
+                android:scrollbars="none"
+                android:src="@drawable/loading" />
+
+            <WebView
+                android:id="@+id/wvPage"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginLeft="2dp"
+                android:scaleType="fitXY"
+                android:scrollbars="none"
+                android:src="@drawable/loading" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <TextView
+                android:id="@+id/tvUploader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/fail_load_uploader_doujin"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/url_color" />
+
+            <TextView
+                android:id="@+id/tvQtyPages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/fail_load_page_doujin"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/darker_gray" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/label_serie"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSerie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fail_load_serie_doujin"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/url_color" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_artist"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fail_load_artist_doujin"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/url_color" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_description"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/fail_load_description_doujin"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@android:color/darker_gray" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_language"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/fail_load_language_doujin"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/url_color" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_translator"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTranslator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/fail_load_translator_doujin"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/url_color" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_tags"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/llTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</ScrollView>

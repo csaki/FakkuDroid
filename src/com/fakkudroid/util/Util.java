@@ -123,13 +123,18 @@ public class Util {
 		HttpResponse response = httpClient.execute(get, localContext);
 		HttpEntity ent = response.getEntity();
 		InputStream is = ent.getContent();
-		BufferedInputStream bis = new BufferedInputStream(is);
-		byte[] tmp = new byte[2048];
-		String ret = "";
-		while (bis.read(tmp) != -1) {
-			ret += new String(tmp);
+		
+
+		String html = "";
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder str = new StringBuilder();
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			str.append(line);
 		}
-		return ret;
+		is.close();
+		html = str.toString();
+		return html;
 	}
 
 	public static String createHTMLImage(String url, float width, float height, boolean japaneseMode, Resources res) {

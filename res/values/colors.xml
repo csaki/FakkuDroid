@@ -4,5 +4,6 @@
     <color name="main_color">#9D0A0A</color>
     <color name="black_overlay">#66000000</color>
     <color name="url_color">#0099cc</color>
+    <color name="rank_color">#088A08</color>
 
 </resources>
