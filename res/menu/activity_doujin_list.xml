@@ -47,6 +47,13 @@
         android:title="@string/check_for_updates">
     </item>
     <item
+        android:id="@+id/menu_settings"
+        android:orderInCategory="102"
+        android:showAsAction="never"
+        android:visible="false"
+        android:title="@string/menu_settings">
+    </item>
+    <item
         android:id="@+id/menu_about"
         android:orderInCategory="102"
         android:showAsAction="never"

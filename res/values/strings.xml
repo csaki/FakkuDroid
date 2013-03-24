@@ -47,7 +47,6 @@
     <string name="tile_artist">Artist rpc1</string>
     <string name="tile_language">Language rpc1</string>
     <string name="tile_translator">Translator rpc1</string>
-    <string name="title_activity_settings">SettingsActivity</string>
     <string name="title_activity_library">LibraryActivity</string>
     <string name="check_for_updates">Check for updates</string>
     <string name="read">Read</string>

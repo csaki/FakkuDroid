@@ -234,6 +234,10 @@ public class DoujinListActivity extends ListActivity{
 			itAbout.setData(Uri.parse(Constants.SITEABOUT));
 			DoujinListActivity.this.startActivity(itAbout);
 			break;
+		case R.id.menu_settings:
+			Intent itSettings = new Intent(DoujinListActivity.this, SettingsActivity.class);
+			DoujinListActivity.this.startActivity(itSettings);
+			break;
 		case R.id.menu_check_for_updates:
 			Intent it3 = new Intent(Intent.ACTION_VIEW);
 			it3.setData(Uri.parse(Constants.SITEDOWNLOAD));

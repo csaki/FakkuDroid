@@ -163,7 +163,7 @@ public class DoujinBean {
 	}
 	
 	public String getUrlImage(){
-		int idxStart = Constants.SITEROOT.length();
+		int idxStart = Constants.SITEIMAGEROOT.length();
 		int idxEnd = urlImageTitle.indexOf("thumbs",idxStart);
 		
 		if(idxEnd==-1)

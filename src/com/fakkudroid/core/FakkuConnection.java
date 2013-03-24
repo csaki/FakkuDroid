@@ -247,7 +247,9 @@ public class FakkuConnection {
 			s = section.substring(idxStart, idxEnd);
 
 			bean.setUrlImageTitle(s);
-
+			
+			//Look for the next image tag
+			idxStart = section.indexOf("<img", idxStart) + token.length();
 			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);
@@ -417,6 +419,9 @@ public class FakkuConnection {
 
 		bean.setUrlImageTitle(s);
 
+		token = "<img ";
+		idxStart = html.indexOf(token, idxStart) + token.length();
+		token = "src=\"";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		idxEnd = html.indexOf("\"", idxStart);
 		s = html.substring(idxStart, idxEnd);

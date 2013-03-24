@@ -13,7 +13,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.52"
+            android:layout_weight="0.61"
             android:background="@android:color/darker_gray"
             android:orientation="vertical" >
 			
@@ -53,7 +53,7 @@
             android:id="@+id/btnReply"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:layout_weight="0.16"
+            android:layout_weight="0.13"
             class="com.fakkudroid.util.ActionImageButton2"
             android:background="@android:color/transparent"
             android:contentDescription="@string/reply"
@@ -64,7 +64,7 @@
             android:id="@+id/btnLike"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:layout_weight="0.16"
+            android:layout_weight="0.13"
             class="com.fakkudroid.util.ActionImageButton2"
             android:background="@android:color/transparent"
             android:contentDescription="@string/like"
@@ -75,7 +75,7 @@
             android:id="@+id/btnDisLike"
             android:layout_width="0dp"
             android:layout_height="50dp"
-            android:layout_weight="0.16"
+            android:layout_weight="0.13"
             class="com.fakkudroid.util.ActionImageButton2"
             android:background="@android:color/transparent"
             android:contentDescription="@string/dislike"
