@@ -52,7 +52,6 @@ public class DoujinActivity extends FragmentActivity {
 	DoujinPagerAdapter adapter;
 	private View mFormView;
 	private View mStatusView;
-	boolean alreadyDownloaded = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,27 +95,10 @@ public class DoujinActivity extends FragmentActivity {
 				}
 			}
 		});
-		alreadyDownloaded = isAlreadyDownloaded();
-		if(alreadyDownloaded){
-			ImageButton btnDownload = (ImageButton)findViewById(R.id.btnDownload);
-			btnDownload.setImageResource(R.drawable.content_discard);
-			btnDownload.setContentDescription(getResources().getString(R.string.delete));
-		}
+		
 			
 	}
 
-	private boolean isAlreadyDownloaded() {
-		List<String> lstFiles = app.getCurrent().getImagesFiles();
-		String folder = app.getCurrent().getId();
-		for (int i = 0; i < lstFiles.size(); i++) {
-			File dir = getDir(folder, Context.MODE_PRIVATE);
-			File myFile = new File(dir, lstFiles.get(i));
-			if (!myFile.exists()) {
-				return false;
-			}
-		}
-		return true;
-	}
 
 	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
@@ -132,8 +114,9 @@ public class DoujinActivity extends FragmentActivity {
 		}
 	}
 
+	
 	public void download(View view) {
-		if(!alreadyDownloaded)
+		if(!adapter.getDoujinDetail().isAlreadyDownloaded())
 			new DownloadDoujin().execute("");
 		else{
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
@@ -149,7 +132,7 @@ public class DoujinActivity extends FragmentActivity {
 			btnDownload.setImageResource(R.drawable.av_download);
 			btnDownload.setContentDescription(getResources().getString(R.string.download));
 			Toast.makeText(this, getResources().getString(R.string.deleted), Toast.LENGTH_SHORT).show();
-			alreadyDownloaded = false;
+			adapter.getDoujinDetail().setAlreadyDownloaded(false);
 		}
 	}
 

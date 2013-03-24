@@ -1,10 +1,13 @@
 package com.fakkudroid.fragment;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -40,6 +43,7 @@ public class DoujinDetailFragment extends Fragment {
 
 	private FakkuDroidApplication app;
 	DoujinActivity doujinActivity;
+	boolean alreadyDownloaded = false;
 	
 	@SuppressLint("ValidFragment")
 	public DoujinDetailFragment(DoujinActivity doujinActivity){
@@ -176,8 +180,9 @@ public class DoujinDetailFragment extends Fragment {
 
 		ImageButton btnAddToFavorite = (ImageButton) doujinActivity.findViewById(
 				R.id.btnAddToFavorite);
+		alreadyDownloaded = verifyAlreadyDownloaded();
 
-		if (app.getCurrent() != null)
+		if (app.getCurrent() != null){
 			if (app.getCurrent().isAddedInFavorite()) {
 				btnAddToFavorite.setImageResource(R.drawable.rating_important);
 				btnAddToFavorite.setContentDescription(getResources()
@@ -188,7 +193,39 @@ public class DoujinDetailFragment extends Fragment {
 				btnAddToFavorite.setContentDescription(getResources()
 						.getString(R.string.add_favorite));
 			}
+			if(alreadyDownloaded){
+				ImageButton btnDownload = (ImageButton)doujinActivity.findViewById(R.id.btnDownload);
+				btnDownload.setImageResource(R.drawable.content_discard);
+				btnDownload.setContentDescription(getResources().getString(R.string.delete));
+			}else{
+				ImageButton btnDownload = (ImageButton)doujinActivity.findViewById(R.id.btnDownload);
+				btnDownload.setImageResource(R.drawable.av_download);
+				btnDownload.setContentDescription(getResources().getString(R.string.download));
+			}
+		}
 	}
+	
+	public void setAlreadyDownloaded(boolean alreadyDownloaded) {
+		this.alreadyDownloaded = alreadyDownloaded;
+	}
+
+	public boolean isAlreadyDownloaded() {
+		return alreadyDownloaded;
+	}
+
+	public boolean verifyAlreadyDownloaded() {
+		List<String> lstFiles = app.getCurrent().getImagesFiles();
+		String folder = app.getCurrent().getId();
+		for (int i = 0; i < lstFiles.size(); i++) {
+			File dir = doujinActivity.getDir(folder, Context.MODE_PRIVATE);
+			File myFile = new File(dir, lstFiles.get(i));
+			if (!myFile.exists()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 
 	class CompleteDoujin extends AsyncTask<DoujinBean, Float, DoujinBean> {
 
