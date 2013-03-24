@@ -149,7 +149,8 @@ public class ListOptionActivity extends ListActivity{
 			} catch (IOException e1) {
 				Log.e(DownloadList.class.toString(), "Exception", e1);
 			} 
-			
+			if(list==null)
+				list = new LinkedList<URLBean>();
 			return list.size();
 		}
 

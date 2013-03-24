@@ -1,5 +1,6 @@
 package com.fakkudroid.adapter;
 
+import java.util.Collection;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.CommentBean;
@@ -131,6 +132,12 @@ public class CommentListAdapter extends ArrayAdapter<CommentBean> {
 			holder.btnLike.setImageResource(R.drawable.navigation_collapse);
 		}
 		return convertView;
+	}
+	
+	public void addAll(LinkedList<CommentBean> lstComments){
+		for (CommentBean commentBean : lstComments) {
+			add(commentBean);
+		}
 	}
 	
 	static class ViewHolder {

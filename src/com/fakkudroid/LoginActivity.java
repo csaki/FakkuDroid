@@ -215,7 +215,7 @@ public class LoginActivity extends Activity {
 		}
 
 		@Override
-		protected void onPostExecute(final Boolean success) {
+		protected void onPostExecute(Boolean success) {
 			mAuthTask = null;
 			showProgress(false);
 

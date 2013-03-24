@@ -1,6 +1,14 @@
 package com.fakkudroid;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -8,6 +16,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -22,7 +32,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
+
 import com.fakkudroid.bean.SettingBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
@@ -40,6 +52,7 @@ public class DoujinActivity extends FragmentActivity {
 	DoujinPagerAdapter adapter;
 	private View mFormView;
 	private View mStatusView;
+	boolean alreadyDownloaded = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,18 +81,41 @@ public class DoujinActivity extends FragmentActivity {
 
 			@Override
 			public void onPageSelected(int arg0) {
-				if (arg0 == 1){
+				if (arg0 == 1) {
 					if (!adapter.getCommentList().isListCharged()) {
 						adapter.getCommentList().refresh();
 					}
-					btnComments.setImageResource(R.drawable.navigation_previous_item);
-					btnComments.setContentDescription(getResources().getString(R.string.come_back));
-				}else{
+					btnComments
+							.setImageResource(R.drawable.navigation_previous_item);
+					btnComments.setContentDescription(getResources().getString(
+							R.string.come_back));
+				} else {
 					btnComments.setImageResource(R.drawable.social_chat);
-					btnComments.setContentDescription(getResources().getString(R.string.comments));
+					btnComments.setContentDescription(getResources().getString(
+							R.string.comments));
 				}
 			}
 		});
+		alreadyDownloaded = isAlreadyDownloaded();
+		if(alreadyDownloaded){
+			ImageButton btnDownload = (ImageButton)findViewById(R.id.btnDownload);
+			btnDownload.setImageResource(R.drawable.content_discard);
+			btnDownload.setContentDescription(getResources().getString(R.string.delete));
+		}
+			
+	}
+
+	private boolean isAlreadyDownloaded() {
+		List<String> lstFiles = app.getCurrent().getImagesFiles();
+		String folder = app.getCurrent().getId();
+		for (int i = 0; i < lstFiles.size(); i++) {
+			File dir = getDir(folder, Context.MODE_PRIVATE);
+			File myFile = new File(dir, lstFiles.get(i));
+			if (!myFile.exists()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void viewInBrowser(View view) {
@@ -96,7 +132,28 @@ public class DoujinActivity extends FragmentActivity {
 		}
 	}
 
-	public void readOnline(View view) {
+	public void download(View view) {
+		if(!alreadyDownloaded)
+			new DownloadDoujin().execute("");
+		else{
+			List<String> lstFiles = app.getCurrent().getImagesFiles();
+			String folder = app.getCurrent().getId();
+			for (int i = 0; i < lstFiles.size(); i++) {
+				File dir = getDir(folder, Context.MODE_PRIVATE);
+				File myFile = new File(dir, lstFiles.get(i));
+				if (myFile.exists()) {
+					myFile.delete();
+				}
+			}
+			ImageButton btnDownload = (ImageButton)findViewById(R.id.btnDownload);
+			btnDownload.setImageResource(R.drawable.av_download);
+			btnDownload.setContentDescription(getResources().getString(R.string.download));
+			Toast.makeText(this, getResources().getString(R.string.deleted), Toast.LENGTH_SHORT).show();
+			alreadyDownloaded = false;
+		}
+	}
+
+	public void read(View view) {
 		Intent it = new Intent(this, GallerySwipeActivity.class);
 		this.startActivity(it);
 	}
@@ -105,7 +162,7 @@ public class DoujinActivity extends FragmentActivity {
 		Intent it = new Intent(this, RelatedContentListActivity.class);
 		this.startActivity(it);
 	}
-	
+
 	public void addOrRemoveFavorite(View view) {
 
 		if (!app.getSettingBean().isChecked()) {
@@ -213,9 +270,11 @@ public class DoujinActivity extends FragmentActivity {
 				Boolean b = bool[0];
 				try {
 					if (b)
-						FakkuConnection.transaction(app.getCurrent().urlFavorite(Constants.SITEADDFAVORITE));
+						FakkuConnection.transaction(app.getCurrent()
+								.urlFavorite(Constants.SITEADDFAVORITE));
 					else
-						FakkuConnection.transaction(app.getCurrent().urlFavorite(Constants.SITEREMOVEFAVORITE));
+						FakkuConnection.transaction(app.getCurrent()
+								.urlFavorite(Constants.SITEREMOVEFAVORITE));
 				} catch (ExceptionNotLoggedIn e) {
 					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
 							e);
@@ -262,6 +321,71 @@ public class DoujinActivity extends FragmentActivity {
 									}
 								}).create().show();
 			}
+		}
+	}
+
+	class DownloadDoujin extends AsyncTask<String, Integer, String> {
+
+		ProgressDialog dialog;
+
+		protected void onPreExecute() {
+			dialog = new ProgressDialog(DoujinActivity.this);
+			dialog.setMax(app.getCurrent().getQtyPages());
+			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			dialog.setProgress(0);
+			dialog.setTitle(R.string.download);
+			dialog.setIndeterminate(false);
+			dialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... arg0) {
+			List<String> lstUrls = app.getCurrent().getImages();
+			List<String> lstFiles = app.getCurrent().getImagesFiles();
+			String folder = app.getCurrent().getId();
+			for (int i = 0; i < lstUrls.size(); i++) {
+				try {
+
+					File dir = getDir(folder, Context.MODE_PRIVATE);
+					File myFile = new File(dir, lstFiles.get(i));
+					if (!myFile.exists()) {
+						URL url = new URL(lstUrls.get(i));
+						URLConnection connection = url.openConnection();
+						connection.connect();
+
+						InputStream input = new BufferedInputStream(
+								url.openStream());
+
+						OutputStream output = new FileOutputStream(myFile);
+
+						byte data[] = new byte[1024];
+						int count;
+						while ((count = input.read(data)) != -1) {
+							output.write(data, 0, count);
+						}
+
+						output.flush();
+						output.close();
+						input.close();
+					}
+					publishProgress(i + 1);
+				} catch (Exception e) {
+					Log.e(DownloadDoujin.class.toString(), e.getMessage(), e);
+				}
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... progress) {
+			super.onProgressUpdate(progress);
+			dialog.setProgress(progress[0]);
+		}
+
+		@Override
+		protected void onPostExecute(String bytes) {
+			dialog.hide();
 		}
 	}
 

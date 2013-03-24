@@ -1,8 +1,11 @@
 package com.fakkudroid.bean;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
+
+import android.content.Context;
 
 import com.fakkudroid.util.Constants;
 
@@ -157,6 +160,16 @@ public class DoujinBean {
 		for (int i = 1; i <= qtyPages; i++) {
 			Formatter fmt = new Formatter();
 			result.add(getUrlImage() +  fmt.format("%03d",i) + ".jpg");
+			fmt.close();
+		}
+		return result;
+	}
+	
+	public List<String> getImagesFiles(){
+		List<String> result = new ArrayList<String>();
+		for (int i = 1; i <= qtyPages; i++) {
+			Formatter fmt = new Formatter();
+			result.add(fmt.format("%03d",i) + ".jpg");
 			fmt.close();
 		}
 		return result;

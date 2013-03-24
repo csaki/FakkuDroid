@@ -102,6 +102,18 @@
                 android:scaleType="center"
                 android:src="@drawable/collections_labels" />
 
+             <view
+                android:id="@+id/btnDownload"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="0.2"
+                class="com.fakkudroid.util.ActionImageButton"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/download"
+                android:onClick="download"
+                android:scaleType="center"
+                android:src="@drawable/av_download" />
+            
             <view
                 android:id="@+id/btnReadOnline"
                 android:layout_width="0dp"
@@ -109,8 +121,8 @@
                 android:layout_weight="0.2"
                 class="com.fakkudroid.util.ActionImageButton"
                 android:background="@android:color/transparent"
-                android:contentDescription="@string/read_online"
-                android:onClick="readOnline"
+                android:contentDescription="@string/read"
+                android:onClick="read"
                 android:scaleType="center"
                 android:src="@drawable/av_play" />
         </LinearLayout>

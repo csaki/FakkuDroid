@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.apache.http.client.ClientProtocolException;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,15 +23,12 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.DoujinListActivity;
 import com.fakkudroid.FavoriteActivity;
 import com.fakkudroid.R;
-import com.fakkudroid.R.drawable;
-import com.fakkudroid.R.id;
-import com.fakkudroid.R.layout;
-import com.fakkudroid.R.string;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.core.FakkuConnection;
@@ -226,9 +221,14 @@ public class DoujinDetailFragment extends Fragment {
 			return bean;
 		}
 
-		protected void onPostExecute(DoujinBean bytes) {
-			setComponents();
-			doujinActivity.showProgress(false);
+		protected void onPostExecute(DoujinBean bean) {
+			if(bean.getTitle()!=null){
+				setComponents();
+				doujinActivity.showProgress(false);
+			}else{
+				Toast.makeText(getActivity(), getResources().getString(R.string.no_data), Toast.LENGTH_SHORT).show();
+				getActivity().finish();
+			}
 		}
 	}
 

@@ -24,8 +24,8 @@
     <string name="button_refresh">Refresh</string>
     <string name="title_activity_doujin">DoujinActivity</string>
     <string name="add_favorite">Add to Favorite</string>
-    <string name="read_online">Read Online</string>
-    <string name="read_doujin">Read Doujin</string>
+    <string name="download">Download</string>
+    <string name="delete">Delete</string>
     <string name="mangas">Mangas</string>
     <string name="doujinshis">Doujinshis</string>
     <string name="title_activity_menu">MenuActivity</string>
@@ -84,13 +84,15 @@
 	<string name="like">Like +1</string>	
 	<string name="dislike">Dislike -1</string>	
 	<string name="come_back">Come back</string>	
-	<string name="soon">Soon</string>	
+	<string name="soon">Soon</string>
+	<string name="no_data">No data</string>		
 	<string name="load_more">Load more&#8230;</string>	
+	<string name="deleted">Deleted</string>		
 	<string name="image_html">
 	    <![CDATA[
 	    	<html>
 	    		<head>
-	    			<script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js\"></script>
+	    			<script src=\"file:///android_asset/js/jquery.min.js\"></script>
 	    		</head>
 	    		<body style=\"margin: 0 0 0 0;\">
 	    			<script type=\"text/javascript\">

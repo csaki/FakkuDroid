@@ -186,7 +186,8 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 			} catch (URISyntaxException e1) {
 				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
 			}
-
+			if(llDoujin == null)
+				llDoujin=new LinkedList<DoujinBean>();
 			return llDoujin.size();
 		}
 
