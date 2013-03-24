@@ -369,6 +369,10 @@ public class DoujinActivity extends FragmentActivity {
 		@Override
 		protected void onPostExecute(String bytes) {
 			dialog.hide();
+			ImageButton btnDownload = (ImageButton)findViewById(R.id.btnDownload);
+			btnDownload.setImageResource(R.drawable.content_discard);
+			btnDownload.setContentDescription(getResources().getString(R.string.delete));
+			adapter.getDoujinDetail().setAlreadyDownloaded(true);
 		}
 	}
 
