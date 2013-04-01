@@ -9,8 +9,10 @@ import org.apache.http.client.ClientProtocolException;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.SpannableString;
@@ -44,6 +46,7 @@ public class DoujinDetailFragment extends Fragment {
 	private FakkuDroidApplication app;
 	DoujinActivity doujinActivity;
 	boolean alreadyDownloaded = false;
+	boolean cacheMode;
 	
 	@SuppressLint("ValidFragment")
 	public DoujinDetailFragment(DoujinActivity doujinActivity){
@@ -54,8 +57,15 @@ public class DoujinDetailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (FakkuDroidApplication) getActivity().getApplication();
+		configSettings();
 		new CompleteDoujin().execute(app.getCurrent());
 
+	}
+
+	private void configSettings() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(doujinActivity);
+		cacheMode = prefs.getBoolean("cache_mode_checkbox", false);
 	}
 
 	@Override
@@ -140,12 +150,25 @@ public class DoujinDetailFragment extends Fragment {
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvTranslator.setText(content);
 
-		wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-				.getCurrent().getUrlImageTitle(), 100, this.getResources()),
-				"text/html", "utf-8", null);
-		wvPage.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-				.getCurrent().getUrlImagePage(), 100, this.getResources()),
-				"text/html", "utf-8", null);
+		if(cacheMode){
+			File titleFile = new File(getActivity().getCacheDir(), app.getCurrent().getFileImageTitle());
+			File pageFile = new File(getActivity().getCacheDir(), app.getCurrent().getFileImagePage());
+			
+			wvTitle.loadDataWithBaseURL(null, Util
+					.createHTMLImagePercentage("file://" + titleFile.getAbsolutePath(), 100,
+							getResources()), "text/html", "utf-8", null);
+			wvPage.loadDataWithBaseURL(null, Util
+					.createHTMLImagePercentage("file://" + pageFile.getAbsolutePath(), 100,
+							getResources()), "text/html", "utf-8", null);
+		}else{
+			wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
+					.getCurrent().getUrlImageTitle(), 100, this.getResources()),
+					"text/html", "utf-8", null);
+			wvPage.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
+					.getCurrent().getUrlImagePage(), 100, this.getResources()),
+					"text/html", "utf-8", null);
+		}
+		
 
 		tvUploader.setOnClickListener(new OnClickListener() {
 
@@ -255,16 +278,32 @@ public class DoujinDetailFragment extends Fragment {
 			} catch (IOException e) {
 				Log.e(CompleteDoujin.class.toString(), "Exception", e);
 			}
+
+			if (cacheMode)
+				try {
+					File dir = getActivity().getCacheDir();
+					
+					File myFile = new File(dir, bean.getFileImageTitle());
+					Util.saveInStorage(myFile, bean.getUrlImageTitle());
+
+					myFile = new File(dir, bean.getFileImagePage());
+					Util.saveInStorage(myFile, bean.getUrlImagePage());
+				} catch (Exception e) {
+					Log.e(CompleteDoujin.class.toString(), "Exception", e);
+				}
 			return bean;
 		}
 
 		protected void onPostExecute(DoujinBean bean) {
-			if(bean.getTitle()!=null){
-				setComponents();
-				doujinActivity.showProgress(false);
-			}else{
-				Toast.makeText(getActivity(), getResources().getString(R.string.no_data), Toast.LENGTH_SHORT).show();
-				getActivity().finish();
+			try {
+				if(bean.getTitle()!=null){
+					setComponents();
+					doujinActivity.showProgress(false);
+				}else{
+					Toast.makeText(getActivity(), getResources().getString(R.string.no_data), Toast.LENGTH_SHORT).show();
+					getActivity().finish();
+				}
+			} catch (Exception e) {
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
 
-import com.fakkudroid.bean.SettingBean;
+import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
@@ -196,7 +196,7 @@ public class LoginActivity extends Activity {
 			
 			try {
 				result = FakkuConnection.connect(mUser, mPassword);
-				SettingBean s = app.getSettingBean(); 
+				UserBean s = app.getSettingBean(); 
 				
 				s.setUser(mUser);
 				s.setPassword(mPassword);

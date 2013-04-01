@@ -1,5 +1,6 @@
 package com.fakkudroid;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -12,10 +13,12 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,9 +30,11 @@ import com.fakkudroid.adapter.FavoriteListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Util;
 import com.fakkudroid.R;
 
-public class FavoriteActivity extends Activity implements AdapterView.OnItemClickListener {
+public class FavoriteActivity extends Activity implements
+		AdapterView.OnItemClickListener {
 
 	/**
 	 * constante para identificar la llave con la que envío datos a través de
@@ -40,6 +45,7 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 
 	FakkuDroidApplication app;
 	LinkedList<DoujinBean> llDoujin;
+	boolean cacheMode;
 	FavoriteListAdapter da;
 	GridView gvFavorites;
 	String user;
@@ -47,35 +53,43 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 	int nroPage = 1;
 	private View mFormView;
 	private View mStatusView;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_favorite);
-		
+
 		gvFavorites = (GridView) findViewById(R.id.gvFavorites);
 		gvFavorites.setOnItemClickListener(this);
 
 		mFormView = findViewById(R.id.view_form);
 		mStatusView = findViewById(R.id.view_status);
-		
+
 		user = getIntent().getStringExtra(INTENT_VAR_USER);
-		
+
 		title = getResources().getString(R.string.favorite);
 		title = title.replace("usr", user);
-		
+
 		app = (FakkuDroidApplication) getApplication();
 		loadPage();
+
+		configSettings();
 	}
 
-	private void loadPage(){
+	private void configSettings() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		cacheMode = prefs.getBoolean("cache_mode_checkbox", false);
+	}
+
+	private void loadPage() {
 		setTitle(app.getTitle(nroPage, title));
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
 		tvPage.setText("Page " + nroPage);
 		new DownloadCatalog().execute(app.getUrlFavorite(nroPage, user));
 	}
-	
-	public void nextPage(View view){
+
+	public void nextPage(View view) {
 		nroPage++;
 		loadPage();
 		Context context = getApplicationContext();
@@ -85,10 +99,10 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 		Toast toast = Toast.makeText(context, text, duration);
 		toast.show();
 	}
-	
-	public void previousPage(View view){
-		if (nroPage-1 == 0) {
-			
+
+	public void previousPage(View view) {
+		if (nroPage - 1 == 0) {
+
 			Context context = getApplicationContext();
 			CharSequence text = "There aren't more pages.";
 			int duration = Toast.LENGTH_SHORT;
@@ -106,23 +120,23 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 			toast.show();
 		}
 	}
-	
-	public void viewInBrowser(View view){
+
+	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
 		viewBrowser.setData(Uri.parse(app.getUrlFavorite(nroPage, user)));
 		this.startActivity(viewBrowser);
 	}
-	
-	public void refresh(View view){
+
+	public void refresh(View view) {
 		loadPage();
 	}
-	
+
 	/**
 	 * Función auxiliar que recibe una lista de mapas, y utilizando esta data
 	 * crea un adaptador para poblar al ListView del diseño
 	 * */
 	private void setData() {
-		da = new FavoriteListAdapter(this, R.layout.row_doujin, 0, llDoujin);
+		da = new FavoriteListAdapter(this, R.layout.row_doujin, 0, llDoujin, cacheMode, getCacheDir());
 		gvFavorites.setAdapter(da);
 	}
 
@@ -150,8 +164,7 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 					});
 
 			mFormView.setVisibility(View.VISIBLE);
-			mFormView.animate().setDuration(shortAnimTime)
-					.alpha(show ? 0 : 1)
+			mFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1)
 					.setListener(new AnimatorListenerAdapter() {
 						@Override
 						public void onAnimationEnd(Animator animation) {
@@ -166,7 +179,7 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 			mFormView.setVisibility(show ? View.GONE : View.VISIBLE);
 		}
 	}
-	
+
 	class DownloadCatalog extends AsyncTask<String, Float, Integer> {
 
 		protected void onPreExecute() {
@@ -185,9 +198,24 @@ public class FavoriteActivity extends Activity implements AdapterView.OnItemClic
 				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
 			} catch (URISyntaxException e1) {
 				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
+			} catch (Exception e) {
+				Log.e(DownloadCatalog.class.toString(), "Exception", e);
 			}
-			if(llDoujin == null)
-				llDoujin=new LinkedList<DoujinBean>();
+			if (llDoujin == null)
+				llDoujin = new LinkedList<DoujinBean>();
+
+			if (cacheMode)
+				for (DoujinBean bean : llDoujin) {
+					try {
+						File dir = getCacheDir();
+						
+						File myFile = new File(dir, bean.getFileImageTitle());
+						Util.saveInStorage(myFile, bean.getUrlImageTitle());
+					} catch (Exception e) {
+						Log.e(DownloadCatalog.class.toString(), "Exception", e);
+					}
+				}
+
 			return llDoujin.size();
 		}
 

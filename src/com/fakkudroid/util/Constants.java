@@ -38,4 +38,7 @@ public class Constants {
 	//Menu Random
 	public static String RANDOM = "/random"; 
 	
+	//Settings
+	public static final int RIGHT_LEFT_MODE = 0;
+	public static final int LEFT_RIGHT_MODE = 1;
 }

@@ -1,0 +1,88 @@
+<resources>
+	<string name="image_html">
+	    <![CDATA[
+	    	<html>
+	    		<head>
+	    			<script src=\"file:///android_asset/js/jquery.min.js\"></script>
+	    		</head>
+	    		<body style=\"margin: 0 0 0 0;\">
+	    			<script type=\"text/javascript\">
+	    				$(window).load(function() {resizeAll(@width,@height);});
+	    				$(window).bind(\'resize\', resizeWindow);
+	    				
+	    				function resizeWindow(e) {
+	    					if(first){
+	    						if(japaneseMode)
+	    							$(\'body\').scrollLeft(5000);
+	    						else 
+	    							$(\'body\').scrollLeft(0);
+	    					}
+	    					first = false;
+	    				}
+	    				
+	    				var japaneseMode = @japaneseMode;
+	    				var first = true;
+	    				
+	    				function resizeAll(maxWidth, maxHeight){
+	    					$(\'.resized\').each(function() {
+	    						var ratio = 0;
+	    						var width = $(this).width();
+	    						var height = $(this).height();
+	    						if(width<=height||maxWidth>maxHeight){
+	    							ratio = maxWidth / width;
+	    							$(this).css(\'width\', maxWidth);
+	    							$(this).css(\'height\', height * ratio);
+	    							height = height * ratio;
+	    							width = width * ratio;
+	    						}else{
+	    							ratio = maxHeight / height;
+	    							$(this).css(\'height\', maxHeight);
+	    							$(this).css(\'width\', width * ratio);
+	    							width = width * ratio;
+	    						}
+	    					});
+	    					if(japaneseMode)
+	    						$(\'body\').scrollLeft(5000);
+	    					else 
+	    						$(\'body\').scrollLeft(0);
+	    							
+	    				}	
+	    			</script>
+	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\"/>
+	    		</body>
+	    	</html>
+	    ]]>	    
+	</string>
+	<string name="image_html_percent">
+	    <![CDATA[
+	    	<html>
+	    		<body style=\"margin: 0 0 0 0;\">
+	    			<img style=\"width:@percentage%;\" src =\"@url\" style=\"padding:0px;\"/>
+	    		</body>
+	    	</html>
+	    ]]>
+	</string>
+	<string name="help_to_fakkudroid">
+	    <![CDATA[
+	    	<HTML>
+				<BODY>
+					<br />
+					<h2 style=\"text-align: center;\">
+					<b><span style=\"color: #cc0000;\">How to help to FakkuDroid?</span></b></h2>
+					<div style=\"text-align: center;\">
+					<br /></div>
+					<div style=\"text-align: center;\">
+					<b>1)</b> Doing click in the ads of <a href=\"http://fakkudroid.blogspot.com/\">the project\'s blog</a> when you have time.</div>
+					<div style=\"text-align: center;\">
+					<br /></div>
+					<div style=\"text-align: center;\">
+					<b>2)</b> Donating $1 or whatever do you want. The link is in the blog.</div>
+					<div style=\"text-align: center;\">
+					<br />
+					<br /></div>
+					</form>
+				</BODY>
+			</HTML>
+	    ]]>
+	</string>
+</resources>

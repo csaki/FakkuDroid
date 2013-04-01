@@ -1,5 +1,6 @@
 package com.fakkudroid;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import com.fakkudroid.adapter.DoujinListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Util;
 import com.fakkudroid.R;
 
 import android.util.Log;
@@ -17,12 +19,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -41,6 +45,7 @@ public class RelatedContentListActivity extends ListActivity {
 	int nroPage = 1;
 	private View mFormView;
 	private View mStatusView;
+	boolean cacheMode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +58,15 @@ public class RelatedContentListActivity extends ListActivity {
 		app = (FakkuDroidApplication) getApplication();
 
 		loadPage();
+		configSettings();
 	}
 
+	private void configSettings() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		cacheMode = prefs.getBoolean("cache_mode_checkbox", false);
+	}
+	
 	public void nextPage(View view) {
 		nroPage++;
 		loadPage();
@@ -108,7 +120,7 @@ public class RelatedContentListActivity extends ListActivity {
 	 * crea un adaptador para poblar al ListView del diseño
 	 * */
 	private void setData() {
-		da = new DoujinListAdapter(this, R.layout.row_doujin, 0, llDoujin);
+		da = new DoujinListAdapter(this, R.layout.row_doujin, 0, llDoujin, cacheMode);
 		this.setListAdapter(da);
 	}
 
@@ -181,6 +193,20 @@ public class RelatedContentListActivity extends ListActivity {
 			}
 			if(llDoujin==null)
 				llDoujin = new LinkedList<DoujinBean>();
+			if (cacheMode)
+				for (DoujinBean bean : llDoujin) {
+					try {
+						File dir = getCacheDir();
+						
+						File myFile = new File(dir, bean.getFileImageTitle());
+						Util.saveInStorage(myFile, bean.getUrlImageTitle());
+
+						myFile = new File(dir, bean.getFileImagePage());
+						Util.saveInStorage(myFile, bean.getUrlImagePage());
+					} catch (Exception e) {
+						Log.e(DownloadCatalog.class.toString(), "Exception", e);
+					}
+				}
 			return llDoujin.size();
 		}
 

@@ -1,5 +1,6 @@
 package com.fakkudroid;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -8,7 +9,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import com.fakkudroid.adapter.DoujinListAdapter;
 import com.fakkudroid.bean.DoujinBean;
-import com.fakkudroid.bean.SettingBean;
+import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
@@ -21,6 +22,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -29,6 +31,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.view.LayoutInflater;
@@ -58,6 +61,7 @@ public class DoujinListActivity extends ListActivity{
 	int nroPage = 1;
 	private View mFormView;
 	private View mStatusView;
+	boolean cacheMode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +86,12 @@ public class DoujinListActivity extends ListActivity{
 		loadPage();
 	}
 
+	private void configSettings() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		cacheMode = prefs.getBoolean("cache_mode_checkbox", false);
+	}
+	
 	public void nextPage(View view) {
 		nroPage++;
 		loadPage();
@@ -162,7 +172,7 @@ public class DoujinListActivity extends ListActivity{
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_logout:
-			SettingBean sb = app.getSettingBean();
+			UserBean sb = app.getSettingBean();
 			sb.setChecked(false);
 			new DataBaseHandler(this).updateSetting(sb);
 			app.setSettingBean(null);
@@ -172,6 +182,10 @@ public class DoujinListActivity extends ListActivity{
 		case R.id.menu_login:
 			Intent itLogin = new Intent(this, LoginActivity.class);
 			this.startActivity(itLogin);
+			break;
+		case R.id.menu_downloads:
+			Intent itDownloads = new Intent(this, DownloadListActivity.class);
+			this.startActivity(itDownloads);
 			break;
 		case R.id.menu_search:
 
@@ -211,7 +225,7 @@ public class DoujinListActivity extends ListActivity{
 									DoujinListActivity.this.startActivity(it);
 								}
 							})
-					.setNegativeButton(R.string.cancel,
+					.setNegativeButton(android.R.string.cancel,
 							new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog,
@@ -276,7 +290,7 @@ public class DoujinListActivity extends ListActivity{
 												.startActivity(it);
 									}
 								})
-						.setNegativeButton(R.string.cancel,
+						.setNegativeButton(android.R.string.cancel,
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int id) {
@@ -302,7 +316,7 @@ public class DoujinListActivity extends ListActivity{
 	 * crea un adaptador para poblar al ListView del diseño
 	 * */
 	private void setData() {
-		da = new DoujinListAdapter(this, R.layout.row_doujin, 0, llDoujin);
+		da = new DoujinListAdapter(this, R.layout.row_doujin, 0, llDoujin, cacheMode);
 		this.setListAdapter(da);
 	}
 
@@ -357,6 +371,7 @@ public class DoujinListActivity extends ListActivity{
 	class DownloadCatalog extends AsyncTask<String, Float, Integer> {
 
 		protected void onPreExecute() {
+			configSettings();
 			showProgress(true);
 		}
 
@@ -375,6 +390,20 @@ public class DoujinListActivity extends ListActivity{
 			}
 			if(llDoujin==null)
 				llDoujin = new LinkedList<DoujinBean>();
+			if (cacheMode)
+				for (DoujinBean bean : llDoujin) {
+					try {
+						File dir = getCacheDir();
+						
+						File myFile = new File(dir, bean.getFileImageTitle());
+						Util.saveInStorage(myFile, bean.getUrlImageTitle());
+
+						myFile = new File(dir, bean.getFileImagePage());
+						Util.saveInStorage(myFile, bean.getUrlImagePage());
+					} catch (Exception e) {
+						Log.e(DownloadCatalog.class.toString(), "Exception", e);
+					}
+				}
 			return llDoujin.size();
 		}
 

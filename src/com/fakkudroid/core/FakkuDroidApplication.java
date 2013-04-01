@@ -4,16 +4,16 @@ package com.fakkudroid.core;
 import android.app.Application;
 
 import com.fakkudroid.bean.DoujinBean;
-import com.fakkudroid.bean.SettingBean;
+import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 
 public class FakkuDroidApplication extends Application {
 
 	private DoujinBean current = null;
-	private SettingBean settingBean = null;
+	private UserBean settingBean = null;
 	
-	public SettingBean getSettingBean() {
+	public UserBean getSettingBean() {
 		if(settingBean==null){
 			DataBaseHandler db = new DataBaseHandler(this.getApplicationContext());
 			settingBean = db.getSetting();
@@ -25,7 +25,7 @@ public class FakkuDroidApplication extends Application {
 		return settingBean;
 	}
 
-	public void setSettingBean(SettingBean settingBean) {
+	public void setSettingBean(UserBean settingBean) {
 		this.settingBean = settingBean;
 	}
 

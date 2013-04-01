@@ -16,14 +16,14 @@
         android:title="@string/go_to_last">
     </item>
     <item
-        android:id="@+id/menu_reading_japanese"
+        android:id="@+id/menu_reading_right_left"
         android:orderInCategory="101"
-        android:title="@string/reading_japanese">
+        android:title="@string/reading_right_left">
     </item>
     <item
-        android:id="@+id/menu_reading_occidental"
+        android:id="@+id/menu_reading_left_right"
         android:orderInCategory="102"
-        android:title="@string/reading_western">
+        android:title="@string/reading_left_right">
     </item>
 
 </menu>

@@ -2,10 +2,15 @@ package com.fakkudroid.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,11 +24,11 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import com.fakkudroid.R;
+import com.fakkudroid.bean.URLBean;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.view.View;
 
 public class Util {
 
@@ -123,7 +128,6 @@ public class Util {
 		HttpResponse response = httpClient.execute(get, localContext);
 		HttpEntity ent = response.getEntity();
 		InputStream is = ent.getContent();
-		
 
 		String html = "";
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -137,23 +141,52 @@ public class Util {
 		return html;
 	}
 
-	public static String createHTMLImage(String url, float width, float height, boolean japaneseMode, Resources res) {
+	public static String createHTMLImage(String url, float width, float height,
+			boolean japaneseMode, Resources res) {
 		url = Util.escapeURL(url);
 		String html = res.getString(R.string.image_html);
 		html = html.replace("@width", width + "");
 		html = html.replace("@height", height + "");
 		html = html.replace("@japaneseMode", japaneseMode + "");
-		html = html.replace("@url", url);		
-		
+		html = html.replace("@url", url);
+
 		return html;
 	}
 
-	public static String createHTMLImagePercentage(String url, int pct, Resources res) {
+	public static String createHTMLImagePercentage(String url, int pct,
+			Resources res) {
 		url = Util.escapeURL(url);
 		String html = res.getString(R.string.image_html_percent);
-		html = html.replace("@percentage", pct + "");		
-		html = html.replace("@url", url);		
+		html = html.replace("@percentage", pct + "");
+		html = html.replace("@url", url);
 		return html;
 	}
+
+	public static void saveInStorage(File file, String imageUrl) throws IOException {
+		imageUrl = Util.escapeURL(imageUrl);
+		if (!file.exists()) {
+			URL url = new URL(imageUrl);
+			URLConnection connection = url.openConnection();
+			connection.connect();
+
+			InputStream input = new BufferedInputStream(url.openStream());
+
+			OutputStream output = new FileOutputStream(file);
+
+			byte data[] = new byte[1024];
+			int count;
+			while ((count = input.read(data)) != -1) {
+				output.write(data, 0, count);
+			}
+
+			output.flush();
+			output.close();
+			input.close();
+		}
+	}
 	
+	public static URLBean castURLBean(String urlBean){
+		URLBean result = new URLBean(urlBean.split("\\|")[1],urlBean.split("\\|")[0]);		
+		return result;
+	}
 }

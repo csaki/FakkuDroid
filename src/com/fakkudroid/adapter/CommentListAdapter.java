@@ -1,14 +1,10 @@
 package com.fakkudroid.adapter;
 
-import java.util.Collection;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.CommentBean;
-import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.fragment.CommentListFragment;
 import com.fakkudroid.util.ActionImageButton2;
-import com.fakkudroid.util.Util;
-import com.fakkudroid.DoujinListActivity;
 import com.fakkudroid.FavoriteActivity;
 import com.fakkudroid.R;
 
@@ -16,12 +12,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.Html;
 import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
 import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -62,6 +58,7 @@ public class CommentListAdapter extends ArrayAdapter<CommentBean> {
 		}
 		holder.tvDate.setText(s.getDate());
 		holder.tvComment.setText(Html.fromHtml(s.getComment().replace("<br>", "<br/>")));
+		holder.tvComment.setMovementMethod(LinkMovementMethod.getInstance());
 		holder.rlComment.setPadding(40*s.getLevel(), 0, 0, 0);
 		SpannableString content = new SpannableString(s.getUser().getDescription());
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);

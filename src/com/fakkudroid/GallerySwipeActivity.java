@@ -8,10 +8,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -19,6 +22,7 @@ import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,9 +31,8 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.fakkudroid.bean.SettingBean;
-import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Constants;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -37,39 +40,43 @@ import com.fakkudroid.core.FakkuDroidApplication;
  * 
  * @see SystemUiHider
  */
-public class GallerySwipeActivity extends Activity {
+public class GallerySwipeActivity extends Activity{
 
 	FakkuDroidApplication app;
 	ViewPager mViewPager;
 	Toast toast;
 	GalleryPagerAdapter adapter;
-
+	boolean showPageNumber, zoomButtons;
+	int readingMode;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_gallery_swipe);
 
+		configSettings();
+		
 		app = (FakkuDroidApplication) getApplication();
 		adapter = new GalleryPagerAdapter(this);
 		mViewPager = (ViewPager) findViewById(R.id.viewPager);
 		mViewPager.setAdapter(adapter);
 
-		SettingBean sb = app.getSettingBean();
-		if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
+		if (readingMode == Constants.RIGHT_LEFT_MODE)
 			mViewPager.setCurrentItem(app.getCurrent().getImages().size() - 1);
 		setTitle(app.getCurrent().getTitle());
 		mViewPager.setOffscreenPageLimit(app.getCurrent().getQtyPages());
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 			@Override
 			public void onPageSelected(int page) {
-				SettingBean sb = app.getSettingBean();
-				if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
-					showToast("Page "
-							+ (app.getCurrent().getImages().size() - page)
-							+ "/" + app.getCurrent().getImages().size(), false);
-				else
-					showToast("Page " + (page + 1) + "/"
-							+ app.getCurrent().getImages().size(), false);
+				if(showPageNumber){
+					if (readingMode == Constants.RIGHT_LEFT_MODE)
+						showToast("Page "
+								+ (app.getCurrent().getImages().size() - page)
+								+ "/" + app.getCurrent().getImages().size(), false);
+					else
+						showToast("Page " + (page + 1) + "/"
+								+ app.getCurrent().getImages().size(), false);
+				}
 			}
 
 			@Override
@@ -82,6 +89,22 @@ public class GallerySwipeActivity extends Activity {
 		});
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2)
 			registerForContextMenu(mViewPager);
+		
+	}
+	
+	private void configSettings(){
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		if(prefs.getBoolean("force_landscape_checkbox", false))
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		showPageNumber = prefs.getBoolean("page_number_checkbox", true);
+		zoomButtons = prefs.getBoolean("zoom_button_checkbox", false);
+		readingMode = Integer.parseInt(prefs.getString("reading_mode_list", "0"));
+	}
+	
+	private void setReadingMode(int readingMode){
+		this.readingMode = readingMode;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		prefs.edit().putString("reading_mode_list", readingMode+"").commit();
 	}
 
 	@Override
@@ -95,13 +118,12 @@ public class GallerySwipeActivity extends Activity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		int selectOption = -1;
-		SettingBean sb = app.getSettingBean();
 		switch (item.getItemId()) {
-		case R.id.menu_reading_japanese:
-			selectOption = SettingBean.JAPANESE_MODE;
+		case R.id.menu_reading_right_left:
+			selectOption = Constants.RIGHT_LEFT_MODE;
 			break;
-		case R.id.menu_reading_occidental:
-			selectOption = SettingBean.OCCIDENTAL_MODE;
+		case R.id.menu_reading_left_right:
+			selectOption = Constants.LEFT_RIGHT_MODE;
 			break;
 		case R.id.go_to:
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -121,7 +143,7 @@ public class GallerySwipeActivity extends Activity {
 							String value = input.getText().toString();
 							if (!value.equals("")) {
 								int page = Integer.parseInt(value) - 1;
-								if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE) {
+								if (readingMode == Constants.RIGHT_LEFT_MODE) {
 									page = app.getCurrent().getImages().size()
 											- page - 1;
 								}
@@ -152,7 +174,7 @@ public class GallerySwipeActivity extends Activity {
 
 			return true;
 		case R.id.go_to_first:
-			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE) {
+			if (readingMode == Constants.RIGHT_LEFT_MODE) {
 				mViewPager.setCurrentItem(app.getCurrent().getQtyPages() - 1);
 			} else {
 				mViewPager.setCurrentItem(0);
@@ -160,7 +182,7 @@ public class GallerySwipeActivity extends Activity {
 			;
 			return true;
 		case R.id.go_to_last:
-			if (sb.getReading_mode() == SettingBean.OCCIDENTAL_MODE) {
+			if (readingMode == Constants.LEFT_RIGHT_MODE) {
 				mViewPager.setCurrentItem(app.getCurrent().getQtyPages() - 1);
 			} else {
 				mViewPager.setCurrentItem(0);
@@ -168,17 +190,18 @@ public class GallerySwipeActivity extends Activity {
 			;
 			return true;
 		}
-		if (sb.getReading_mode() == selectOption) {
+		if (readingMode == selectOption) {
 			showToast("You are already in this mode.", false);
 		} else {
 			int currentItem = Math.abs(app.getCurrent().getQtyPages() - 1
 					- mViewPager.getCurrentItem());
-			sb.setReading_mode(selectOption);
+
+			setReadingMode(selectOption);
+			
 			adapter.inverseOrder();
 			mViewPager.setAdapter(adapter);
 			mViewPager.setCurrentItem(currentItem);
-			new DataBaseHandler(this).updateSetting(sb);
-			app.setSettingBean(null);
+			
 		}
 		return true;
 	}
@@ -204,13 +227,12 @@ public class GallerySwipeActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int selectOption = -1;
-		SettingBean sb = app.getSettingBean();
 		switch (item.getItemId()) {
-		case R.id.menu_reading_japanese:
-			selectOption = SettingBean.JAPANESE_MODE;
+		case R.id.menu_reading_right_left:
+			selectOption = Constants.RIGHT_LEFT_MODE;
 			break;
-		case R.id.menu_reading_occidental:
-			selectOption = SettingBean.OCCIDENTAL_MODE;
+		case R.id.menu_reading_left_right:
+			selectOption = Constants.LEFT_RIGHT_MODE;
 			break;
 		case R.id.go_to:
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -230,7 +252,7 @@ public class GallerySwipeActivity extends Activity {
 							String value = input.getText().toString();
 							if (!value.equals("")) {
 								int page = Integer.parseInt(value) - 1;
-								if (app.getSettingBean().getReading_mode() == SettingBean.JAPANESE_MODE) {
+								if (readingMode == Constants.RIGHT_LEFT_MODE) {
 									page = app.getCurrent().getImages().size()
 											- page - 1;
 								}
@@ -261,7 +283,7 @@ public class GallerySwipeActivity extends Activity {
 
 			return true;
 		case R.id.go_to_first:
-			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE) {
+			if (readingMode == Constants.RIGHT_LEFT_MODE) {
 				mViewPager.setCurrentItem(app.getCurrent().getQtyPages() - 1);
 			} else {
 				mViewPager.setCurrentItem(0);
@@ -269,7 +291,7 @@ public class GallerySwipeActivity extends Activity {
 			;
 			return true;
 		case R.id.go_to_last:
-			if (sb.getReading_mode() == SettingBean.OCCIDENTAL_MODE) {
+			if (readingMode == Constants.LEFT_RIGHT_MODE) {
 				mViewPager.setCurrentItem(app.getCurrent().getQtyPages() - 1);
 			} else {
 				mViewPager.setCurrentItem(0);
@@ -277,18 +299,16 @@ public class GallerySwipeActivity extends Activity {
 			;
 			return true;
 		}
-		if (sb.getReading_mode() == selectOption) {
+		if (readingMode == selectOption) {
 			showToast("You are already in this mode.", false);
-		} else if (SettingBean.JAPANESE_MODE == selectOption
-				|| SettingBean.OCCIDENTAL_MODE == selectOption) {
+		} else if (Constants.RIGHT_LEFT_MODE == selectOption
+				|| Constants.LEFT_RIGHT_MODE == selectOption) {
 			int currentItem = Math.abs(app.getCurrent().getQtyPages() - 1
 					- mViewPager.getCurrentItem());
-			sb.setReading_mode(selectOption);
+			setReadingMode(selectOption);
 			adapter.inverseOrder();
 			mViewPager.setAdapter(adapter);
 			mViewPager.setCurrentItem(currentItem);
-			new DataBaseHandler(this).updateSetting(sb);
-			app.setSettingBean(null);
 		}
 		return true;
 	}
@@ -316,14 +336,12 @@ public class GallerySwipeActivity extends Activity {
 			views = new ArrayList<WebViewImageLayout>();
 
 			this.context = context;
-			SettingBean sb = app.getSettingBean();
-
 			File dir = getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
+			List<String> lstImages = app.getCurrent().getImages();
 
-			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE) {
-				List<String> lstImages = app.getCurrent().getImages();
-				for (int i = lstImages.size() - 1; i >= 0; i--) {
+			if (readingMode == Constants.RIGHT_LEFT_MODE) {
+				for (int i = lstFiles.size() - 1; i >= 0; i--) {
 					String strImageFile = lstImages.get(i);
 					File myFile = new File(dir, lstFiles.get(i));
 					WebViewImageLayout wv = null;
@@ -336,9 +354,15 @@ public class GallerySwipeActivity extends Activity {
 					views.add(wv);
 				}
 			} else
-				for (String strImageFile : app.getCurrent().getImages()) {
-					WebViewImageLayout wv = new WebViewImageLayout(
-							strImageFile, GallerySwipeActivity.this);
+				for (int i = 0; i<lstFiles.size(); i++) {
+					String strImageFile = lstImages.get(i);
+					File myFile = new File(dir, lstFiles.get(i));WebViewImageLayout wv = null;
+					if (!myFile.exists())
+						wv = new WebViewImageLayout(strImageFile,
+								GallerySwipeActivity.this);
+					else
+						wv = new WebViewImageLayout("file://" + myFile.getAbsolutePath(),
+								GallerySwipeActivity.this);
 					views.add(wv);
 				}
 		}
@@ -395,9 +419,7 @@ public class GallerySwipeActivity extends Activity {
 
 			WebViewImageLayout wv = null;
 
-			SettingBean sb = app.getSettingBean();
-
-			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
+			if (readingMode == Constants.RIGHT_LEFT_MODE)
 				for (int i = views.size() - 1; i >= 0; i--) {
 					wv = views.get(i);
 					wv.startLoader(width, height, true);
@@ -419,8 +441,7 @@ public class GallerySwipeActivity extends Activity {
 			int width = display.getWidth();
 			int height = display.getHeight();
 
-			SettingBean sb = app.getSettingBean();
-			if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
+			if (readingMode == Constants.RIGHT_LEFT_MODE)
 				for (int i = views.size() - 1; i >= 0; i--) {
 					wv = views.get(i);
 					wv.resizeImage(width, height);
@@ -435,9 +456,8 @@ public class GallerySwipeActivity extends Activity {
 		public void inverseOrder() {
 			ArrayList<WebViewImageLayout> result = new ArrayList<WebViewImageLayout>();
 
-			SettingBean sb = app.getSettingBean();
 			for (int i = views.size() - 1; i >= 0; i--) {
-				if (sb.getReading_mode() == SettingBean.JAPANESE_MODE)
+				if (readingMode == Constants.RIGHT_LEFT_MODE)
 					views.get(i).changeJapaneseMode(true);
 				else
 					views.get(i).changeJapaneseMode(false);
@@ -446,5 +466,26 @@ public class GallerySwipeActivity extends Activity {
 			views = result;
 
 		}
+		
+		public WebViewImageLayout getCurrent(){
+			return views.get(mViewPager.getCurrentItem());
+		}
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+	    int action = event.getAction();
+	    int keyCode = event.getKeyCode();
+		if(zoomButtons)
+			if((action == KeyEvent.ACTION_DOWN) && 
+	                (keyCode == KeyEvent.KEYCODE_VOLUME_UP)){
+				adapter.getCurrent().zoomIn();
+				return true;
+			}else if((action == KeyEvent.ACTION_DOWN) && 
+	                (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)){
+				adapter.getCurrent().zoomOut();
+				return true;
+			}
+		return super.dispatchKeyEvent(event);
 	}
 }

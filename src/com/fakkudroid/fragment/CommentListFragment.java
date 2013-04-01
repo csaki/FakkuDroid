@@ -26,7 +26,7 @@ import com.fakkudroid.R.layout;
 import com.fakkudroid.R.string;
 import com.fakkudroid.adapter.CommentListAdapter;
 import com.fakkudroid.bean.CommentBean;
-import com.fakkudroid.bean.SettingBean;
+import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
 import com.fakkudroid.core.FakkuConnection;
@@ -118,7 +118,7 @@ public class CommentListFragment extends ListFragment {
 											.startActivity(it);
 								}
 							})
-					.setNegativeButton(R.string.cancel,
+					.setNegativeButton(android.R.string.cancel,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
@@ -194,7 +194,7 @@ public class CommentListFragment extends ListFragment {
 				}
 
 			if (!isConnected) {
-				SettingBean s = app.getSettingBean();
+				UserBean s = app.getSettingBean();
 				s.setChecked(false);
 				new DataBaseHandler(getActivity()).updateSetting(s);
 				app.setSettingBean(null);
@@ -255,7 +255,7 @@ public class CommentListFragment extends ListFragment {
 										getActivity().startActivity(it);
 									}
 								})
-						.setNegativeButton(R.string.cancel,
+						.setNegativeButton(android.R.string.cancel,
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int id) {

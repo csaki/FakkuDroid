@@ -11,21 +11,21 @@ import android.view.MotionEvent;
 import android.webkit.WebView;
 import android.widget.ZoomButtonsController;
 
-public class NoZoomControllWebView extends WebView {
+public class NoZoomControlWebView extends WebView {
 
     private ZoomButtonsController zoom_controll = null;
 
-    public NoZoomControllWebView(Context context) {
+    public NoZoomControlWebView(Context context) {
         super(context);
         disableControls();
     }
 
-    public NoZoomControllWebView(Context context, AttributeSet attrs, int defStyle) {
+    public NoZoomControlWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         disableControls();
     }
 
-    public NoZoomControllWebView(Context context, AttributeSet attrs) {
+    public NoZoomControlWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
         disableControls();
     }

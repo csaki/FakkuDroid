@@ -1,5 +1,6 @@
 package com.fakkudroid.adapter;
 
+import java.io.File;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.DoujinBean;
@@ -18,12 +19,16 @@ public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 	
 	LayoutInflater inf;
 	LinkedList<DoujinBean> objects;
+	boolean cacheMode;
+	File cacheDir;
 
 	public FavoriteListAdapter(Context context, int resource, int textViewResourceId,
-			LinkedList<DoujinBean> objects) {
+			LinkedList<DoujinBean> objects, boolean cacheMode,File cacheDir) {
 		super(context, resource, textViewResourceId, objects);
 		this.inf = LayoutInflater.from(context);
 		this.objects = objects;
+		this.cacheMode = cacheMode;
+		this.cacheDir = cacheDir;
 	}
 	
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -44,7 +49,12 @@ public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 		holder.wvTitle.setLongClickable(false);
 		holder.wvTitle.setClickable(false);
 		holder.wvTitle.setFocusableInTouchMode(false);
-		holder.wvTitle.loadDataWithBaseURL(null,Util.createHTMLImagePercentage(s.getUrlImageTitle(),100,parent.getResources()),"text/html", "utf-8",null);		
+		if(cacheMode){
+			File myFile = new File(cacheDir, s.getFileImageTitle());
+			
+			holder.wvTitle.loadDataWithBaseURL(null,Util.createHTMLImagePercentage("file://" + myFile.getAbsolutePath(),100,parent.getResources()),"text/html", "utf-8",null);
+		}else
+			holder.wvTitle.loadDataWithBaseURL(null,Util.createHTMLImagePercentage(s.getUrlImageTitle(),100,parent.getResources()),"text/html", "utf-8",null);		
 		return convertView;
 	}
 	

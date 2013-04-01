@@ -25,6 +25,7 @@
     <string name="title_activity_doujin">DoujinActivity</string>
     <string name="add_favorite">Add to Favorite</string>
     <string name="download">Download</string>
+    <string name="menu_downloads">Downloads</string>
     <string name="delete">Delete</string>
     <string name="mangas">Mangas</string>
     <string name="doujinshis">Doujinshis</string>
@@ -41,7 +42,6 @@
     <string name="title_activity_list_option">ListOptionActivity</string>
     <string name="loading">Loading&#8230;</string>
     <string name="search">Search</string>
-    <string name="cancel">Cancel</string>
     <string name="tile_tag">Tag rpc1</string>
     <string name="tile_serie">Serie rpc1</string>
     <string name="tile_artist">Artist rpc1</string>
@@ -61,8 +61,8 @@
     <string name="title_activity_gallery_swipe">GallerySwipeActivity</string>
     <string name="title_activity_favorite">FavoriteActivity</string>
     <string name="favorite">Favorite of usr</string>
-    <string name="reading_japanese">Reading: Japanese</string>
-    <string name="reading_western">Reading: Western</string>
+    <string name="reading_left_right">Reading: Left to Right</string>
+    <string name="reading_right_left">Reading: Right to Left</string>
     <string name="next_page">Next Page</string>
     <string name="previous_page">Previous Page</string>
     <string name="page_1">Page 1</string>
@@ -77,78 +77,21 @@
     <string name="related_content">Related Content</string>
     <string name="in_construction">In Construction</string>
     <string name="go_to">Go to&#8230;</string>
-	<string name="go_to_first">Go to First Page</string>
-	<string name="go_to_last">Go to Last Page</string>
-	<string name="error_page_out">Error: Number Page</string>	
-	<string name="reply">Reply</string>	
-	<string name="like">Like +1</string>	
-	<string name="dislike">Dislike -1</string>	
-	<string name="come_back">Come back</string>	
-	<string name="soon">Soon</string>
-	<string name="no_data">No data</string>		
-	<string name="load_more">Load more&#8230;</string>	
-	<string name="deleted">Deleted</string>		
-	<string name="image_html">
-	    <![CDATA[
-	    	<html>
-	    		<head>
-	    			<script src=\"file:///android_asset/js/jquery.min.js\"></script>
-	    		</head>
-	    		<body style=\"margin: 0 0 0 0;\">
-	    			<script type=\"text/javascript\">
-	    				$(window).load(function() {resizeAll(@width,@height);});
-	    				$(window).bind(\'resize\', resizeWindow);
-	    				
-	    				function resizeWindow(e) {
-	    					if(first){
-	    						if(japaneseMode)
-	    							$(\'body\').scrollLeft(5000);
-	    						else 
-	    							$(\'body\').scrollLeft(0);
-	    					}
-	    					first = false;
-	    				}
-	    				
-	    				var japaneseMode = @japaneseMode;
-	    				var first = true;
-	    				
-	    				function resizeAll(maxWidth, maxHeight){
-	    					$(\'.resized\').each(function() {
-	    						var ratio = 0;
-	    						var width = $(this).width();
-	    						var height = $(this).height();
-	    						if(width<=height||maxWidth>maxHeight){
-	    							ratio = maxWidth / width;
-	    							$(this).css(\'width\', maxWidth);
-	    							$(this).css(\'height\', height * ratio);
-	    							height = height * ratio;
-	    							width = width * ratio;
-	    						}else{
-	    							ratio = maxHeight / height;
-	    							$(this).css(\'height\', maxHeight);
-	    							$(this).css(\'width\', width * ratio);
-	    							width = width * ratio;
-	    						}
-	    					});
-	    					if(japaneseMode)
-	    						$(\'body\').scrollLeft(5000);
-	    					else 
-	    						$(\'body\').scrollLeft(0);
-	    							
-	    				}	
-	    			</script>
-	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\"/>
-	    		</body>
-	    	</html>
-	    ]]>	    
-	</string>
-	<string name="image_html_percent">
-	    <![CDATA[
-	    	<html>
-	    		<body style=\"margin: 0 0 0 0;\">
-	    			<img style=\"width:@percentage%;\" src =\"@url\" style=\"padding:0px;\"/>
-	    		</body>
-	    	</html>
-	    ]]>
-	</string>
+    <string name="go_to_first">Go to First Page</string>
+    <string name="go_to_last">Go to Last Page</string>
+    <string name="error_page_out">Error: Number Page</string>
+    <string name="reply">Reply</string>
+    <string name="details">Details</string>
+    <string name="like">Like +1</string>
+    <string name="dislike">Dislike -1</string>
+    <string name="come_back">Come back</string>
+    <string name="soon">Soon</string>
+    <string name="no_data">No data</string>
+    <string name="load_more">Load more&#8230;</string>
+    <string name="deleted">Deleted</string>
+    <string name="password_incorrect">Password incorrect</string>
+    <string name="unlock">Unlock</string>
+    <string name="ask_delete">Are you sure you want to delete?</string>
+    <string name="title_activity_download_list">Downloads</string>
+
 </resources>
