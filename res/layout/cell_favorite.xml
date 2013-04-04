@@ -17,11 +17,10 @@
         android:textColor="@color/main_color" 
         android:gravity="center_horizontal"/>
 
-    <WebView
-        android:id="@+id/wvTitle"
+    <ImageView
+        android:id="@+id/ivTitle"
         android:layout_width="100dp"
         android:layout_height="140dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/loading" />
+        android:scaleType="fitXY" />
 
 </LinearLayout>

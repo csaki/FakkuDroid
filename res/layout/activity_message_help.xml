@@ -4,11 +4,21 @@
     android:layout_height="match_parent"
     tools:context=".MessageHelpActivity" >
 
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:onClick="close"
+        android:text="@string/close" />
+
     <WebView
         android:id="@+id/wbHelp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true" 
+        android:layout_above="@+id/btnClose"/>
 
 </RelativeLayout>

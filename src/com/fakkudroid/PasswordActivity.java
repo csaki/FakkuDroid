@@ -39,6 +39,10 @@ public class PasswordActivity extends Activity {
 		}
 		finish();
 	}
+	
+	public void close(View view) {
+		finish();
+	}
 
 	public void checkPassword(View view) {
 		SharedPreferences prefs = PreferenceManager

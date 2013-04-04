@@ -90,11 +90,10 @@ public class DoujinActivity extends FragmentActivity {
 				}
 			}
 		});
-		
+
 		setTitle(app.getCurrent().getTitle());
 	}
 
-	
 	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
 		viewBrowser.setData(Uri.parse(app.getCurrent().getUrl()));
@@ -114,31 +113,44 @@ public class DoujinActivity extends FragmentActivity {
 			new DownloadDoujin().execute("");
 		else {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-	        builder.setMessage(R.string.ask_delete)
-	               .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-	                   public void onClick(DialogInterface dialog, int id) {
-	                	   List<String> lstFiles = app.getCurrent().getImagesFiles();
-	           			String folder = app.getCurrent().getId();
-	           			for (int i = 0; i < lstFiles.size(); i++) {
-	           				File dir = getDir(folder, Context.MODE_PRIVATE);
-	           				File myFile = new File(dir, lstFiles.get(i));
-	           				if (myFile.exists()) {
-	           					myFile.delete();
-	           				}
-	           			}
-	           			DataBaseHandler db = new DataBaseHandler(DoujinActivity.this);
-	           			db.deleteDoujin(app.getCurrent().getId());
-	           			
-	           			ImageButton btnDownload = (ImageButton) findViewById(R.id.btnDownload);
-	           			btnDownload.setImageResource(R.drawable.av_download);
-	           			btnDownload.setContentDescription(getResources().getString(
-	           					R.string.download));
-	           			Toast.makeText(DoujinActivity.this, getResources().getString(R.string.deleted),
-	           					Toast.LENGTH_SHORT).show();
-	           			adapter.getDoujinDetail().setAlreadyDownloaded(false);
-	                   }
-	               })
-	               .setNegativeButton(android.R.string.no, null).create().show();
+			builder.setMessage(R.string.ask_delete)
+					.setPositiveButton(android.R.string.yes,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									List<String> lstFiles = app.getCurrent()
+											.getImagesFiles();
+									String folder = app.getCurrent().getId();
+									for (int i = 0; i < lstFiles.size(); i++) {
+										File dir = getDir(folder,
+												Context.MODE_PRIVATE);
+										File myFile = new File(dir, lstFiles
+												.get(i));
+										if (myFile.exists()) {
+											myFile.delete();
+										}
+									}
+									DataBaseHandler db = new DataBaseHandler(
+											DoujinActivity.this);
+									db.deleteDoujin(app.getCurrent().getId());
+
+									ImageButton btnDownload = (ImageButton) findViewById(R.id.btnDownload);
+									btnDownload
+											.setImageResource(R.drawable.av_download);
+									btnDownload
+											.setContentDescription(getResources()
+													.getString(
+															R.string.download));
+									Toast.makeText(
+											DoujinActivity.this,
+											getResources().getString(
+													R.string.deleted),
+											Toast.LENGTH_SHORT).show();
+									adapter.getDoujinDetail()
+											.setAlreadyDownloaded(false);
+								}
+							}).setNegativeButton(android.R.string.no, null)
+					.create().show();
 		}
 	}
 
@@ -316,6 +328,7 @@ public class DoujinActivity extends FragmentActivity {
 	class DownloadDoujin extends AsyncTask<String, Integer, String> {
 
 		ProgressDialog dialog;
+		boolean cancel;
 
 		protected void onPreExecute() {
 			dialog = new ProgressDialog(DoujinActivity.this);
@@ -325,10 +338,12 @@ public class DoujinActivity extends FragmentActivity {
 			dialog.setTitle(R.string.download);
 			dialog.setIndeterminate(false);
 			dialog.setCancelable(false);
-			dialog.setButton(DialogInterface.BUTTON_NEGATIVE,getResources().getString(android.R.string.cancel) ,
+			dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getResources()
+					.getString(android.R.string.cancel),
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							cancel = true;
 							dialog.dismiss();
 						}
 					});
@@ -343,7 +358,7 @@ public class DoujinActivity extends FragmentActivity {
 			File dir = getDir(folder, Context.MODE_PRIVATE);
 			for (int i = 0; i < lstUrls.size(); i++) {
 				File myFile = new File(dir, lstFiles.get(i));
-				if (dialog.isShowing()) {
+				if (cancel) {
 					if (!myFile.exists()) {
 						try {
 							Util.saveInStorage(myFile, lstUrls.get(i));
@@ -370,12 +385,14 @@ public class DoujinActivity extends FragmentActivity {
 
 		@Override
 		protected void onPostExecute(String bytes) {
-			dialog.dismiss();
-			ImageButton btnDownload = (ImageButton) findViewById(R.id.btnDownload);
-			btnDownload.setImageResource(R.drawable.content_discard);
-			btnDownload.setContentDescription(getResources().getString(
-					R.string.delete));
-			adapter.getDoujinDetail().setAlreadyDownloaded(true);
+			if (!cancel) {
+				dialog.dismiss();
+				ImageButton btnDownload = (ImageButton) findViewById(R.id.btnDownload);
+				btnDownload.setImageResource(R.drawable.content_discard);
+				btnDownload.setContentDescription(getResources().getString(
+						R.string.delete));
+				adapter.getDoujinDetail().setAlreadyDownloaded(true);
+			}
 		}
 	}
 

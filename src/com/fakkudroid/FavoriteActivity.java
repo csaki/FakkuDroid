@@ -45,7 +45,6 @@ public class FavoriteActivity extends Activity implements
 
 	FakkuDroidApplication app;
 	LinkedList<DoujinBean> llDoujin;
-	boolean cacheMode;
 	FavoriteListAdapter da;
 	GridView gvFavorites;
 	String user;
@@ -73,13 +72,6 @@ public class FavoriteActivity extends Activity implements
 		app = (FakkuDroidApplication) getApplication();
 		loadPage();
 
-		configSettings();
-	}
-
-	private void configSettings() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		cacheMode = prefs.getBoolean("cache_mode_checkbox", false);
 	}
 
 	private void loadPage() {
@@ -136,7 +128,7 @@ public class FavoriteActivity extends Activity implements
 	 * crea un adaptador para poblar al ListView del diseño
 	 * */
 	private void setData() {
-		da = new FavoriteListAdapter(this, R.layout.row_doujin, 0, llDoujin, cacheMode, getCacheDir());
+		da = new FavoriteListAdapter(this, R.layout.row_doujin, 0, llDoujin);
 		gvFavorites.setAdapter(da);
 	}
 
@@ -204,17 +196,16 @@ public class FavoriteActivity extends Activity implements
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
 
-			if (cacheMode)
-				for (DoujinBean bean : llDoujin) {
-					try {
-						File dir = getCacheDir();
-						
-						File myFile = new File(dir, bean.getFileImageTitle());
-						Util.saveInStorage(myFile, bean.getUrlImageTitle());
-					} catch (Exception e) {
-						Log.e(DownloadCatalog.class.toString(), "Exception", e);
-					}
+			for (DoujinBean bean : llDoujin) {
+				try {
+					File dir = getCacheDir();
+
+					File myFile = new File(dir, bean.getFileImageTitle());
+					Util.saveInStorage(myFile, bean.getUrlImageTitle());
+				} catch (Exception e) {
+					Log.e(DownloadCatalog.class.toString(), "Exception", e);
 				}
+			}
 
 			return llDoujin.size();
 		}

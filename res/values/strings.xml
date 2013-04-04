@@ -93,5 +93,6 @@
     <string name="unlock">Unlock</string>
     <string name="ask_delete">Are you sure you want to delete?</string>
     <string name="title_activity_download_list">Downloads</string>
+    <string name="close">Close</string>
 
 </resources>
