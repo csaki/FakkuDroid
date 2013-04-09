@@ -8,15 +8,18 @@ import com.fakkudroid.adapter.DownloadListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Constants;
 
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 public class DownloadListActivity extends ListActivity{
 
@@ -31,6 +34,33 @@ public class DownloadListActivity extends ListActivity{
 		app = (FakkuDroidApplication) getApplication();
 		
 		setData();
+	}
+	
+	@Override
+	public File getDir(String dir, int mode){
+		File file = null;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+			String state = Environment.getExternalStorageState();
+			if(Environment.MEDIA_MOUNTED.equals(state)){
+				file = new File(Environment.getExternalStorageDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
+				boolean success = true;
+				if(!file.exists()){
+					success = file.mkdirs();
+				}
+				
+				if(!success)
+					file = null;
+			}
+		}
+		if(file == null)
+			file = new File(Environment.getRootDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
+		
+		if(!file.exists()){
+			file.mkdirs();
+		}
+		return file;
 	}
 	
 	private void setData(){

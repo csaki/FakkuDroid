@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.fakkudroid.adapter.FavoriteListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 import com.fakkudroid.R;
 
@@ -37,7 +39,7 @@ public class FavoriteActivity extends Activity implements
 		AdapterView.OnItemClickListener {
 
 	/**
-	 * constante para identificar la llave con la que envío datos a través de
+	 * constante para identificar la llave con la que envï¿½o datos a travï¿½s de
 	 * intents para comunicar entre las dos actividades: Main y ShowElement
 	 */
 
@@ -72,6 +74,30 @@ public class FavoriteActivity extends Activity implements
 		app = (FakkuDroidApplication) getApplication();
 		loadPage();
 
+	}
+	
+	@Override
+	public File getCacheDir(){
+		File file = null;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+			String state = Environment.getExternalStorageState();
+			if(Environment.MEDIA_MOUNTED.equals(state)){
+				file = new File(Environment.getExternalStorageDirectory() + Constants.CACHE_DIRECTORY);
+				boolean success = true;
+				if(!file.exists()){
+					success = file.mkdirs();
+				}
+				
+				if(!success)
+					file = null;
+			}
+		}
+		if(file == null)
+			file = new File(Environment.getRootDirectory() + Constants.CACHE_DIRECTORY);
+		
+		return file;
 	}
 
 	private void loadPage() {
@@ -124,8 +150,8 @@ public class FavoriteActivity extends Activity implements
 	}
 
 	/**
-	 * Función auxiliar que recibe una lista de mapas, y utilizando esta data
-	 * crea un adaptador para poblar al ListView del diseño
+	 * Funciï¿½n auxiliar que recibe una lista de mapas, y utilizando esta data
+	 * crea un adaptador para poblar al ListView del diseï¿½o
 	 * */
 	private void setData() {
 		da = new FavoriteListAdapter(this, R.layout.row_doujin, 0, llDoujin);

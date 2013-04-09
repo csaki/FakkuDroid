@@ -9,10 +9,8 @@ import org.apache.http.client.ClientProtocolException;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.SpannableString;
@@ -46,26 +44,18 @@ public class DoujinDetailFragment extends Fragment {
 	private FakkuDroidApplication app;
 	DoujinActivity doujinActivity;
 	boolean alreadyDownloaded = false;
-	boolean cacheMode;
-	
+
 	@SuppressLint("ValidFragment")
-	public DoujinDetailFragment(DoujinActivity doujinActivity){
+	public DoujinDetailFragment(DoujinActivity doujinActivity) {
 		this.doujinActivity = doujinActivity;
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (FakkuDroidApplication) getActivity().getApplication();
-		configSettings();
 		new CompleteDoujin().execute(app.getCurrent());
 
-	}
-
-	private void configSettings() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(doujinActivity);
-		cacheMode = prefs.getBoolean("cache_mode_checkbox", false);
 	}
 
 	@Override
@@ -76,18 +66,20 @@ public class DoujinDetailFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_doujin_detail, container, false);
+		View view = inflater.inflate(R.layout.fragment_doujin_detail,
+				container, false);
 		return view;
 	}
-	
-	public void refresh(){
+
+	public void refresh() {
 		new CompleteDoujin().execute(app.getCurrent());
 	}
 
 	public void setComponents() {
-		RelativeLayout rl = (RelativeLayout) getView().findViewById(R.id.doujinDetail);
+		RelativeLayout rl = (RelativeLayout) getView().findViewById(
+				R.id.doujinDetail);
 		rl.setVisibility(View.VISIBLE);
-		
+
 		TextView tvDescription = (TextView) getView().findViewById(
 				R.id.tvDescription);
 		TextView tvDoujin = (TextView) getView().findViewById(R.id.tvDoujin);
@@ -150,25 +142,17 @@ public class DoujinDetailFragment extends Fragment {
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvTranslator.setText(content);
 
-		if(cacheMode){
-			File titleFile = new File(getActivity().getCacheDir(), app.getCurrent().getFileImageTitle());
-			File pageFile = new File(getActivity().getCacheDir(), app.getCurrent().getFileImagePage());
-			
-			wvTitle.loadDataWithBaseURL(null, Util
-					.createHTMLImagePercentage("file://" + titleFile.getAbsolutePath(), 100,
-							getResources()), "text/html", "utf-8", null);
-			wvPage.loadDataWithBaseURL(null, Util
-					.createHTMLImagePercentage("file://" + pageFile.getAbsolutePath(), 100,
-							getResources()), "text/html", "utf-8", null);
-		}else{
-			wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-					.getCurrent().getUrlImageTitle(), 100, this.getResources()),
-					"text/html", "utf-8", null);
-			wvPage.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(app
-					.getCurrent().getUrlImagePage(), 100, this.getResources()),
-					"text/html", "utf-8", null);
-		}
-		
+		File titleFile = new File(getActivity().getCacheDir(), app.getCurrent()
+				.getFileImageTitle());
+		File pageFile = new File(getActivity().getCacheDir(), app.getCurrent()
+				.getFileImagePage());
+
+		wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(
+				"file://" + titleFile.getAbsolutePath(), 100, getResources()),
+				"text/html", "utf-8", null);
+		wvPage.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(
+				"file://" + pageFile.getAbsolutePath(), 100, getResources()),
+				"text/html", "utf-8", null);
 
 		tvUploader.setOnClickListener(new OnClickListener() {
 
@@ -201,11 +185,11 @@ public class DoujinDetailFragment extends Fragment {
 			llTags.addView(tv);
 		}
 
-		ImageButton btnAddToFavorite = (ImageButton) doujinActivity.findViewById(
-				R.id.btnAddToFavorite);
+		ImageButton btnAddToFavorite = (ImageButton) doujinActivity
+				.findViewById(R.id.btnAddToFavorite);
 		alreadyDownloaded = verifyAlreadyDownloaded();
 
-		if (app.getCurrent() != null){
+		if (app.getCurrent() != null) {
 			if (app.getCurrent().isAddedInFavorite()) {
 				btnAddToFavorite.setImageResource(R.drawable.rating_important);
 				btnAddToFavorite.setContentDescription(getResources()
@@ -216,18 +200,22 @@ public class DoujinDetailFragment extends Fragment {
 				btnAddToFavorite.setContentDescription(getResources()
 						.getString(R.string.add_favorite));
 			}
-			if(alreadyDownloaded){
-				ImageButton btnDownload = (ImageButton)doujinActivity.findViewById(R.id.btnDownload);
+			if (alreadyDownloaded) {
+				ImageButton btnDownload = (ImageButton) doujinActivity
+						.findViewById(R.id.btnDownload);
 				btnDownload.setImageResource(R.drawable.content_discard);
-				btnDownload.setContentDescription(getResources().getString(R.string.delete));
-			}else{
-				ImageButton btnDownload = (ImageButton)doujinActivity.findViewById(R.id.btnDownload);
+				btnDownload.setContentDescription(getResources().getString(
+						R.string.delete));
+			} else {
+				ImageButton btnDownload = (ImageButton) doujinActivity
+						.findViewById(R.id.btnDownload);
 				btnDownload.setImageResource(R.drawable.av_download);
-				btnDownload.setContentDescription(getResources().getString(R.string.download));
+				btnDownload.setContentDescription(getResources().getString(
+						R.string.download));
 			}
 		}
 	}
-	
+
 	public void setAlreadyDownloaded(boolean alreadyDownloaded) {
 		this.alreadyDownloaded = alreadyDownloaded;
 	}
@@ -248,7 +236,6 @@ public class DoujinDetailFragment extends Fragment {
 		}
 		return true;
 	}
-	
 
 	class CompleteDoujin extends AsyncTask<DoujinBean, Float, DoujinBean> {
 
@@ -279,28 +266,29 @@ public class DoujinDetailFragment extends Fragment {
 				Log.e(CompleteDoujin.class.toString(), "Exception", e);
 			}
 
-			if (cacheMode)
-				try {
-					File dir = getActivity().getCacheDir();
-					
-					File myFile = new File(dir, bean.getFileImageTitle());
-					Util.saveInStorage(myFile, bean.getUrlImageTitle());
+			try {
+				File dir = getActivity().getCacheDir();
 
-					myFile = new File(dir, bean.getFileImagePage());
-					Util.saveInStorage(myFile, bean.getUrlImagePage());
-				} catch (Exception e) {
-					Log.e(CompleteDoujin.class.toString(), "Exception", e);
-				}
+				File myFile = new File(dir, bean.getFileImageTitle());
+				Util.saveInStorage(myFile, bean.getUrlImageTitle());
+
+				myFile = new File(dir, bean.getFileImagePage());
+				Util.saveInStorage(myFile, bean.getUrlImagePage());
+			} catch (Exception e) {
+				Log.e(CompleteDoujin.class.toString(), "Exception", e);
+			}
 			return bean;
 		}
 
 		protected void onPostExecute(DoujinBean bean) {
 			try {
-				if(bean.getTitle()!=null){
+				if (bean.getTitle() != null) {
 					setComponents();
 					doujinActivity.showProgress(false);
-				}else{
-					Toast.makeText(getActivity(), getResources().getString(R.string.no_data), Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getActivity(),
+							getResources().getString(R.string.no_data),
+							Toast.LENGTH_SHORT).show();
 					getActivity().finish();
 				}
 			} catch (Exception e) {

@@ -14,10 +14,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -92,6 +95,60 @@ public class DoujinActivity extends FragmentActivity {
 		});
 
 		setTitle(app.getCurrent().getTitle());
+	}
+	
+	@Override
+	public File getCacheDir(){
+		File file = null;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+			String state = Environment.getExternalStorageState();
+			if(Environment.MEDIA_MOUNTED.equals(state)){
+				file = new File(Environment.getExternalStorageDirectory() + Constants.CACHE_DIRECTORY);
+				boolean success = true;
+				if(!file.exists()){
+					success = file.mkdirs();
+				}
+				
+				if(!success)
+					file = null;
+			}
+		}
+		if(file == null)
+			file = new File(Environment.getRootDirectory() + Constants.CACHE_DIRECTORY);
+		
+		if(!file.exists()){
+			file.mkdirs();
+		}
+		return file;
+	}
+	
+	@Override
+	public File getDir(String dir, int mode){
+		File file = null;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+			String state = Environment.getExternalStorageState();
+			if(Environment.MEDIA_MOUNTED.equals(state)){
+				file = new File(Environment.getExternalStorageDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
+				boolean success = true;
+				if(!file.exists()){
+					success = file.mkdirs();
+				}
+				
+				if(!success)
+					file = null;
+			}
+		}
+		if(file == null)
+			file = new File(Environment.getRootDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
+		
+		if(!file.exists()){
+			file.mkdirs();
+		}
+		return file;
 	}
 
 	public void viewInBrowser(View view) {
@@ -358,7 +415,7 @@ public class DoujinActivity extends FragmentActivity {
 			File dir = getDir(folder, Context.MODE_PRIVATE);
 			for (int i = 0; i < lstUrls.size(); i++) {
 				File myFile = new File(dir, lstFiles.get(i));
-				if (cancel) {
+				if (!cancel) {
 					if (!myFile.exists()) {
 						try {
 							Util.saveInStorage(myFile, lstUrls.get(i));

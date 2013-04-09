@@ -24,8 +24,17 @@
 	
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
-    <string name="pref_title_cache_mode">Active cache mode</string>
-    <string name="pref_description_cache_mode">The app are going to download the images in a cache storage when it\'s loading a list. This mode avoid than the images flicker.This mode loads the lists slower than normal mode.</string>
+    <string name="pref_title_dir_download">Cache and Download Directory</string>
     <string name="pref_title_password">Password to unlock</string>
     <string name="pref_description_password">Put a password to open the app. If it is empty, it is deactivated</string>
+    
+    <string-array name="pref_dir_download_list">
+        <item>External Storage if exists</item>
+        <item>Always Local Storage</item>
+    </string-array>
+    
+    <string-array name="pref_dir_download_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 </resources>

@@ -41,4 +41,11 @@ public class Constants {
 	//Settings
 	public static final int RIGHT_LEFT_MODE = 0;
 	public static final int LEFT_RIGHT_MODE = 1;
+	
+
+	public static final int EXTERNAL_STORAGE = 0;
+	public static final int LOCAL_STORAGE = 1;
+	
+	public static final String LOCAL_DIRECTORY = "/FakkuDroid/Downloads";
+	public static final String CACHE_DIRECTORY = "/FakkuDroid/Cache";
 }

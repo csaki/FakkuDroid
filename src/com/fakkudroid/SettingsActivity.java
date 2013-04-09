@@ -64,6 +64,7 @@ public class SettingsActivity extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.pref_gallery);
 		
 		bindPreferenceSummaryToValue(findPreference("reading_mode_list"));
+		bindPreferenceSummaryToValue(findPreference("dir_download_list"));
 	}
 
 	/** {@inheritDoc} */

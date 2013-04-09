@@ -1,5 +1,5 @@
 <resources>
-	<string name="image_html">
+	<string name="image_html" formatted="false">
 	    <![CDATA[
 	    	<html>
 	    		<head>
@@ -48,7 +48,7 @@
 	    							
 	    				}	
 	    			</script>
-	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\"/>
+	    			<img class=\"resized\" src = \"@url\" style=\"width:100%;height:100%;padding:0px;\"/>
 	    		</body>
 	    	</html>
 	    ]]>	    

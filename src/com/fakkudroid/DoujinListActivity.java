@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -43,10 +44,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DoujinListActivity extends ListActivity{
+public class DoujinListActivity extends ListActivity {
 
 	/**
-	 * constante para identificar la llave con la que envío datos a través de
+	 * constante para identificar la llave con la que envï¿½o datos a travï¿½s de
 	 * intents para comunicar entre las dos actividades: Main y ShowElement
 	 */
 
@@ -61,7 +62,6 @@ public class DoujinListActivity extends ListActivity{
 	int nroPage = 1;
 	private View mFormView;
 	private View mStatusView;
-	boolean cacheMode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,13 +85,34 @@ public class DoujinListActivity extends ListActivity{
 		app = (FakkuDroidApplication) getApplication();
 		loadPage();
 	}
-
-	private void configSettings() {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		cacheMode = prefs.getBoolean("cache_mode_checkbox", false);
-	}
 	
+	@Override
+	public File getCacheDir(){
+		File file = null;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+			String state = Environment.getExternalStorageState();
+			if(Environment.MEDIA_MOUNTED.equals(state)){
+				file = new File(Environment.getExternalStorageDirectory() + Constants.CACHE_DIRECTORY);
+				boolean success = true;
+				if(!file.exists()){
+					success = file.mkdirs();
+				}
+				
+				if(!success)
+					file = null;
+			}
+		}
+		if(file == null)
+			file = new File(Environment.getRootDirectory() + Constants.CACHE_DIRECTORY);
+		
+		if(!file.exists()){
+			file.mkdirs();
+		}
+		return file;
+	}
+
 	public void nextPage(View view) {
 		nroPage++;
 		loadPage();
@@ -177,7 +198,8 @@ public class DoujinListActivity extends ListActivity{
 			new DataBaseHandler(this).updateSetting(sb);
 			app.setSettingBean(null);
 			FakkuConnection.disconnect();
-			Toast.makeText(this, getResources().getString(R.string.loggedout), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, getResources().getString(R.string.loggedout),
+					Toast.LENGTH_SHORT).show();
 			break;
 		case R.id.menu_login:
 			Intent itLogin = new Intent(this, LoginActivity.class);
@@ -249,7 +271,8 @@ public class DoujinListActivity extends ListActivity{
 			DoujinListActivity.this.startActivity(itAbout);
 			break;
 		case R.id.menu_settings:
-			Intent itSettings = new Intent(DoujinListActivity.this, SettingsActivity.class);
+			Intent itSettings = new Intent(DoujinListActivity.this,
+					SettingsActivity.class);
 			DoujinListActivity.this.startActivity(itSettings);
 			break;
 		case R.id.menu_check_for_updates:
@@ -312,11 +335,11 @@ public class DoujinListActivity extends ListActivity{
 	}
 
 	/**
-	 * Función auxiliar que recibe una lista de mapas, y utilizando esta data
-	 * crea un adaptador para poblar al ListView del diseño
+	 * Funciï¿½n auxiliar que recibe una lista de mapas, y utilizando esta data
+	 * crea un adaptador para poblar al ListView del diseï¿½o
 	 * */
 	private void setData() {
-		da = new DoujinListAdapter(this, R.layout.row_doujin, 0, llDoujin, cacheMode);
+		da = new DoujinListAdapter(this, R.layout.row_doujin, 0, llDoujin);
 		this.setListAdapter(da);
 	}
 
@@ -371,7 +394,6 @@ public class DoujinListActivity extends ListActivity{
 	class DownloadCatalog extends AsyncTask<String, Float, Integer> {
 
 		protected void onPreExecute() {
-			configSettings();
 			showProgress(true);
 		}
 
@@ -388,22 +410,21 @@ public class DoujinListActivity extends ListActivity{
 			} catch (URISyntaxException e1) {
 				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
 			}
-			if(llDoujin==null)
+			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
-			if (cacheMode)
-				for (DoujinBean bean : llDoujin) {
-					try {
-						File dir = getCacheDir();
-						
-						File myFile = new File(dir, bean.getFileImageTitle());
-						Util.saveInStorage(myFile, bean.getUrlImageTitle());
+			for (DoujinBean bean : llDoujin) {
+				try {
+					File dir = getCacheDir();
 
-						myFile = new File(dir, bean.getFileImagePage());
-						Util.saveInStorage(myFile, bean.getUrlImagePage());
-					} catch (Exception e) {
-						Log.e(DownloadCatalog.class.toString(), "Exception", e);
-					}
+					File myFile = new File(dir, bean.getFileImageTitle());
+					Util.saveInStorage(myFile, bean.getUrlImageTitle());
+
+					myFile = new File(dir, bean.getFileImagePage());
+					Util.saveInStorage(myFile, bean.getUrlImagePage());
+				} catch (Exception e) {
+					Log.e(DownloadCatalog.class.toString(), "Exception", e);
 				}
+			}
 			return llDoujin.size();
 		}
 

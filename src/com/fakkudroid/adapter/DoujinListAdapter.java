@@ -20,15 +20,12 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 
 	LayoutInflater inf;
 	LinkedList<DoujinBean> objects;
-	boolean cacheMode;
 
 	public DoujinListAdapter(Context context, int resource,
-			int textViewResourceId, LinkedList<DoujinBean> objects,
-			boolean cacheMode) {
+			int textViewResourceId, LinkedList<DoujinBean> objects) {
 		super(context, resource, textViewResourceId, objects);
 		this.inf = LayoutInflater.from(context);
 		this.objects = objects;
-		this.cacheMode = cacheMode;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -70,25 +67,21 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		holder.wvPage.setClickable(false);
 		holder.wvPage.setFocusableInTouchMode(false);
 
-		if (cacheMode) {
+		File titleFile = new File(getContext().getCacheDir(),
+				s.getFileImageTitle());
+		File pageFile = new File(getContext().getCacheDir(),
+				s.getFileImagePage());
 
-			File titleFile = new File(getContext().getCacheDir(), s.getFileImageTitle());
-			File pageFile = new File(getContext().getCacheDir(), s.getFileImagePage());
-			
-			holder.wvTitle.loadDataWithBaseURL(null, Util
-					.createHTMLImagePercentage("file://" + titleFile.getAbsolutePath(), 100,
-							parent.getResources()), "text/html", "utf-8", null);
-			holder.wvPage.loadDataWithBaseURL(null, Util
-					.createHTMLImagePercentage("file://" + pageFile.getAbsolutePath(), 100,
-							parent.getResources()), "text/html", "utf-8", null);
-		} else {
-			holder.wvTitle.loadDataWithBaseURL(null, Util
-					.createHTMLImagePercentage(s.getUrlImageTitle(), 100,
-							parent.getResources()), "text/html", "utf-8", null);
-			holder.wvPage.loadDataWithBaseURL(null, Util
-					.createHTMLImagePercentage(s.getUrlImagePage(), 100,
-							parent.getResources()), "text/html", "utf-8", null);
-		}
+		holder.wvTitle.loadDataWithBaseURL(
+				null,
+				Util.createHTMLImagePercentage(
+						"file://" + titleFile.getAbsolutePath(), 100,
+						parent.getResources()), "text/html", "utf-8", null);
+		holder.wvPage.loadDataWithBaseURL(
+				null,
+				Util.createHTMLImagePercentage(
+						"file://" + pageFile.getAbsolutePath(), 100,
+						parent.getResources()), "text/html", "utf-8", null);
 		return convertView;
 	}
 
