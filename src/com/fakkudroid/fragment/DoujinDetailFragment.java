@@ -45,6 +45,8 @@ public class DoujinDetailFragment extends Fragment {
 	DoujinActivity doujinActivity;
 	boolean alreadyDownloaded = false;
 
+	public DoujinDetailFragment(){}
+	
 	@SuppressLint("ValidFragment")
 	public DoujinDetailFragment(DoujinActivity doujinActivity) {
 		this.doujinActivity = doujinActivity;

@@ -22,8 +22,6 @@ import android.widget.Toast;
 import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.LoginActivity;
 import com.fakkudroid.R;
-import com.fakkudroid.R.layout;
-import com.fakkudroid.R.string;
 import com.fakkudroid.adapter.CommentListAdapter;
 import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.bean.UserBean;
@@ -31,7 +29,6 @@ import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Constants;
 
 @SuppressLint("ValidFragment")
 public class CommentListFragment extends ListFragment {
@@ -43,6 +40,8 @@ public class CommentListFragment extends ListFragment {
 	private boolean lastPage = false;
 	private int currentPage = 1;
 
+	public CommentListFragment(){}
+	
 	@SuppressLint("ValidFragment")
 	public CommentListFragment(DoujinActivity doujinActivity) {
 		this.doujinActivity = doujinActivity;
@@ -128,12 +127,6 @@ public class CommentListFragment extends ListFragment {
 		}
 		app.setSettingBean(null);
 		if (app.getSettingBean().isChecked()) {
-			String url = "";
-			if (like) {
-				url = b.getUrlLike();
-			} else {
-				url = b.getUrlDislike();
-			}
 			new TransactionLike().execute(b, like);
 		}
 	}

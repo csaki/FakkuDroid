@@ -53,7 +53,7 @@ public class DoujinActivity extends FragmentActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		super.onCreate(null);
 		setContentView(R.layout.activity_doujin);
 
 		app = (FakkuDroidApplication) getApplication();
@@ -65,16 +65,11 @@ public class DoujinActivity extends FragmentActivity {
 		mViewPager.setAdapter(adapter);
 		final ActionImageButton btnComments = (ActionImageButton) findViewById(R.id.btnComments);
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
-
+			
 			@Override
-			public void onPageScrollStateChanged(int arg0) {
-
-			}
-
+			public void onPageScrollStateChanged(int arg0) {}
 			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-			}
+			public void onPageScrolled(int arg0, float arg1, int arg2) {}
 
 			@Override
 			public void onPageSelected(int arg0) {
