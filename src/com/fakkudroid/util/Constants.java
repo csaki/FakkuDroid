@@ -48,4 +48,8 @@ public class Constants {
 	
 	public static final String LOCAL_DIRECTORY = "/FakkuDroid/Downloads";
 	public static final String CACHE_DIRECTORY = "/FakkuDroid/Cache";
+
+	public static final int SCREEN_ORIENTATION_NONE = 0;
+	public static final int SCREEN_ORIENTATION_PORTRAIT = 1;
+	public static final int SCREEN_ORIENTATION_LANDSCAPE = 2;
 }

@@ -72,7 +72,9 @@ public class FavoriteActivity extends Activity implements
 		title = title.replace("usr", user);
 
 		app = (FakkuDroidApplication) getApplication();
-		loadPage();
+
+		if(llDoujin==null||llDoujin.isEmpty())
+			loadPage();
 
 	}
 	

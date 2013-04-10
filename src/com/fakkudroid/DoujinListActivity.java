@@ -47,8 +47,8 @@ import android.widget.Toast;
 public class DoujinListActivity extends ListActivity {
 
 	/**
-	 * constante para identificar la llave con la que env�o datos a trav�s de
-	 * intents para comunicar entre las dos actividades: Main y ShowElement
+	 * constante para identificar la llave con la que env�o datos a trav�s
+	 * de intents para comunicar entre las dos actividades: Main y ShowElement
 	 */
 
 	public final static String INTENT_VAR_URL = "intentVarUrl";
@@ -67,6 +67,7 @@ public class DoujinListActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_doujin_list);
+		app = (FakkuDroidApplication) getApplication();
 
 		mFormView = findViewById(R.id.view_form);
 		mStatusView = findViewById(R.id.view_status);
@@ -82,32 +83,34 @@ public class DoujinListActivity extends ListActivity {
 			url = Constants.SITEROOT;
 		}
 
-		app = (FakkuDroidApplication) getApplication();
 		loadPage();
 	}
-	
+
 	@Override
-	public File getCacheDir(){
+	public File getCacheDir() {
 		File file = null;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		String settingDir = prefs.getString("dir_download", "0");
-		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
 			String state = Environment.getExternalStorageState();
-			if(Environment.MEDIA_MOUNTED.equals(state)){
-				file = new File(Environment.getExternalStorageDirectory() + Constants.CACHE_DIRECTORY);
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.CACHE_DIRECTORY);
 				boolean success = true;
-				if(!file.exists()){
+				if (!file.exists()) {
 					success = file.mkdirs();
 				}
-				
-				if(!success)
+
+				if (!success)
 					file = null;
 			}
 		}
-		if(file == null)
-			file = new File(Environment.getRootDirectory() + Constants.CACHE_DIRECTORY);
-		
-		if(!file.exists()){
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.CACHE_DIRECTORY);
+
+		if (!file.exists()) {
 			file.mkdirs();
 		}
 		return file;

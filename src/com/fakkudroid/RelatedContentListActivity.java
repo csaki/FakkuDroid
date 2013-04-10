@@ -58,7 +58,8 @@ public class RelatedContentListActivity extends ListActivity {
 
 		app = (FakkuDroidApplication) getApplication();
 
-		loadPage();
+		if(llDoujin==null||llDoujin.isEmpty())
+			loadPage();
 	}
 
 	public void nextPage(View view) {

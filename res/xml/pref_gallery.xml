@@ -1,9 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="force_landscape_checkbox"
-        android:title="@string/pref_title_force_landscape" />
+     <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/pref_screen_orientation_list"
+        android:entryValues="@array/pref_screen_orientation_values"
+        android:key="screen_orientation_list"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_force_screen_orientation" />
     
     <CheckBoxPreference
         android:defaultValue="false"
@@ -16,11 +20,6 @@
         android:key="page_number_checkbox"
         android:title="@string/pref_title_page_number" />
 
-    <!--
-         NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
-         dismiss it.
-    -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
         android:defaultValue="0"
         android:entries="@array/pref_reading_mode_list"

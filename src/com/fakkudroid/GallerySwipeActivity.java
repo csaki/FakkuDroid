@@ -149,8 +149,14 @@ public class GallerySwipeActivity extends Activity{
 	
 	private void configSettings(){
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		if(prefs.getBoolean("force_landscape_checkbox", false))
+		switch(Integer.parseInt(prefs.getString("screen_orientation_list", "0"))){
+		case Constants.SCREEN_ORIENTATION_LANDSCAPE:
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			break;
+		case Constants.SCREEN_ORIENTATION_PORTRAIT:
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			break;
+		}
 		showPageNumber = prefs.getBoolean("page_number_checkbox", true);
 		zoomButtons = prefs.getBoolean("zoom_button_checkbox", false);
 		readingMode = Integer.parseInt(prefs.getString("reading_mode_list", "0"));
