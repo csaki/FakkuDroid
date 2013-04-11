@@ -92,7 +92,7 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 		});
 
 		File dir = this.getContext().getDir(s.getId(), Context.MODE_PRIVATE);
-		File titleFile = new File(dir, "001.jpg");
+		File titleFile = new File(dir, "001.fakku");
 		holder.wvTitle.loadDataWithBaseURL(
 				null,
 				Util.createHTMLImagePercentage(
