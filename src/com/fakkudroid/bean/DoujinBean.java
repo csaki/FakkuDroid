@@ -218,6 +218,8 @@ public class DoujinBean {
 			int idxEnd = urlImageTitle.indexOf("thumbs", idxStart);
 
 			if (idxEnd == -1)
+				idxEnd = urlImageTitle.indexOf("xcover", idxStart);
+			if (idxEnd == -1)
 				idxEnd = urlImageTitle.indexOf("cover", idxStart);
 
 			urlImage = urlImageTitle.substring(idxStart, idxEnd);
