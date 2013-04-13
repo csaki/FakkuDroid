@@ -34,6 +34,7 @@ import com.fakkudroid.FavoriteActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
+import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Util;
@@ -227,16 +228,14 @@ public class DoujinDetailFragment extends Fragment {
 	}
 
 	public boolean verifyAlreadyDownloaded() {
-		List<String> lstFiles = app.getCurrent().getImagesFiles();
-		String folder = app.getCurrent().getId();
-		for (int i = 0; i < lstFiles.size(); i++) {
-			File dir = doujinActivity.getDir(folder, Context.MODE_PRIVATE);
-			File myFile = new File(dir, lstFiles.get(i));
-			if (!myFile.exists()) {
-				return false;
-			}
+		try {
+			DataBaseHandler db = new DataBaseHandler(this.getActivity());
+			return db.getDoujinBean(app.getCurrent().getId())!=null;
+		} catch (Exception e) {
+			Log.e(DoujinDetailFragment.class.getName(), "Error verifing if exists doujin in the db.", e);
 		}
-		return true;
+		
+		return false;
 	}
 
 	class CompleteDoujin extends AsyncTask<DoujinBean, Float, DoujinBean> {

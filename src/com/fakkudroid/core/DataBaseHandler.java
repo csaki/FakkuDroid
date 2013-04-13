@@ -165,6 +165,42 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		// return contact list
 		return result;
 	}
+	
+	public DoujinBean getDoujinBean(String id) {
+		DoujinBean result = null;
+		// Select All Query
+		String selectQuery = "SELECT " + KEY_ID + "," + KEY_TITLE + ","
+				+ KEY_DESCRIPTION + "," + KEY_ARTIST + "," + KEY_TAGS + ","
+				+ KEY_SERIE + "," + KEY_QTY_PAGES + "," + KEY_URL + " FROM " + TABLE_DOUJIN
+				+ " WHERE " + KEY_ID + "='" + id + "'";
+
+		Log.i(this.getClass().toString(), selectQuery);
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			result = new DoujinBean();
+			result.setTitle(cursor.getString(1));
+			result.setDescription(cursor.getString(2));
+			result.setArtist(Util.castURLBean(cursor.getString(3)));
+			List<URLBean> lstTags = new ArrayList<URLBean>();
+			String tags = cursor.getString(4);
+			String[] tags_list = tags.split(",");
+			for (String str : tags_list) {
+				lstTags.add(Util.castURLBean(str));
+			}
+			result.setLstTags(lstTags);
+			result.setSerie(Util.castURLBean(cursor.getString(5)));
+			result.setQtyPages(cursor.getInt(6));
+			result.setUrl(cursor.getString(7));
+		}
+
+		db.close();
+		// return contact list
+		return result;
+	}
 
 	public LinkedList<DoujinBean> getDoujinList() {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();

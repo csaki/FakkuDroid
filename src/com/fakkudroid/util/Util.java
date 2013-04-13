@@ -164,6 +164,12 @@ public class Util {
 
 	public static void saveInStorage(File file, String imageUrl) throws IOException {
 		imageUrl = Util.escapeURL(imageUrl);
+		String fakkuExtentionFile = file.getAbsolutePath();
+		fakkuExtentionFile = fakkuExtentionFile.replaceAll("\\.jpg", "\\.fakku");
+		File fakkuFile = new File(fakkuExtentionFile);
+		if(fakkuFile.exists()){
+			fakkuFile.renameTo(file);
+		}
 		if (!file.exists()) {
 			URL url = new URL(imageUrl);
 			URLConnection connection = url.openConnection();

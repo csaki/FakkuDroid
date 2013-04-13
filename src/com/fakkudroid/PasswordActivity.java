@@ -1,9 +1,15 @@
 package com.fakkudroid;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Constants;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -22,10 +28,45 @@ public class PasswordActivity extends Activity {
 
 		app = (FakkuDroidApplication) getApplication();
 
+		createFolders();
+		
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		if (prefs.getString("password_text", "").equals("")) {
 			unlock();
+		}
+	}
+	
+	private void createFolders(){
+		File file = null;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		
+		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+			String state = Environment.getExternalStorageState();
+			if(Environment.MEDIA_MOUNTED.equals(state)){
+				file = new File(Environment.getExternalStorageDirectory() + Constants.DIRECTORY);
+				boolean success = true;
+				if(!file.exists()){
+					success = file.mkdirs();
+				}
+				
+				if(!success)
+					file = null;
+			}
+		}
+		if(file == null)
+			file = new File(Environment.getRootDirectory() + Constants.DIRECTORY);
+		
+		if(!file.exists()){
+			file.mkdirs();
+		}
+		
+		File nomedia = new File(file, ".nomedia");
+		try {
+			nomedia.createNewFile();
+		} catch (IOException e) {
+			Log.e(PasswordActivity.class.getName(), "Error creating .nomedia file.", e);
 		}
 	}
 	

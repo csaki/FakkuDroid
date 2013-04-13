@@ -20,6 +20,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.InputType;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Display;
@@ -395,7 +396,9 @@ public class GallerySwipeActivity extends Activity{
 
 		public GalleryPagerAdapter(Context context) {
 			views = new ArrayList<WebViewImageLayout>();
-
+			
+			renameAllFiles();
+			
 			this.context = context;
 			File dir = getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
@@ -426,6 +429,23 @@ public class GallerySwipeActivity extends Activity{
 								GallerySwipeActivity.this);
 					views.add(wv);
 				}
+		}
+		
+		private void renameAllFiles(){
+			try {
+				List<String> lstFiles = app.getCurrent().getImagesFiles();
+				List<String> lstOldFiles = app.getCurrent().getOldImagesFiles();
+				
+				for (int i = 0; i < lstFiles.size(); i++) {
+					File oldFile = new File(lstOldFiles.get(i));
+					File newFile = new File(lstFiles.get(i));
+					if(oldFile.exists()){
+						oldFile.renameTo(newFile);
+					}
+				}
+			} catch (Exception e) {
+				Log.e(GalleryPagerAdapter.class.getName(), "Error renaming files.", e);
+			}
 		}
 
 		@Override

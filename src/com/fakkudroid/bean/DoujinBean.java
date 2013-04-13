@@ -71,11 +71,11 @@ public class DoujinBean {
 	}
 
 	public String getFileImageTitle() {
-		return getId() + "title.fakku";
+		return getId() + "title.jpg";
 	}
 
 	public String getFileImagePage() {
-		return getId() + "page.fakku";
+		return getId() + "page.jpg";
 	}
 
 	public String getTitle() {
@@ -202,6 +202,16 @@ public class DoujinBean {
 	}
 
 	public List<String> getImagesFiles() {
+		List<String> result = new ArrayList<String>();
+		for (int i = 1; i <= qtyPages; i++) {
+			Formatter fmt = new Formatter();
+			result.add(fmt.format("%03d", i) + ".jpg");
+			fmt.close();
+		}
+		return result;
+	}
+	
+	public List<String> getOldImagesFiles() {
 		List<String> result = new ArrayList<String>();
 		for (int i = 1; i <= qtyPages; i++) {
 			Formatter fmt = new Formatter();
