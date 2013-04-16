@@ -435,10 +435,11 @@ public class GallerySwipeActivity extends Activity{
 			try {
 				List<String> lstFiles = app.getCurrent().getImagesFiles();
 				List<String> lstOldFiles = app.getCurrent().getOldImagesFiles();
+				File dir = getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
 				
 				for (int i = 0; i < lstFiles.size(); i++) {
-					File oldFile = new File(lstOldFiles.get(i));
-					File newFile = new File(lstFiles.get(i));
+					File oldFile = new File(dir, lstOldFiles.get(i));
+					File newFile = new File(dir, lstFiles.get(i));
 					if(oldFile.exists()){
 						oldFile.renameTo(newFile);
 					}
@@ -451,11 +452,6 @@ public class GallerySwipeActivity extends Activity{
 		@Override
 		public void destroyItem(View view, int arg1, Object object) {
 			((ViewPager) view).removeView((WebViewImageLayout) object);
-		}
-
-		@Override
-		public void finishUpdate(View arg0) {
-
 		}
 
 		@Override
@@ -473,21 +469,6 @@ public class GallerySwipeActivity extends Activity{
 		@Override
 		public boolean isViewFromObject(View view, Object object) {
 			return view == object;
-		}
-
-		@Override
-		public void restoreState(Parcelable arg0, ClassLoader arg1) {
-
-		}
-
-		@Override
-		public Parcelable saveState() {
-			return null;
-		}
-
-		@Override
-		public void startUpdate(View arg0) {
-
 		}
 
 		@SuppressWarnings("deprecation")
@@ -550,6 +531,26 @@ public class GallerySwipeActivity extends Activity{
 		
 		public WebViewImageLayout getCurrent(){
 			return views.get(mViewPager.getCurrentItem());
+		}
+
+		@Override
+		public Parcelable saveState() {
+			return null;
+		}
+
+		@Override
+		public void startUpdate(View arg0) {
+
+		}
+
+		@Override
+		public void restoreState(Parcelable arg0, ClassLoader arg1) {
+
+		}
+
+		@Override
+		public void finishUpdate(View arg0) {
+
 		}
 	}
 
