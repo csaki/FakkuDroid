@@ -32,24 +32,63 @@ import android.graphics.BitmapFactory;
 
 public class Util {
 
-	public static Bitmap loadFromUrl(String link, int reqWidth)
-			throws IOException, URISyntaxException {
-		link = escapeURL(link);
+	public static int calculateInSampleSize(BitmapFactory.Options options,
+			int reqWidth, int reqHeight) {
+		// Raw height and width of image
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
 
-		HttpGet httpRequest = null;
+		if (height > reqHeight || width > reqWidth) {
 
-		httpRequest = new HttpGet(link);
+			// Calculate ratios of height and width to requested height and
+			// width
+			final int heightRatio = Math.round((float) height
+					/ (float) reqHeight);
+			final int widthRatio = Math.round((float) width / (float) reqWidth);
 
-		HttpClient httpclient = new DefaultHttpClient();
+			// Choose the smallest ratio as inSampleSize value, this will
+			// guarantee
+			// a final image with both dimensions larger than or equal to the
+			// requested height and width.
+			inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+		}
 
-		HttpResponse response = (HttpResponse) httpclient.execute(httpRequest);
+		return inSampleSize;
+	}
 
-		HttpEntity entity = response.getEntity();
+	public static Bitmap decodeSampledBitmapFromResource(Resources res,
+			int resId, int reqWidth, int reqHeight) {
 
-		BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+		// First decode with inJustDecodeBounds=true to check dimensions
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeResource(res, resId, options);
 
-		InputStream instream = bufHttpEntity.getContent();
-		return decodeFile(instream, reqWidth);
+		// Calculate inSampleSize
+		options.inSampleSize = calculateInSampleSize(options, reqWidth,
+				reqHeight);
+
+		// Decode bitmap with inSampleSize set
+		options.inJustDecodeBounds = false;
+		return BitmapFactory.decodeResource(res, resId, options);
+	}
+
+	public static Bitmap decodeSampledBitmapFromFile(String file, int reqWidth,
+			int reqHeight) {
+
+		// First decode with inJustDecodeBounds=true to check dimensions
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(file, options);
+
+		// Calculate inSampleSize
+		options.inSampleSize = calculateInSampleSize(options, reqWidth,
+				reqHeight);
+
+		// Decode bitmap with inSampleSize set
+		options.inJustDecodeBounds = false;
+		return BitmapFactory.decodeFile(file, options);
 	}
 
 	public static String escapeURL(String link) {
@@ -57,29 +96,6 @@ public class Util {
 		link = link.replaceAll("\\]", "%5D");
 		link = link.replaceAll("\\s", "%20");
 		return link;
-	}
-
-	public static Bitmap decodeFile(InputStream instream, int reqWidth)
-			throws IOException {
-		// Decode image size
-		BitmapFactory.Options o = new BitmapFactory.Options();
-		o.inJustDecodeBounds = true;
-		BitmapFactory.decodeStream(instream, null, o);
-
-		final int width = o.outWidth;
-		// Find the correct scale value. It should be the power of 2.
-		int inSampleSize = 1;
-
-		if (width > reqWidth) {
-			inSampleSize = Math.round((float) width / (float) reqWidth);
-		}
-
-		// Decode with inSampleSize
-		BitmapFactory.Options o2 = new BitmapFactory.Options();
-		o2.inSampleSize = inSampleSize;
-
-		instream.reset();
-		return BitmapFactory.decodeStream(instream, null, o2);
 	}
 
 	public static String limitString(String s, int maxSize, String fill) {

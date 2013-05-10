@@ -410,7 +410,7 @@ public class FakkuConnection {
 		bean.setQtyFavorites(c);
 		
 		// Images
-		token = "<img class=\"cover\"";
+		token = "<img ";
 		idxStart = html.indexOf(token) + token.length();
 		token = "src=\"";
 		idxStart = html.indexOf(token, idxStart) + token.length();

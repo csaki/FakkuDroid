@@ -53,4 +53,6 @@ public class Constants {
 	public static final int SCREEN_ORIENTATION_NONE = 0;
 	public static final int SCREEN_ORIENTATION_PORTRAIT = 1;
 	public static final int SCREEN_ORIENTATION_LANDSCAPE = 2;
+	
+	public static final String SHOW_MESSAGE_HELP = "show_message_help";
 }

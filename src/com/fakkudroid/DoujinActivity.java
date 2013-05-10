@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
 
 import android.animation.Animator;
@@ -32,6 +33,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.fakkudroid.DownloadListActivity.ScanFolder;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
@@ -65,11 +67,14 @@ public class DoujinActivity extends FragmentActivity {
 		mViewPager.setAdapter(adapter);
 		final ActionImageButton btnComments = (ActionImageButton) findViewById(R.id.btnComments);
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
-			
+
 			@Override
-			public void onPageScrollStateChanged(int arg0) {}
+			public void onPageScrollStateChanged(int arg0) {
+			}
+
 			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {}
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
 
 			@Override
 			public void onPageSelected(int arg0) {
@@ -91,56 +96,62 @@ public class DoujinActivity extends FragmentActivity {
 
 		setTitle(app.getCurrent().getTitle());
 	}
-	
+
 	@Override
-	public File getCacheDir(){
+	public File getCacheDir() {
 		File file = null;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		String settingDir = prefs.getString("dir_download", "0");
-		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
 			String state = Environment.getExternalStorageState();
-			if(Environment.MEDIA_MOUNTED.equals(state)){
-				file = new File(Environment.getExternalStorageDirectory() + Constants.CACHE_DIRECTORY);
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.CACHE_DIRECTORY);
 				boolean success = true;
-				if(!file.exists()){
+				if (!file.exists()) {
 					success = file.mkdirs();
 				}
-				
-				if(!success)
+
+				if (!success)
 					file = null;
 			}
 		}
-		if(file == null)
-			file = new File(Environment.getRootDirectory() + Constants.CACHE_DIRECTORY);
-		
-		if(!file.exists()){
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.CACHE_DIRECTORY);
+
+		if (!file.exists()) {
 			file.mkdirs();
 		}
 		return file;
 	}
-	
+
 	@Override
-	public File getDir(String dir, int mode){
+	public File getDir(String dir, int mode) {
 		File file = null;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		String settingDir = prefs.getString("dir_download", "0");
-		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
 			String state = Environment.getExternalStorageState();
-			if(Environment.MEDIA_MOUNTED.equals(state)){
-				file = new File(Environment.getExternalStorageDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.LOCAL_DIRECTORY + "/" + dir);
 				boolean success = true;
-				if(!file.exists()){
+				if (!file.exists()) {
 					success = file.mkdirs();
 				}
-				
-				if(!success)
+
+				if (!success)
 					file = null;
 			}
 		}
-		if(file == null)
-			file = new File(Environment.getRootDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
-		
-		if(!file.exists()){
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.LOCAL_DIRECTORY + "/" + dir);
+
+		if (!file.exists()) {
 			file.mkdirs();
 		}
 		return file;
@@ -170,17 +181,14 @@ public class DoujinActivity extends FragmentActivity {
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									List<String> lstFiles = app.getCurrent()
-											.getImagesFiles();
 									String folder = app.getCurrent().getId();
-									for (int i = 0; i < lstFiles.size(); i++) {
-										File dir = getDir(folder,
-												Context.MODE_PRIVATE);
-										File myFile = new File(dir, lstFiles
-												.get(i));
-										if (myFile.exists()) {
-											myFile.delete();
-										}
+									File dir = getDir(folder,
+											Context.MODE_PRIVATE);
+									try {
+										FileUtils.deleteDirectory(dir);
+									} catch (IOException e) {
+										Log.e(ScanFolder.class.toString(),
+												"Exception", e);
 									}
 									DataBaseHandler db = new DataBaseHandler(
 											DoujinActivity.this);

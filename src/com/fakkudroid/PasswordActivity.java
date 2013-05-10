@@ -74,7 +74,10 @@ public class PasswordActivity extends Activity {
 		Intent it = new Intent(this, DoujinListActivity.class);
 		this.startActivity(it);
 
-		if (app.getSettingBean().isShowMessage()) {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		
+		if (prefs.getBoolean(Constants.SHOW_MESSAGE_HELP, true)) {
 			it = new Intent(this, MessageHelpActivity.class);
 			this.startActivity(it);
 		}

@@ -53,6 +53,7 @@
     <string name="remove_favorite">Remove from favorite</string>
     <string name="my_favorites">My favorites</string>
     <string name="login">Login</string>
+    <string name="scan">Scan folder</string>
     <string name="logout">Logout</string>
     <string name="login_please">Your are not logged. Do you want to log in?</string>
     <string name="view_browser">View in Browser</string>
