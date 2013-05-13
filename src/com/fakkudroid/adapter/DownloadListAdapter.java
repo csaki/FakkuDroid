@@ -1,16 +1,20 @@
 package com.fakkudroid.adapter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.util.ActionImageButton2;
+import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 import com.fakkudroid.DownloadListActivity;
 import com.fakkudroid.R;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,11 +68,6 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 		holder.tvDescription.setText(Html.fromHtml(s.getDescription().replace(
 				"<br>", "<br/>")));
 		;
-		holder.wvTitle.setFocusable(false);
-		holder.wvTitle.setLongClickable(false);
-		holder.wvTitle.setClickable(false);
-		holder.wvTitle.setFocusableInTouchMode(false);
-
 		holder.btnDelete.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -97,11 +96,22 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 		if(oldTitleFile.exists()){
 			oldTitleFile.renameTo(titleFile);
 		}
+		File thumbFile = new File(dir,"thumb.jpg");
+		
+		if(!thumbFile.exists()&&titleFile.exists()){
+			Bitmap titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+			try {
+				Util.saveBitmap(thumbFile, titleBitmap);
+			} catch (IOException e) {
+				Log.e("DownloadListAdapter", "Error saving bitmap thumb", e);
+			}
+		}
+		
 		holder.wvTitle.loadDataWithBaseURL(
 				null,
 				Util.createHTMLImagePercentage(
-						"file://" + titleFile.getAbsolutePath(), 100,
-						parent.getResources()), "text/html", "utf-8", null);
+						"file://" + thumbFile.getAbsolutePath(), 100,
+						parent.getResources()), "text/html", "utf-8", null);;
 		return convertView;
 	}
 

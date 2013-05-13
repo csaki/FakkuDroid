@@ -4,10 +4,52 @@
     android:layout_height="match_parent"
     tools:context=".DownloadListActivity" >
 
+    <LinearLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:orientation="horizontal" >
+
+        <view
+            android:id="@+id/btnPreviousPage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            class="com.fakkudroid.util.ActionImageButton"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/previous_page"
+            android:onClick="previousPage"
+            android:scaleType="fitXY"
+            android:src="@drawable/navigation_previous_item" />
+
+        <TextView
+            android:id="@+id/tvPage"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.6"
+            android:gravity="center"
+            android:text="@string/page_1"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/main_color" />
+
+        <view
+            android:id="@+id/btnNextPage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            class="com.fakkudroid.util.ActionImageButton"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/next_page"
+            android:onClick="nextPage"
+            android:scaleType="fitXY"
+            android:src="@drawable/navigation_next_item" />
+    </LinearLayout>
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/ll"
         android:layout_margin="5dp"
         android:background="@android:color/white"
         android:scrollbars="horizontal" >

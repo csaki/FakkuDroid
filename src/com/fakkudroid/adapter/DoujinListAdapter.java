@@ -4,16 +4,18 @@ import java.io.File;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 import com.fakkudroid.R;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
@@ -42,8 +44,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 			holder.tvDescription = (TextView) convertView
 					.findViewById(R.id.tvDescription);
 			holder.tvTags = (TextView) convertView.findViewById(R.id.tvTags);
-			holder.wvTitle = (WebView) convertView.findViewById(R.id.wvTitle);
-			holder.wvPage = (WebView) convertView.findViewById(R.id.wvPage);
+			holder.ivTitle = (ImageView) convertView.findViewById(R.id.ivTitle);
+			holder.ivPage = (ImageView) convertView.findViewById(R.id.ivPage);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
@@ -56,32 +58,16 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 				"<br>", "<br/>")));
 		;
 		holder.tvTags.setText(s.getTags());
-
-		holder.wvTitle.setFocusable(false);
-		holder.wvTitle.setLongClickable(false);
-		holder.wvTitle.setClickable(false);
-		holder.wvTitle.setFocusableInTouchMode(false);
-
-		holder.wvPage.setFocusable(false);
-		holder.wvPage.setLongClickable(false);
-		holder.wvPage.setClickable(false);
-		holder.wvPage.setFocusableInTouchMode(false);
-
 		File titleFile = new File(getContext().getCacheDir(),
 				s.getFileImageTitle());
 		File pageFile = new File(getContext().getCacheDir(),
 				s.getFileImagePage());
 
-		holder.wvTitle.loadDataWithBaseURL(
-				null,
-				Util.createHTMLImagePercentage(
-						"file://" + titleFile.getAbsolutePath(), 100,
-						parent.getResources()), "text/html", "utf-8", null);
-		holder.wvPage.loadDataWithBaseURL(
-				null,
-				Util.createHTMLImagePercentage(
-						"file://" + pageFile.getAbsolutePath(), 100,
-						parent.getResources()), "text/html", "utf-8", null);
+		Bitmap titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+		Bitmap pageBitmap = Util.decodeSampledBitmapFromFile(pageFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+		
+		holder.ivTitle.setImageBitmap(titleBitmap);
+		holder.ivPage.setImageBitmap(pageBitmap);
 		return convertView;
 	}
 
@@ -92,7 +78,7 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		TextView tvTags;
 		TextView tvDescription;
 
-		WebView wvTitle;
-		WebView wvPage;
+		ImageView ivTitle;
+		ImageView ivPage;
 	}
 }

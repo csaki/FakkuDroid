@@ -33,7 +33,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.fakkudroid.DownloadListActivity.ScanFolder;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
@@ -187,7 +186,7 @@ public class DoujinActivity extends FragmentActivity {
 									try {
 										FileUtils.deleteDirectory(dir);
 									} catch (IOException e) {
-										Log.e(ScanFolder.class.toString(),
+										Log.e(DoujinActivity.class.toString(),
 												"Exception", e);
 									}
 									DataBaseHandler db = new DataBaseHandler(

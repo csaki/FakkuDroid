@@ -2,13 +2,12 @@ package com.fakkudroid.fragment;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,6 +22,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,6 +37,7 @@ import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 
 @SuppressLint("ValidFragment")
@@ -87,8 +88,8 @@ public class DoujinDetailFragment extends Fragment {
 				R.id.tvDescription);
 		TextView tvDoujin = (TextView) getView().findViewById(R.id.tvDoujin);
 		TextView tvArtist = (TextView) getView().findViewById(R.id.tvArtist);
-		WebView wvTitle = (WebView) getView().findViewById(R.id.wvTitle);
-		WebView wvPage = (WebView) getView().findViewById(R.id.wvPage);
+		ImageView ivTitle = (ImageView) getView().findViewById(R.id.ivTitle);
+		ImageView ivPage = (ImageView) getView().findViewById(R.id.ivPage);
 		TextView tvSerie = (TextView) getView().findViewById(R.id.tvSerie);
 		TextView tvQtyPages = (TextView) getView()
 				.findViewById(R.id.tvQtyPages);
@@ -150,13 +151,12 @@ public class DoujinDetailFragment extends Fragment {
 		File pageFile = new File(getActivity().getCacheDir(), app.getCurrent()
 				.getFileImagePage());
 
-		wvTitle.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(
-				"file://" + titleFile.getAbsolutePath(), 100, getResources()),
-				"text/html", "utf-8", null);
-		wvPage.loadDataWithBaseURL(null, Util.createHTMLImagePercentage(
-				"file://" + pageFile.getAbsolutePath(), 100, getResources()),
-				"text/html", "utf-8", null);
-
+		Bitmap titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+		Bitmap pageBitmap = Util.decodeSampledBitmapFromFile(pageFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+		
+		ivTitle.setImageBitmap(titleBitmap);
+		ivPage.setImageBitmap(pageBitmap);
+		
 		tvUploader.setOnClickListener(new OnClickListener() {
 
 			@Override

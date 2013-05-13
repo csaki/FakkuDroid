@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -18,7 +17,6 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
@@ -32,6 +30,14 @@ import android.graphics.BitmapFactory;
 
 public class Util {
 
+	public static void saveBitmap(File file, Bitmap bitmap) throws IOException{
+		FileOutputStream fOut = new FileOutputStream(file);
+
+	    bitmap.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+	    fOut.flush();
+	    fOut.close();
+	}
+	
 	public static int calculateInSampleSize(BitmapFactory.Options options,
 			int reqWidth, int reqHeight) {
 		// Raw height and width of image

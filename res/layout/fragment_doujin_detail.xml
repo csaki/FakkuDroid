@@ -32,19 +32,19 @@
             android:orientation="horizontal"
             android:padding="10dp" >
 
-            <WebView
-                android:id="@+id/wvTitle"
+            <ImageView
+                android:id="@+id/ivTitle"
                 android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_height="210dp"
                 android:layout_marginRight="2dp"
                 android:scaleType="fitXY"
                 android:scrollbars="none"
                 android:src="@drawable/loading" />
 
-            <WebView
-                android:id="@+id/wvPage"
+            <ImageView
+                android:id="@+id/ivPage"
                 android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_height="210dp"
                 android:layout_marginLeft="2dp"
                 android:scaleType="fitXY"
                 android:scrollbars="none"

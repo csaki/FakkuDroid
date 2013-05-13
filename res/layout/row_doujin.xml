@@ -9,8 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-        <WebView
-            android:id="@+id/wvPage"
+        <ImageView
+            android:id="@+id/ivPage"
             android:layout_width="100dp"
             android:layout_height="140dp"
             android:layout_alignParentTop="true"
@@ -18,13 +18,13 @@
             android:layout_centerVertical="true"
             android:scaleType="fitXY"
             android:src="@drawable/loading" />
-        <WebView
-            android:id="@+id/wvTitle"
+        <ImageView
+            android:id="@+id/ivTitle"
             android:layout_width="100dp"
             android:layout_height="140dp"
             android:layout_alignParentTop="true"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/wvPage"
+            android:layout_toLeftOf="@+id/ivPage"
             android:scaleType="fitXY"
             android:src="@drawable/loading" />
 
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/wvTitle"
+            android:layout_toLeftOf="@+id/ivTitle"
             android:layout_alignParentLeft="true"
             android:orientation="vertical" >
 

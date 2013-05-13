@@ -3,28 +3,21 @@ package com.fakkudroid;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-
 import org.apache.commons.io.FileUtils;
-
-
 import com.fakkudroid.adapter.DownloadListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.DataBaseHandler;
-import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
-
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,6 +27,7 @@ public class DownloadListActivity extends ListActivity{
 
 	private FakkuDroidApplication app;
 	DownloadListAdapter da;
+	int numPage = 1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,21 +39,40 @@ public class DownloadListActivity extends ListActivity{
 		setData();
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_download_list, menu);
-		return true;
+	public void nextPage(View view) {
+		numPage++;
+		TextView tvPage = (TextView) findViewById(R.id.tvPage);
+		tvPage.setText("Page " + numPage);
+		setData();
+		Context context = getApplicationContext();
+		CharSequence text = "Page " + numPage;
+		int duration = Toast.LENGTH_SHORT;
+
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.show();
 	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_scan:
-			new ScanFolder().execute(true);
-			break;
+
+	public void previousPage(View view) {
+		if (numPage - 1 == 0) {
+
+			Context context = getApplicationContext();
+			CharSequence text = "There aren't more pages.";
+			int duration = Toast.LENGTH_SHORT;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
+		} else {
+			numPage--;
+			TextView tvPage = (TextView) findViewById(R.id.tvPage);
+			tvPage.setText("Page " + numPage);
+			setData();
+			Context context = getApplicationContext();
+			CharSequence text = "Page " + numPage;
+			int duration = Toast.LENGTH_SHORT;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
 		}
-		return true;
 	}
 	
 	@Override
@@ -91,7 +104,7 @@ public class DownloadListActivity extends ListActivity{
 	
 	private void setData(){
 		DataBaseHandler db = new DataBaseHandler(this);
-		LinkedList<DoujinBean> llDoujin = db.getDoujinList();
+		LinkedList<DoujinBean> llDoujin = db.getDoujinList(numPage);
 		
 		da = new DownloadListAdapter(this, R.layout.row_download, 0, llDoujin, this);
 		this.setListAdapter(da);
@@ -107,7 +120,7 @@ public class DownloadListActivity extends ListActivity{
        				try {
 						FileUtils.deleteDirectory(dir);
 					} catch (IOException e) {
-						Log.e(ScanFolder.class.toString(),
+						Log.e(DownloadListActivity.class.toString(),
 								"Exception", e);
 					}
            			DataBaseHandler db = new DataBaseHandler(DownloadListActivity.this);
@@ -129,98 +142,5 @@ public class DownloadListActivity extends ListActivity{
 		app.setCurrent(bean);
 		Intent it = new Intent(this, GallerySwipeActivity.class);
 		this.startActivity(it);
-	}
-
-	class ScanFolder extends AsyncTask<Boolean, Integer, Boolean> {
-		
-		ProgressDialog dialog;
-		boolean cancel;
-		File folder;
-		
-		ScanFolder(){
-			folder = getDir("", Context.MODE_PRIVATE);
-		}
-		
-		protected void onPreExecute() {
-			dialog = new ProgressDialog(DownloadListActivity.this);
-			dialog.setMax(folder.listFiles().length);
-			dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			dialog.setProgress(0);
-			dialog.setTitle(R.string.scan);
-			dialog.setIndeterminate(false);
-			dialog.setCancelable(false);
-			dialog.setButton(DialogInterface.BUTTON_NEGATIVE, getResources()
-					.getString(android.R.string.cancel),
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							cancel = true;
-							dialog.dismiss();
-						}
-					});
-			dialog.show();
-		}
-		
-		@Override
-		protected Boolean doInBackground(Boolean... arg0) {
-			DataBaseHandler db = new DataBaseHandler(DownloadListActivity.this);
-			int i = 0;
-			for (File doujinFolder : folder.listFiles()) {
-				String id = doujinFolder.getName();
-				if (!cancel) {
-					if(doujinFolder.listFiles().length==0){
-						doujinFolder.delete();
-					}else{
-						DoujinBean bean = db.getDoujinBean(id);
-						if(bean==null){
-							String url = Constants.SITEDOUJINSHI+"/"+id;
-							bean = new DoujinBean();
-							bean.setUrl(url);
-							boolean error = false;
-							try {
-								FakkuConnection.parseHTMLDoujin(bean);
-							} catch (Exception e) {
-								error = true;
-								Log.e(ScanFolder.class.toString(), "Exception", e);
-							} 
-							if(error){								
-								url = Constants.SITEMANGA+"/"+id;
-								try {
-									FakkuConnection.parseHTMLDoujin(bean);
-									error = false;
-								} catch (Exception e) {
-									Log.e(ScanFolder.class.toString(), "Exception", e);
-								}
-							}
-							if(!error){
-								db.deleteDoujin(bean.getId());
-								db.addDoujin(bean);
-							}else{
-								try {
-									FileUtils.deleteDirectory(doujinFolder);
-								} catch (IOException e) {
-									Log.e(ScanFolder.class.toString(), "Exception", e);
-								}
-							}
-						}
-					}
-				}else
-					return true;
-				publishProgress(++i);
-			}
-			return true;
-		}
-		
-		@Override
-		protected void onProgressUpdate(Integer... progress) {
-			super.onProgressUpdate(progress);
-			dialog.setProgress(progress[0]);
-		}
-		
-		protected void onPostExecute(Boolean bytes) {
-			if(!cancel)
-				dialog.dismiss();
-			setData();
-		}
 	}
 }

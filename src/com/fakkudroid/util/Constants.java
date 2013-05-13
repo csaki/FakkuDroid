@@ -9,7 +9,7 @@ public class Constants {
 	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html"; 
 	public static String SITEABOUT = "http://fakkudroid.blogspot.com/2013/01/about-fakkudroid.html"; 
 	public static String SITEROOT = "http://www.fakku.net"; 
-	public static String SITEIMAGEROOT = "http://1-ps.googleusercontent.com/h/www.fakku.net"; 
+	public static String SITEIMAGEROOT = "http://www.fakku.net"; 
 	public static String SITEIMAGE = "http://cdn.fakku.net/8041E1/c";
 	public static String SITECOMMENTS = "http://www.fakku.net/get/comments/@id/@page";
 	public static String SITEFAVORITE = "http://www.fakku.net/users/usr/favorites?mode=viewfavorites&u=2&start=";
@@ -55,4 +55,8 @@ public class Constants {
 	public static final int SCREEN_ORIENTATION_LANDSCAPE = 2;
 	
 	public static final String SHOW_MESSAGE_HELP = "show_message_help";
+
+	public static final int WIDTH_STANDARD = 119;
+	public static final int HEIGHT_STANDARD = 163;
+	
 }

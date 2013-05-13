@@ -59,7 +59,7 @@ public class DoujinListActivity extends ListActivity {
 	DoujinListAdapter da;
 	String url;
 	String title;
-	int nroPage = 1;
+	int numPage = 1;
 	private View mFormView;
 	private View mStatusView;
 
@@ -117,10 +117,10 @@ public class DoujinListActivity extends ListActivity {
 	}
 
 	public void nextPage(View view) {
-		nroPage++;
+		numPage++;
 		loadPage();
 		Context context = getApplicationContext();
-		CharSequence text = "Page " + nroPage;
+		CharSequence text = "Page " + numPage;
 		int duration = Toast.LENGTH_SHORT;
 
 		Toast toast = Toast.makeText(context, text, duration);
@@ -128,7 +128,7 @@ public class DoujinListActivity extends ListActivity {
 	}
 
 	public void previousPage(View view) {
-		if (nroPage - 1 == 0) {
+		if (numPage - 1 == 0) {
 
 			Context context = getApplicationContext();
 			CharSequence text = "There aren't more pages.";
@@ -137,10 +137,10 @@ public class DoujinListActivity extends ListActivity {
 			Toast toast = Toast.makeText(context, text, duration);
 			toast.show();
 		} else {
-			nroPage--;
+			numPage--;
 			loadPage();
 			Context context = getApplicationContext();
-			CharSequence text = "Page " + nroPage;
+			CharSequence text = "Page " + numPage;
 			int duration = Toast.LENGTH_SHORT;
 
 			Toast toast = Toast.makeText(context, text, duration);
@@ -150,7 +150,7 @@ public class DoujinListActivity extends ListActivity {
 
 	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
-		viewBrowser.setData(Uri.parse(app.getUrl(nroPage, url)));
+		viewBrowser.setData(Uri.parse(app.getUrl(numPage, url)));
 		DoujinListActivity.this.startActivity(viewBrowser);
 	}
 
@@ -159,10 +159,10 @@ public class DoujinListActivity extends ListActivity {
 	}
 
 	private void loadPage() {
-		setTitle(app.getTitle(nroPage, title));
+		setTitle(app.getTitle(numPage, title));
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
-		tvPage.setText("Page " + nroPage);
-		new DownloadCatalog().execute(app.getUrl(nroPage, url));
+		tvPage.setText("Page " + numPage);
+		new DownloadCatalog().execute(app.getUrl(numPage, url));
 	}
 
 	@Override

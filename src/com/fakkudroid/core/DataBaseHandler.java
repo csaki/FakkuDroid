@@ -202,12 +202,14 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
-	public LinkedList<DoujinBean> getDoujinList() {
+	public LinkedList<DoujinBean> getDoujinList(int numPage) {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
+		int pageSize = 20;
 		// Select All Query
 		String selectQuery = "SELECT " + KEY_ID + "," + KEY_TITLE + ","
 				+ KEY_DESCRIPTION + "," + KEY_ARTIST + "," + KEY_TAGS + ","
-				+ KEY_SERIE + "," + KEY_QTY_PAGES + "," + KEY_URL + " FROM " + TABLE_DOUJIN;
+				+ KEY_SERIE + "," + KEY_QTY_PAGES + "," + KEY_URL + " FROM " + TABLE_DOUJIN +
+				" ORDER BY " + KEY_TITLE + " LIMIT "+((numPage-1)*pageSize)+"," + pageSize;
 
 		Log.i(this.getClass().toString(), selectQuery);
 

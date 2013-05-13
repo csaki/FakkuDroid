@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 
 public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
@@ -46,7 +47,7 @@ public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 
 		File myFile = new File(getContext().getCacheDir(), s.getFileImageTitle());
 		
-		Bitmap myBitmap = BitmapFactory.decodeFile(myFile.getAbsolutePath());
+		Bitmap myBitmap = Util.decodeSampledBitmapFromFile(myFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
 		
 		holder.ivTitle.setImageBitmap(myBitmap);
 		return convertView;
