@@ -41,12 +41,6 @@
         android:title="@string/menu_downloads">
     </item>
     <item
-        android:id="@+id/menu_search"
-        android:showAsAction="ifRoom"
-        android:orderInCategory="10"
-        android:title="@string/search">
-    </item>
-    <item
         android:id="@+id/menu_check_for_updates"
         android:orderInCategory="101"
         android:showAsAction="never"

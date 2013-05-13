@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:id="@+id/view_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:id="@+id/ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:orientation="horizontal" >
+
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
+                android:id="@+id/btnPreviousPage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/previous_page"
+                android:onClick="previousPage"
+                android:scaleType="fitXY"
+                android:src="@drawable/navigation_previous_item" />
+
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
+                android:id="@+id/btnNextPage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/next_page"
+                android:onClick="nextPage"
+                android:scaleType="fitXY"
+                android:src="@drawable/navigation_next_item" />
+
+            <TextView
+                android:id="@+id/tvPage"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.6"
+                android:gravity="center"
+                android:text="@string/page_1"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/main_color" />
+
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
+                android:id="@+id/btnRefresh"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/button_refresh"
+                android:onClick="refresh"
+                android:scaleType="fitXY"
+                android:src="@drawable/navigation_refresh" />
+
+            <view
+                class="com.fakkudroid.util.ActionImageButton"
+                android:id="@+id/btnViewInBrowser"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/view_browser"
+                android:onClick="viewInBrowser"
+                android:scaleType="fitXY"
+                android:src="@drawable/location_web_site" />
+        </LinearLayout>
+        
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/ll"
+            android:layout_margin="5dp"
+            android:background="@android:color/white"
+            android:scrollbars="horizontal" >
+        </ListView>
+        
+        <TextView android:id="@android:id/empty"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:textAppearance="?android:attr/textAppearanceLarge"
+               android:gravity="center"
+               android:text="@string/no_data"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/view_status"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="sans-serif-light"
+            android:text="@string/loading"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
+
+</merge>

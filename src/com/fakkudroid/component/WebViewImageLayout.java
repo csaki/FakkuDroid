@@ -1,4 +1,4 @@
-package com.fakkudroid;
+package com.fakkudroid.component;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.fakkudroid.R;
+import com.fakkudroid.R.id;
 import com.fakkudroid.util.Util;
 import com.fakkudroid.util.NoZoomControlWebView;
 
@@ -31,7 +33,6 @@ public class WebViewImageLayout extends RelativeLayout{
 
 	@SuppressLint("SetJavaScriptEnabled")
 	private void init() {
-		setBackgroundColor(Color.GREEN);
 		bar = new ProgressBar(getContext(), null, android.R.attr.progressBarStyleHorizontal);;
 		bar.setId(R.id.view_status);
 		bar.setMax(100);

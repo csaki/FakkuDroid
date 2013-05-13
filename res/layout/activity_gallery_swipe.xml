@@ -1,12 +1,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
-    android:orientation="vertical" >
+    android:layout_height="match_parent" >
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+    
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" 
+        android:src="@drawable/abs__ic_menu_moreoverflow_normal_holo_dark"
+        android:background="@android:color/transparent"
+        android:onClick="openOptionsMenu"/>
 
 </RelativeLayout>

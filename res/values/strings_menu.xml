@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="main_menu">
+	    <item>Sign in</item>
+	    <item>My favorites</item>
+	    <item>Logout</item>
+	    <item>Browse</item>
+	    <item>Manga</item>
+	    <item>Doujin</item>
+	    <item>Downloads</item>
+	    <item>Check for updates</item>
+	    <item>Settings</item>	    
+	</string-array>
+	<string-array name="browser_manga">
+	    <item>Sort by&#8230; Newest</item>
+	    <item>Sort by&#8230; English</item>
+	    <item>Sort by&#8230; Tags</item>
+	    <item>Sort by&#8230; Artist</item>
+	    <item>Most Controversial</item>
+	    <item>Most Favorites</item>
+	    <item>Most Popular</item>
+	    <item>Random</item>	    	    
+	</string-array>
+	<string-array name="browser_doujinshi">
+	    <item>Sort by&#8230; Newest</item>
+	    <item>Sort by&#8230; English</item>
+	    <item>Sort by&#8230; Tags</item>
+	    <item>Sort by&#8230; Series</item>
+	    <item>Sort by&#8230; Artist</item>
+	    <item>Most Controversial</item>
+	    <item>Most Favorites</item>
+	    <item>Most Popular</item>
+	    <item>Random</item>	    	    
+	</string-array>
+	<string-array name="url_browser_manga">
+	    <item>http://www.fakku.net/manga/newest</item>
+	    <item>http://www.fakku.net/manga/english</item>
+	    <item>http://www.fakku.net/manga/tags</item>
+	    <item>http://www.fakku.net/manga/artists</item>
+	    <item>http://www.fakku.net/manga/controversial</item>
+	    <item>http://www.fakku.net/manga/favorites</item>
+	    <item>http://www.fakku.net/manga/popular</item>
+	    <item>http://www.fakku.net/manga/random</item>	    	    
+	</string-array>
+	<string-array name="url_browser_doujinshis">
+	    <item>http://www.fakku.net/doujinshi/newest</item>
+	    <item>http://www.fakku.net/doujinshi/english</item>
+	    <item>http://www.fakku.net/doujinshi/tags</item>
+	    <item>http://www.fakku.net/doujinshi/series</item>
+	    <item>http://www.fakku.net/doujinshi/artists</item>
+	    <item>http://www.fakku.net/doujinshi/controversial</item>
+	    <item>http://www.fakku.net/doujinshi/favorites</item>
+	    <item>http://www.fakku.net/doujinshi/popular</item>
+	    <item>http://www.fakku.net/doujinshi/random</item>	    	    
+	</string-array>
+    <string name="app_name">FakkuDroid</string>
+</resources>

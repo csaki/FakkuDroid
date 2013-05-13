@@ -7,6 +7,8 @@ import java.util.LinkedList;
 
 import org.apache.http.client.ClientProtocolException;
 
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.widget.SearchView;
 import com.fakkudroid.adapter.DoujinListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.UserBean;
@@ -28,28 +30,21 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DoujinListActivity extends ListActivity {
-
-	/**
-	 * constante para identificar la llave con la que env�o datos a trav�s
-	 * de intents para comunicar entre las dos actividades: Main y ShowElement
-	 */
+public class DoujinListActivity extends SherlockListActivity implements
+		SearchView.OnQueryTextListener, SearchView.OnSuggestionListener {
 
 	public final static String INTENT_VAR_URL = "intentVarUrl";
 	public final static String INTENT_VAR_TITLE = "intentVarTitle";
@@ -167,8 +162,27 @@ public class DoujinListActivity extends ListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		// Used to put dark icons on light action bar
+		boolean isLight = false;
+
+		// Create the search view
+		SearchView searchView = new SearchView(getSupportActionBar()
+				.getThemedContext());
+		searchView.setQueryHint(getResources().getText(R.string.search));
+		searchView.setOnQueryTextListener(this);
+		searchView.setOnSuggestionListener(this);
+		menu.add(getResources().getText(R.string.search))
+				.setIcon(
+						isLight ? R.drawable.ic_search_inverse
+								: R.drawable.abs__ic_search)
+				.setActionView(searchView)
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_IF_ROOM
+								| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_doujin_list, menu);
+		getSupportMenuInflater().inflate(R.menu.activity_doujin_list, menu);
+
 		return true;
 	}
 
@@ -185,9 +199,6 @@ public class DoujinListActivity extends ListActivity {
 			menu.findItem(R.id.menu_login).setVisible(true);
 			menu.findItem(R.id.menu_logout).setVisible(false);
 			menu.findItem(R.id.menu_myfavorites).setVisible(false);
-		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-			(menu.findItem(R.id.menu_search)).setIcon(R.drawable.action_search);
 		}
 		return true;
 	}
@@ -211,52 +222,6 @@ public class DoujinListActivity extends ListActivity {
 		case R.id.menu_downloads:
 			Intent itDownloads = new Intent(this, DownloadListActivity.class);
 			this.startActivity(itDownloads);
-			break;
-		case R.id.menu_search:
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			// Get the layout inflater
-			LayoutInflater inflater = getLayoutInflater();
-
-			final View view = inflater.inflate(R.layout.dialog_search, null);
-			// Inflate and set the layout for the dialog
-			// Pass null as the parent view because its going in the dialog
-			// layout
-			builder.setView(view)
-					// Add action buttons
-					.setPositiveButton(R.string.search,
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int id) {
-									EditText etSearch = (EditText) view
-											.findViewById(R.id.etSearch);
-									String query = etSearch.getText()
-											.toString();
-
-									String strSearch = getResources()
-											.getString(R.string.search);
-
-									Intent it = new Intent(
-											DoujinListActivity.this,
-											DoujinListActivity.class);
-									it.putExtra(
-											INTENT_VAR_URL,
-											Constants.SITESEARCH
-													+ Util.escapeURL(query
-															.trim()));
-									it.putExtra(INTENT_VAR_TITLE, strSearch
-											+ ": " + query.trim());
-									DoujinListActivity.this.startActivity(it);
-								}
-							})
-					.setNegativeButton(android.R.string.cancel,
-							new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog,
-										int id) {
-								}
-							}).setTitle(R.string.search).create().show();
 			break;
 		case R.id.menu_doujinshis:
 			Intent it = new Intent(DoujinListActivity.this, MenuActivity.class);
@@ -435,6 +400,39 @@ public class DoujinListActivity extends ListActivity {
 			setData();
 			showProgress(false);
 		}
+	}
+
+	@Override
+	public boolean onSuggestionClick(int arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onSuggestionSelect(int arg0) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onQueryTextChange(String arg0) {
+		return false;
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String arg0) {
+		String query = arg0.trim();
+		if (!query.equals("")) {
+			String strSearch = getResources().getString(R.string.search);
+			url = Constants.SITESEARCH + Util.escapeURL(query.trim());
+			title = strSearch + ": " + query.trim();
+			loadPage();
+		} else {
+			title = getResources().getString(R.string.app_name);
+			url = Constants.SITEROOT;
+			loadPage();
+		}
+		return true;
 	}
 
 }
