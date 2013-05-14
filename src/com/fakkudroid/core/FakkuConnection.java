@@ -409,6 +409,19 @@ public class FakkuConnection {
 
 		bean.setQtyFavorites(c);
 		
+		// URL
+		token = "<div class=\"wrap\">";
+		idxStart = html.indexOf(token) + token.length();
+		token = "<a href=\"";
+		idxStart = html.indexOf(token, idxStart) + token.length();
+		idxEnd = html.indexOf("\"", idxStart);
+		
+		s = html.substring(idxStart, idxEnd);
+		s = Constants.SITEROOT + s;
+		idxEnd = s.lastIndexOf("/");
+		s=s.substring(0, idxEnd);
+		bean.setUrl(s);
+		
 		// Images
 		token = "<img ";
 		idxStart = html.indexOf(token) + token.length();

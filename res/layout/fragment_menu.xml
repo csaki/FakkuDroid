@@ -1,5 +1,6 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools" 
+    android:theme="@style/Theme.Sherlock">
 
     <LinearLayout
         android:id="@+id/view_status"
@@ -99,7 +100,6 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/ll"
             android:layout_margin="5dp"
-            android:background="@android:color/white"
             android:scrollbars="vertical|horizontal" >
         </ListView>
         

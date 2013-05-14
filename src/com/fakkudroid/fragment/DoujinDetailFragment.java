@@ -150,7 +150,7 @@ public class DoujinDetailFragment extends Fragment {
 				.getFileImageTitle());
 		File pageFile = new File(getActivity().getCacheDir(), app.getCurrent()
 				.getFileImagePage());
-
+		
 		Bitmap titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
 		Bitmap pageBitmap = Util.decodeSampledBitmapFromFile(pageFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
 		
