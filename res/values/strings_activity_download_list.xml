@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_title">Search by Title</string>
+    <string name="search_serie">Search by Serie</string>
+    <string name="search_artist">Search by Artist</string>
+</resources>

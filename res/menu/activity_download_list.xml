@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/search_title"
+              android:title="@string/search_title" />
+        <item android:id="@+id/search_serie"
+              android:title="@string/search_serie" />
+        <item android:id="@+id/search_artist"
+              android:title="@string/search_artist" />
+    </group>
+</menu>
