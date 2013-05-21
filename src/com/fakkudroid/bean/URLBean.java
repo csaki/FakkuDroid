@@ -4,6 +4,7 @@ public class URLBean {
 
 	private String url;
 	private String description;
+	private int icon;
 
 	public URLBean(){}
 	
@@ -32,5 +33,13 @@ public class URLBean {
 	@Override
 	public String toString() {
 		return "URLBean [url=" + url + ", description=" + description + "]";
+	}
+
+	public int getIcon() {
+		return icon;
+	}
+
+	public void setIcon(int icon) {
+		this.icon = icon;
 	}
 }

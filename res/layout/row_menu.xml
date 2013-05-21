@@ -2,19 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
-    android:padding="20dp">
-
+    android:padding="10dp">
+	
+    <ImageView 
+        android:id="@+id/iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/av_play"/>
+    
     <TextView
-        android:id="@+id/tvURL"
+        android:id="@+id/tvMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/main_color"
-        android:textStyle="bold" 
-        android:layout_centerVertical="true"
-        android:gravity="center"/>
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/darker_gray"
+        android:layout_toRightOf="@id/iv"/>
 	
 </RelativeLayout>

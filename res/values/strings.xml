@@ -95,5 +95,7 @@
     <string name="ask_delete">Are you sure you want to delete?</string>
     <string name="title_activity_download_list">Downloads</string>
     <string name="close">Close</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

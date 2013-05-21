@@ -45,8 +45,8 @@
         </activity>
         <activity
             android:name="com.fakkudroid.GallerySwipeActivity"
-            android:label="@string/title_activity_gallery_swipe" 
-        	android:theme="@style/Theme.Sherlock">
+            android:label="@string/title_activity_gallery_swipe"
+            android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
             android:name="com.fakkudroid.FavoriteActivity"
@@ -76,6 +76,10 @@
         <activity
             android:name="com.fakkudroid.DownloadListActivity"
             android:label="@string/title_activity_download_list" >
+        </activity>
+        <activity
+            android:name="com.fakkudroid.MainActivity"
+            android:label="@string/title_activity_main" >
         </activity>
     </application>
 

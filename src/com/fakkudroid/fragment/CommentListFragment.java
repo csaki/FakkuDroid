@@ -12,13 +12,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockListFragment;
 import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.LoginActivity;
 import com.fakkudroid.R;
@@ -31,7 +31,7 @@ import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 
 @SuppressLint("ValidFragment")
-public class CommentListFragment extends ListFragment {
+public class CommentListFragment extends SherlockListFragment {
 
 	private FakkuDroidApplication app;
 	private DoujinActivity doujinActivity;

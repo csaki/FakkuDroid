@@ -2,13 +2,9 @@ package com.fakkudroid.core;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -241,7 +237,7 @@ public class FakkuConnection {
 
 			// Images
 			String s = "";
-			token = "src=\"";
+			token = "data-cfsrc=\"";
 			idxStart = section.indexOf(token) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);

@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -33,6 +32,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
@@ -44,7 +44,7 @@ import com.fakkudroid.util.ActionImageButton;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 
-public class DoujinActivity extends FragmentActivity {
+public class DoujinActivity extends SherlockFragmentActivity {
 
 	private FakkuDroidApplication app;
 	ViewPager mViewPager;

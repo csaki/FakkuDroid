@@ -71,7 +71,7 @@ public class PasswordActivity extends Activity {
 	}
 	
 	private void unlock(){
-		Intent it = new Intent(this, DoujinListActivity.class);
+		Intent it = new Intent(this, MainActivity.class);
 		this.startActivity(it);
 
 		SharedPreferences prefs = PreferenceManager

@@ -36,7 +36,7 @@ public class DoujinBean {
 	public String getId() {
 		int idxStart = url.lastIndexOf("/") + 1;
 
-		return url.substring(idxStart);
+		return url.substring(idxStart).replaceAll("'", "");
 	}
 
 	public String urlFavorite(String urlFavorite) {

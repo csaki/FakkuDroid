@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.fragment.DownloadListFragment;
 import com.fakkudroid.util.ActionImageButton2;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
-import com.fakkudroid.DownloadListActivity;
 import com.fakkudroid.R;
 
 import android.content.Context;
@@ -26,15 +26,15 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 
 	LayoutInflater inf;
 	LinkedList<DoujinBean> objects;
-	DownloadListActivity downloadListActivity;
+	DownloadListFragment downloadListFragment;
 
 	public DownloadListAdapter(Context context, int resource,
 			int textViewResourceId, LinkedList<DoujinBean> objects,
-			DownloadListActivity downloadListActivity) {
+			DownloadListFragment downloadListFragment) {
 		super(context, resource, textViewResourceId, objects);
 		this.inf = LayoutInflater.from(context);
 		this.objects = objects;
-		this.downloadListActivity = downloadListActivity;
+		this.downloadListFragment = downloadListFragment;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -72,21 +72,21 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 
 			@Override
 			public void onClick(View v) {
-				downloadListActivity.delete(s);
+				downloadListFragment.delete(s);
 			}
 		});
 		holder.btnDetails.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				downloadListActivity.showDetails(s);
+				downloadListFragment.showDetails(s);
 			}
 		});
 		holder.btnRead.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				downloadListActivity.read(s);
+				downloadListFragment.read(s);
 			}
 		});
 

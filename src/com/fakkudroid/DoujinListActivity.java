@@ -220,8 +220,8 @@ public class DoujinListActivity extends SherlockListActivity implements
 			this.startActivity(itLogin);
 			break;
 		case R.id.menu_downloads:
-			Intent itDownloads = new Intent(this, DownloadListActivity.class);
-			this.startActivity(itDownloads);
+//			Intent itDownloads = new Intent(this, DownloadListActivity.class);
+//			this.startActivity(itDownloads);
 			break;
 		case R.id.menu_doujinshis:
 			Intent it = new Intent(DoujinListActivity.this, MenuActivity.class);
