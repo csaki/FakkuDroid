@@ -3,8 +3,8 @@ package com.fakkudroid.adapter;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.CommentBean;
+import com.fakkudroid.component.ActionImageButton2;
 import com.fakkudroid.fragment.CommentListFragment;
-import com.fakkudroid.util.ActionImageButton2;
 import com.fakkudroid.FavoriteActivity;
 import com.fakkudroid.R;
 

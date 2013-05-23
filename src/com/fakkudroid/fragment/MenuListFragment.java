@@ -2,22 +2,34 @@ package com.fakkudroid.fragment;
 
 import java.util.LinkedList;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.fakkudroid.DoujinActivity;
+import com.fakkudroid.DoujinListActivity;
+import com.fakkudroid.LoginActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
+import com.fakkudroid.SettingsActivity;
 import com.fakkudroid.adapter.MenuListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
+import com.fakkudroid.bean.UserBean;
+import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Constants;
 
 public class MenuListFragment extends SherlockListFragment {
 
@@ -49,7 +61,7 @@ public class MenuListFragment extends SherlockListFragment {
 		return view;
 	}
 
-	private void createMainMenu() {
+	public void createMainMenu() {
 		level = 1;
 		
 		boolean connected = app.getSettingBean().isChecked();
@@ -125,6 +137,40 @@ public class MenuListFragment extends SherlockListFragment {
 				mainActivity.loadPageDoujinList(getResources().getString(R.string.app_name), com.fakkudroid.util.Constants.SITEROOT);
 			}else if(lstURL.get(position).getDescription().equals("Downloads")){
 				mainActivity.goToDownload();
+			}else if(lstURL.get(position).getDescription().startsWith("Sign")){
+				Intent itLogin = new Intent(this.getActivity(), LoginActivity.class);
+				this.startActivityForResult(itLogin, 1);
+			}else if(lstURL.get(position).getDescription().equals("Settings")){
+				Intent itSettings = new Intent(this.getActivity(), SettingsActivity.class);
+				getActivity().startActivity(itSettings);
+			}else if(lstURL.get(position).getDescription().equals("Logout")){
+				UserBean sb = app.getSettingBean();
+				sb.setChecked(false);
+				new DataBaseHandler(getActivity()).updateSetting(sb);
+				app.setSettingBean(null);
+				FakkuConnection.disconnect();
+				Toast.makeText(getActivity(), getResources().getString(R.string.loggedout),
+						Toast.LENGTH_SHORT).show();
+				createMainMenu();
+			}else if(lstURL.get(position).getDescription().startsWith("Check")){
+				Intent it3 = new Intent(Intent.ACTION_VIEW);
+				it3.setData(Uri.parse(Constants.SITEDOWNLOAD));
+
+				PackageInfo pInfo = null;
+				try {
+					pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+				} catch (NameNotFoundException e) {
+					Log.e(DoujinListActivity.class.toString(),
+							"onOptionsItemSelected", e);
+				}
+				String version = pInfo.versionName;
+
+				getActivity().startActivity(it3);
+				CharSequence text = "Your current version is " + version;
+				int duration = Toast.LENGTH_LONG;
+
+				Toast toast = Toast.makeText(getActivity(), text, duration);
+				toast.show();
 			}
 		} else if (level == 2) {
 			if(lstURL.get(position).getUrl()==null||lstURL.get(position).getUrl().equals("")){

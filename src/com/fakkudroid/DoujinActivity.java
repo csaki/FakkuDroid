@@ -34,13 +34,13 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.fakkudroid.bean.UserBean;
+import com.fakkudroid.component.ActionImageButton;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.fragment.CommentListFragment;
 import com.fakkudroid.fragment.DoujinDetailFragment;
-import com.fakkudroid.util.ActionImageButton;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 

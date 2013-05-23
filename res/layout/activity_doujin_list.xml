@@ -17,7 +17,7 @@
             android:orientation="horizontal" >
 
             <view
-                class="com.fakkudroid.util.ActionImageButton"
+                class="com.fakkudroid.component.ActionImageButton"
                 android:id="@+id/btnPreviousPage"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -28,7 +28,7 @@
                 android:src="@drawable/navigation_previous_item" />
 
             <view
-                class="com.fakkudroid.util.ActionImageButton"
+                class="com.fakkudroid.component.ActionImageButton"
                 android:id="@+id/btnNextPage"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -49,7 +49,7 @@
                 android:textColor="@color/main_color" />
 
             <view
-                class="com.fakkudroid.util.ActionImageButton"
+                class="com.fakkudroid.component.ActionImageButton"
                 android:id="@+id/btnRefresh"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -60,7 +60,7 @@
                 android:src="@drawable/navigation_refresh" />
 
             <view
-                class="com.fakkudroid.util.ActionImageButton"
+                class="com.fakkudroid.component.ActionImageButton"
                 android:id="@+id/btnViewInBrowser"
                 android:layout_width="50dp"
                 android:layout_height="50dp"

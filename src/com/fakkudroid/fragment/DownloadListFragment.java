@@ -31,6 +31,7 @@ public class DownloadListFragment extends SherlockListFragment{
 	private FakkuDroidApplication app;
 	DownloadListAdapter da;
 	int numPage = 1;
+	private String query = "";
 	private View view;
 
 	@Override
@@ -55,7 +56,7 @@ public class DownloadListFragment extends SherlockListFragment{
 
 	public void nextPage(View view) {
 		numPage++;
-		TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
+		TextView tvPage = (TextView) this.view.findViewById(R.id.tvPage);
 		tvPage.setText("Page " + numPage);
 		setData();
 		CharSequence text = "Page " + numPage;
@@ -75,7 +76,7 @@ public class DownloadListFragment extends SherlockListFragment{
 			toast.show();
 		} else {
 			numPage--;
-			TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
+			TextView tvPage = (TextView) this.view.findViewById(R.id.tvPage);
 			tvPage.setText("Page " + numPage);
 			setData();
 			CharSequence text = "Page " + numPage;
@@ -86,9 +87,18 @@ public class DownloadListFragment extends SherlockListFragment{
 		}
 	}
 
-	private void setData() {
+	public void search(String query){
+		this.query = query;
+
+		numPage = 1;
+		TextView tvPage = (TextView) this.view.findViewById(R.id.tvPage);
+		tvPage.setText("Page " + numPage);
+		setData();
+	}
+	
+	private void setData() {		
 		DataBaseHandler db = new DataBaseHandler(this.getActivity());
-		LinkedList<DoujinBean> llDoujin = db.getDoujinList(numPage);
+		LinkedList<DoujinBean> llDoujin = db.getDoujinList(numPage, query);
 
 		da = new DownloadListAdapter(this.getActivity(), R.layout.row_download, 0, llDoujin,
 				this);

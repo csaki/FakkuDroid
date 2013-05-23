@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="force_screen_orientation">Force screen orientation</string>
+    <string name="none_screen_orientation">None</string>
+    <string name="portrait_screen_orientation">Portrait</string>
+    <string name="landscape_screen_orientation">Landscape</string>
+</resources>

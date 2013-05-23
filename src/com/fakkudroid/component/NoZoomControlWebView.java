@@ -1,4 +1,4 @@
-package com.fakkudroid.util;
+package com.fakkudroid.component;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -2,16 +2,7 @@ package com.fakkudroid;
 
 import java.io.File;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.widget.SearchView;
-import com.fakkudroid.fragment.DoujinListFragment;
-import com.fakkudroid.fragment.DownloadListFragment;
-import com.fakkudroid.fragment.MenuListFragment;
-import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
-
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -24,9 +15,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.ActionProvider;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.inputmethod.InputMethodManager;
+
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.widget.SearchView;
+import com.fakkudroid.fragment.DoujinListFragment;
+import com.fakkudroid.fragment.DownloadListFragment;
+import com.fakkudroid.fragment.MenuListFragment;
+import com.fakkudroid.util.Constants;
+import com.fakkudroid.util.Util;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		SearchView.OnQueryTextListener {
@@ -387,7 +389,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public boolean onQueryTextChange(String arg0) {
-		return false;
+		String query = arg0.trim();
+		if (currentContent!=DOUJIN_LIST) {
+			frmDownloadListFragment.search(query);
+		}
+		return true;
 	}
 
 	@Override
@@ -405,6 +411,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 			loadPageDoujinList(title, url);
 		}
+		InputMethodManager im = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+	    im.hideSoftInputFromWindow(getCurrentFocus()
+	            .getWindowToken(), 0);
 		return true;
 	}
 
@@ -510,5 +519,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			file.mkdirs();
 		}
 		return file;
+	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		frmMenu.createMainMenu();
 	}
 }

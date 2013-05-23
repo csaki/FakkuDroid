@@ -2,7 +2,6 @@ package com.fakkudroid.component;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -11,9 +10,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.fakkudroid.R;
-import com.fakkudroid.R.id;
 import com.fakkudroid.util.Util;
-import com.fakkudroid.util.NoZoomControlWebView;
+import com.fakkudroid.component.NoZoomControlWebView;
 
 public class WebViewImageLayout extends RelativeLayout{
 

@@ -41,7 +41,7 @@ import com.fakkudroid.util.Constants;
  * 
  * @see SystemUiHider
  */
-public class GallerySwipeActivity extends SherlockActivity{
+public class GallerySwipeActivity extends SherlockActivity {
 
 	FakkuDroidApplication app;
 	ViewPager mViewPager;
@@ -49,7 +49,7 @@ public class GallerySwipeActivity extends SherlockActivity{
 	GalleryPagerAdapter adapter;
 	boolean showPageNumber, zoomButtons;
 	int readingMode;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -59,7 +59,7 @@ public class GallerySwipeActivity extends SherlockActivity{
 		setContentView(R.layout.activity_gallery_swipe);
 
 		configSettings();
-		
+
 		app = (FakkuDroidApplication) getApplication();
 		adapter = new GalleryPagerAdapter(this);
 		mViewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -72,11 +72,12 @@ public class GallerySwipeActivity extends SherlockActivity{
 		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
 			@Override
 			public void onPageSelected(int page) {
-				if(showPageNumber){
+				if (showPageNumber) {
 					if (readingMode == Constants.RIGHT_LEFT_MODE)
 						showToast("Page "
 								+ (app.getCurrent().getImages().size() - page)
-								+ "/" + app.getCurrent().getImages().size(), false);
+								+ "/" + app.getCurrent().getImages().size(),
+								false);
 					else
 						showToast("Page " + (page + 1) + "/"
 								+ app.getCurrent().getImages().size(), false);
@@ -92,68 +93,76 @@ public class GallerySwipeActivity extends SherlockActivity{
 			}
 		});
 	}
-	
+
 	public void openOptionsMenu(View view) {
 		openOptionsMenu();
 	}
-	
+
 	@Override
-	public File getCacheDir(){
+	public File getCacheDir() {
 		File file = null;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		String settingDir = prefs.getString("dir_download", "0");
-		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
 			String state = Environment.getExternalStorageState();
-			if(Environment.MEDIA_MOUNTED.equals(state)){
-				file = new File(Environment.getExternalStorageDirectory() + Constants.CACHE_DIRECTORY);
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.CACHE_DIRECTORY);
 				boolean success = true;
-				if(!file.exists()){
+				if (!file.exists()) {
 					success = file.mkdirs();
 				}
-				
-				if(!success)
+
+				if (!success)
 					file = null;
 			}
 		}
-		if(file == null)
-			file = new File(Environment.getRootDirectory() + Constants.CACHE_DIRECTORY);
-		
-		if(!file.exists()){
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.CACHE_DIRECTORY);
+
+		if (!file.exists()) {
 			file.mkdirs();
 		}
 		return file;
 	}
-	
+
 	@Override
-	public File getDir(String dir, int mode){
+	public File getDir(String dir, int mode) {
 		File file = null;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		String settingDir = prefs.getString("dir_download", "0");
-		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
 			String state = Environment.getExternalStorageState();
-			if(Environment.MEDIA_MOUNTED.equals(state)){
-				file = new File(Environment.getExternalStorageDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.LOCAL_DIRECTORY + "/" + dir);
 				boolean success = true;
-				if(!file.exists()){
+				if (!file.exists()) {
 					success = file.mkdirs();
 				}
-				
-				if(!success)
+
+				if (!success)
 					file = null;
 			}
 		}
-		if(file == null)
-			file = new File(Environment.getRootDirectory() + Constants.LOCAL_DIRECTORY + "/" + dir);
-		
-		if(!file.exists()){
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.LOCAL_DIRECTORY + "/" + dir);
+
+		if (!file.exists()) {
 			file.mkdirs();
 		}
 		return file;
 	}
-	
-	private void configSettings(){
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		switch(Integer.parseInt(prefs.getString("screen_orientation_list", "0"))){
+
+	private void configSettings() {
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		switch (Integer.parseInt(prefs
+				.getString("screen_orientation_list", "0"))) {
 		case Constants.SCREEN_ORIENTATION_LANDSCAPE:
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 			break;
@@ -163,13 +172,15 @@ public class GallerySwipeActivity extends SherlockActivity{
 		}
 		showPageNumber = prefs.getBoolean("page_number_checkbox", true);
 		zoomButtons = prefs.getBoolean("zoom_button_checkbox", false);
-		readingMode = Integer.parseInt(prefs.getString("reading_mode_list", "0"));
+		readingMode = Integer.parseInt(prefs
+				.getString("reading_mode_list", "0"));
 	}
-	
-	private void setReadingMode(int readingMode){
+
+	private void setReadingMode(int readingMode) {
 		this.readingMode = readingMode;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		prefs.edit().putString("reading_mode_list", readingMode+"").commit();
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		prefs.edit().putString("reading_mode_list", readingMode + "").commit();
 	}
 
 	@Override
@@ -183,6 +194,8 @@ public class GallerySwipeActivity extends SherlockActivity{
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int selectOption = -1;
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		switch (item.getItemId()) {
 		case R.id.menu_reading_right_left:
 			selectOption = Constants.RIGHT_LEFT_MODE;
@@ -254,6 +267,20 @@ public class GallerySwipeActivity extends SherlockActivity{
 			}
 			;
 			return true;
+		case R.id.menu_none_screen_orientation:
+			prefs.edit().putString("screen_orientation_list", "0").commit();
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+			return true;
+		case R.id.menu_portrait_screen_orientation:
+			prefs.edit().putString("screen_orientation_list", "1").commit();
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			return true;
+		case R.id.menu_landscape_screen_orientation:
+			prefs.edit().putString("screen_orientation_list", "2").commit();
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			return true;
+		default:
+			return true;
 		}
 		if (readingMode == selectOption) {
 			showToast("You are already in this mode.", false);
@@ -262,11 +289,11 @@ public class GallerySwipeActivity extends SherlockActivity{
 					- mViewPager.getCurrentItem());
 
 			setReadingMode(selectOption);
-			
+
 			adapter.inverseOrder();
 			mViewPager.setAdapter(adapter);
 			mViewPager.setCurrentItem(currentItem);
-			
+
 		}
 		return true;
 	}
@@ -303,9 +330,9 @@ public class GallerySwipeActivity extends SherlockActivity{
 
 		public GalleryPagerAdapter(Context context) {
 			views = new ArrayList<WebViewImageLayout>();
-			
+
 			renameAllFiles();
-			
+
 			this.context = context;
 			File dir = getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
@@ -320,39 +347,44 @@ public class GallerySwipeActivity extends SherlockActivity{
 						wv = new WebViewImageLayout(strImageFile,
 								GallerySwipeActivity.this);
 					else
-						wv = new WebViewImageLayout("file://" + myFile.getAbsolutePath(),
+						wv = new WebViewImageLayout("file://"
+								+ myFile.getAbsolutePath(),
 								GallerySwipeActivity.this);
 					views.add(wv);
 				}
 			} else
-				for (int i = 0; i<lstFiles.size(); i++) {
+				for (int i = 0; i < lstFiles.size(); i++) {
 					String strImageFile = lstImages.get(i);
-					File myFile = new File(dir, lstFiles.get(i));WebViewImageLayout wv = null;
+					File myFile = new File(dir, lstFiles.get(i));
+					WebViewImageLayout wv = null;
 					if (!myFile.exists())
 						wv = new WebViewImageLayout(strImageFile,
 								GallerySwipeActivity.this);
 					else
-						wv = new WebViewImageLayout("file://" + myFile.getAbsolutePath(),
+						wv = new WebViewImageLayout("file://"
+								+ myFile.getAbsolutePath(),
 								GallerySwipeActivity.this);
 					views.add(wv);
 				}
 		}
-		
-		private void renameAllFiles(){
+
+		private void renameAllFiles() {
 			try {
 				List<String> lstFiles = app.getCurrent().getImagesFiles();
 				List<String> lstOldFiles = app.getCurrent().getOldImagesFiles();
-				File dir = getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
-				
+				File dir = getDir(app.getCurrent().getId(),
+						Context.MODE_PRIVATE);
+
 				for (int i = 0; i < lstFiles.size(); i++) {
 					File oldFile = new File(dir, lstOldFiles.get(i));
 					File newFile = new File(dir, lstFiles.get(i));
-					if(oldFile.exists()){
+					if (oldFile.exists()) {
 						oldFile.renameTo(newFile);
 					}
 				}
 			} catch (Exception e) {
-				Log.e(GalleryPagerAdapter.class.getName(), "Error renaming files.", e);
+				Log.e(GalleryPagerAdapter.class.getName(),
+						"Error renaming files.", e);
 			}
 		}
 
@@ -435,8 +467,8 @@ public class GallerySwipeActivity extends SherlockActivity{
 			views = result;
 
 		}
-		
-		public WebViewImageLayout getCurrent(){
+
+		public WebViewImageLayout getCurrent() {
 			return views.get(mViewPager.getCurrentItem());
 		}
 
@@ -463,15 +495,15 @@ public class GallerySwipeActivity extends SherlockActivity{
 
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent event) {
-	    int action = event.getAction();
-	    int keyCode = event.getKeyCode();
-		if(zoomButtons)
-			if((action == KeyEvent.ACTION_DOWN) && 
-	                (keyCode == KeyEvent.KEYCODE_VOLUME_UP)){
+		int action = event.getAction();
+		int keyCode = event.getKeyCode();
+		if (zoomButtons)
+			if ((action == KeyEvent.ACTION_DOWN)
+					&& (keyCode == KeyEvent.KEYCODE_VOLUME_UP)) {
 				adapter.getCurrent().zoomIn();
 				return true;
-			}else if((action == KeyEvent.ACTION_DOWN) && 
-	                (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)){
+			} else if ((action == KeyEvent.ACTION_DOWN)
+					&& (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
 				adapter.getCurrent().zoomOut();
 				return true;
 			}

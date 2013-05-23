@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.component.ActionImageButton2;
 import com.fakkudroid.fragment.DownloadListFragment;
-import com.fakkudroid.util.ActionImageButton2;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 import com.fakkudroid.R;

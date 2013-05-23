@@ -25,5 +25,27 @@
         android:orderInCategory="102"
         android:title="@string/reading_left_right">
     </item>
+    <item
+        android:id="@+id/menu_force_screen_orientation"
+        android:orderInCategory="103"
+        android:title="@string/force_screen_orientation">
+        <menu >
+		    <item
+		        android:id="@+id/menu_none_screen_orientation"
+		        android:orderInCategory="1"
+		        android:title="@string/none_screen_orientation">
+		    </item>
+		    <item
+		        android:id="@+id/menu_portrait_screen_orientation"
+		        android:orderInCategory="2"
+		        android:title="@string/portrait_screen_orientation">
+		    </item>
+		    <item
+		        android:id="@+id/menu_landscape_screen_orientation"
+		        android:orderInCategory="3"
+		        android:title="@string/landscape_screen_orientation">
+		    </item>
+        </menu>
+    </item>
 
 </menu>

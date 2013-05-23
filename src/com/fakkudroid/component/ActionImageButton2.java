@@ -1,4 +1,4 @@
-package com.fakkudroid.util;
+package com.fakkudroid.component;
 
 import android.R;
 import android.content.Context;
@@ -8,20 +8,20 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-public class ActionImageButton extends ImageButton{
+public class ActionImageButton2 extends ImageButton{
 
-	public ActionImageButton(Context context) {
+	public ActionImageButton2(Context context) {
 		super(context);
 		this.setOnTouchListener(new OnTouchListenerCahngeBackground());
 		this.setOnLongClickListener(new OnLongClickListenerShowContent());
 	}
-	public ActionImageButton(Context context, AttributeSet attrs) {
+	public ActionImageButton2(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.setOnTouchListener(new OnTouchListenerCahngeBackground());
 		this.setOnLongClickListener(new OnLongClickListenerShowContent());
 	}
 
-	public ActionImageButton(Context context, AttributeSet attrs, int defStyle) {
+	public ActionImageButton2(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		this.setOnTouchListener(new OnTouchListenerCahngeBackground());
 		this.setOnLongClickListener(new OnLongClickListenerShowContent());
@@ -31,7 +31,7 @@ public class ActionImageButton extends ImageButton{
 
 		@Override
 		public boolean onLongClick(View v) {
-			Toast.makeText(ActionImageButton.this.getContext(), ActionImageButton.this.getContentDescription(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(ActionImageButton2.this.getContext(), ActionImageButton2.this.getContentDescription(), Toast.LENGTH_SHORT).show();
 			return true;
 		}
 		
@@ -45,16 +45,15 @@ public class ActionImageButton extends ImageButton{
 	        {
 		        case MotionEvent.ACTION_DOWN:
 	            {
-	            	ActionImageButton.this.setBackgroundResource(com.fakkudroid.R.color.url_color);
+	            	ActionImageButton2.this.setBackgroundResource(com.fakkudroid.R.color.url_color);
 	                return false;
 	            }
-		        case MotionEvent.ACTION_UP:
+		        default:
 	            {
-	            	ActionImageButton.this.setBackgroundResource(R.color.transparent);
+	            	ActionImageButton2.this.setBackgroundResource(R.color.transparent);
 	                return false;
 	            }
 	        }
-			return false;
 		}
 		
 	}
