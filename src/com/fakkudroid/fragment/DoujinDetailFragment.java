@@ -29,8 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fakkudroid.DoujinActivity;
-import com.fakkudroid.DoujinListActivity;
-import com.fakkudroid.FavoriteActivity;
+import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
@@ -146,26 +145,17 @@ public class DoujinDetailFragment extends Fragment {
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvTranslator.setText(content);
 
-		File titleFile = new File(getActivity().getCacheDir(), app.getCurrent()
-				.getFileImageTitle());
-		File pageFile = new File(getActivity().getCacheDir(), app.getCurrent()
-				.getFileImagePage());
-		
-		Bitmap titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
-		Bitmap pageBitmap = Util.decodeSampledBitmapFromFile(pageFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
-		
-		ivTitle.setImageBitmap(titleBitmap);
-		ivPage.setImageBitmap(pageBitmap);
+		ivTitle.setImageBitmap(app.getCurrent().getBitmapImageTitle(getActivity().getCacheDir()));
+		ivPage.setImageBitmap(app.getCurrent().getBitmapImagePage(getActivity().getCacheDir()));
 		
 		tvUploader.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				Intent itFavorites = new Intent(getActivity(),
-						FavoriteActivity.class);
-				itFavorites.putExtra(FavoriteActivity.INTENT_VAR_USER, app
+				Intent itFavorites = new Intent();
+				itFavorites.putExtra(MainActivity.INTENT_VAR_USER, app
 						.getCurrent().getUploader().getDescription());
-				getActivity().startActivity(itFavorites);
+				doujinActivity.goToFavorite(itFavorites);
 			}
 		});
 		tvArtist.setOnClickListener(new URLListener(app.getCurrent()
@@ -293,6 +283,7 @@ public class DoujinDetailFragment extends Fragment {
 					getActivity().finish();
 				}
 			} catch (Exception e) {
+				Log.e(CompleteDoujin.class.toString(), "Exception", e);
 			}
 		}
 	}
@@ -310,11 +301,11 @@ public class DoujinDetailFragment extends Fragment {
 		@Override
 		public void onClick(View v) {
 
-			Intent it = new Intent(getActivity(), DoujinListActivity.class);
-			it.putExtra(DoujinListActivity.INTENT_VAR_TITLE,
+			Intent it = new Intent();
+			it.putExtra(MainActivity.INTENT_VAR_TITLE,
 					urlBean.getDescription());
-			it.putExtra(DoujinListActivity.INTENT_VAR_URL, urlBean.getUrl());
-			getActivity().startActivity(it);
+			it.putExtra(MainActivity.INTENT_VAR_URL, urlBean.getUrl());
+			doujinActivity.goToList(it);
 
 		}
 	}

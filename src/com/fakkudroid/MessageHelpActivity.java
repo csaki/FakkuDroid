@@ -1,7 +1,5 @@
 package com.fakkudroid;
 
-import com.fakkudroid.bean.UserBean;
-import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
 

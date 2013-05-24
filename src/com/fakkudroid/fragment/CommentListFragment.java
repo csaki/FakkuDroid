@@ -99,6 +99,10 @@ public class CommentListFragment extends SherlockListFragment {
 				getResources().getString(R.string.soon), Toast.LENGTH_SHORT)
 				.show();
 	}
+	
+	public void goToFavorite(Intent data) {
+		doujinActivity.goToFavorite(data);
+	}
 
 	public void likeOrDislike(CommentBean b, boolean like) {
 		if (!app.getSettingBean().isChecked()) {

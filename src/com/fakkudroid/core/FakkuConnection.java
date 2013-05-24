@@ -239,6 +239,10 @@ public class FakkuConnection {
 			String s = "";
 			token = "data-cfsrc=\"";
 			idxStart = section.indexOf(token) + token.length();
+			if(idxStart==token.length()-1){
+				token = "src=\"";
+				idxStart = section.indexOf(token) + token.length();
+			}
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);
 
@@ -246,7 +250,13 @@ public class FakkuConnection {
 			
 			//Look for the next image tag
 			idxStart = section.indexOf("<img", idxStart) + token.length();
-			idxStart = section.indexOf(token, idxStart) + token.length();
+			int idxStartAux = section.indexOf(token, idxStart) + token.length();
+			if(idxStart==token.length()-1){
+				token = "src=\"";
+				idxStart = section.indexOf(token) + token.length();
+			}else{
+				idxStart = idxStartAux;
+			}
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);
 			bean.setUrlImagePage(s);

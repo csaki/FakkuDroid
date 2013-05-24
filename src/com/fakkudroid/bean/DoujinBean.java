@@ -1,10 +1,14 @@
 package com.fakkudroid.bean;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
+import android.graphics.Bitmap;
+
 import com.fakkudroid.util.Constants;
+import com.fakkudroid.util.Util;
 
 public class DoujinBean {
 
@@ -24,6 +28,7 @@ public class DoujinBean {
 	private List<URLBean> lstTags;
 	private boolean addedInFavorite;
 	private String timeAgo;
+	private Bitmap titleBitmap,pageBitmap;
 
 	public String getTimeAgo() {
 		return timeAgo;
@@ -76,6 +81,24 @@ public class DoujinBean {
 
 	public String getFileImagePage() {
 		return getId() + "page.jpg";
+	}
+	
+	public Bitmap getBitmapImageTitle(File dir){
+		if(titleBitmap==null){
+			File titleFile = new File(dir,
+					getFileImageTitle());
+			titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+		}
+		return titleBitmap;
+	}
+	
+	public Bitmap getBitmapImagePage(File dir){
+		if(pageBitmap==null){
+			File titlePage = new File(dir,
+					getFileImagePage());
+			pageBitmap = Util.decodeSampledBitmapFromFile(titlePage.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+		}
+		return pageBitmap;
 	}
 
 	public String getTitle() {

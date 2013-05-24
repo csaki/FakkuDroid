@@ -11,6 +11,8 @@
 	<string name="pref_description_zoom_button">Use volume buttons as zoom buttons</string>
 	<string name="pref_title_page_number">Show page number</string>
 	<string name="pref_title_reading_mode">Reading mode</string>
+	<string name="pref_title_perfect_viewer">Use Perfect Viewer</string>
+	<string name="pref_description_perfect_viewer">Use Perfect Viewer (only downloaded files)</string>
 	
 	<string-array name="pref_reading_mode_list">
         <item>Right to Left</item>

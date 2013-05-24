@@ -3,6 +3,7 @@ package com.fakkudroid.fragment;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
@@ -10,7 +11,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +29,7 @@ import com.fakkudroid.adapter.DownloadListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Util;
 
 public class DownloadListFragment extends SherlockListFragment{
 	private FakkuDroidApplication app;
@@ -142,7 +146,16 @@ public class DownloadListFragment extends SherlockListFragment{
 
 	public void read(DoujinBean bean) {
 		app.setCurrent(bean);
-		Intent it = new Intent(this.getActivity(), GallerySwipeActivity.class);
-		this.startActivity(it);
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(getActivity());
+		if(prefs.getBoolean("perfect_viewer_checkbox", false)){
+			List<String> lstFiles = app.getCurrent().getImagesFiles();
+			File dir = getActivity().getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
+			File myFile = new File(dir, lstFiles.get(0));
+			Util.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
+		}else{
+			Intent it = new Intent(this.getActivity(), GallerySwipeActivity.class);
+			this.startActivity(it);
+		}
 	}
 }

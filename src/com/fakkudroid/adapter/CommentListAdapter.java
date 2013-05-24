@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.component.ActionImageButton2;
 import com.fakkudroid.fragment.CommentListFragment;
-import com.fakkudroid.FavoriteActivity;
+import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 
 import android.content.Context;
@@ -67,10 +67,9 @@ public class CommentListAdapter extends ArrayAdapter<CommentBean> {
 			
 			@Override
 			public void onClick(View v) {
-				Intent itFavorites = new Intent(fragment.getActivity(),
-						FavoriteActivity.class);
-				itFavorites.putExtra(FavoriteActivity.INTENT_VAR_USER,s.getUser().getDescription());
-				fragment.getActivity().startActivity(itFavorites);		
+				Intent itFavorites = new Intent();
+				itFavorites.putExtra(MainActivity.INTENT_VAR_USER, s.getUser().getDescription());
+				fragment.goToFavorite(itFavorites);
 			}
 		});
 		if(s.getLevel()==2){

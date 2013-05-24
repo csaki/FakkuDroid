@@ -58,16 +58,9 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 				"<br>", "<br/>")));
 		;
 		holder.tvTags.setText(s.getTags());
-		File titleFile = new File(getContext().getCacheDir(),
-				s.getFileImageTitle());
-		File pageFile = new File(getContext().getCacheDir(),
-				s.getFileImagePage());
-
-		Bitmap titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
-		Bitmap pageBitmap = Util.decodeSampledBitmapFromFile(pageFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
 		
-		holder.ivTitle.setImageBitmap(titleBitmap);
-		holder.ivPage.setImageBitmap(pageBitmap);
+		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(getContext().getCacheDir()));
+		holder.ivPage.setImageBitmap(s.getBitmapImagePage(getContext().getCacheDir()));
 		return convertView;
 	}
 

@@ -1,4 +1,4 @@
-package com.fakkudroid;
+package com.fakkudroid.fragment;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,107 +7,130 @@ import java.util.LinkedList;
 
 import org.apache.http.client.ClientProtocolException;
 
-import com.fakkudroid.adapter.DoujinListAdapter;
-import com.fakkudroid.bean.DoujinBean;
-import com.fakkudroid.core.FakkuConnection;
-import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
-import com.fakkudroid.R;
-
-import android.util.Log;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.app.ListActivity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class RelatedContentListActivity extends ListActivity {
+import com.actionbarsherlock.app.SherlockFragment;
+import com.fakkudroid.adapter.FavoriteListAdapter;
+import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.core.FakkuConnection;
+import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Util;
+import com.fakkudroid.DoujinActivity;
+import com.fakkudroid.R;
+
+public class FavoriteFragment extends SherlockFragment implements
+		AdapterView.OnItemClickListener {
 
 	/**
 	 * constante para identificar la llave con la que env�o datos a trav�s de
 	 * intents para comunicar entre las dos actividades: Main y ShowElement
 	 */
 
+	public final static String INTENT_VAR_USER = "intentVarUser";
+
 	FakkuDroidApplication app;
 	LinkedList<DoujinBean> llDoujin;
-	DoujinListAdapter da;
+	FavoriteListAdapter da;
+	GridView gvFavorites;
+	String user;
+	String title;
 	int nroPage = 1;
 	private View mFormView;
 	private View mStatusView;
+	private View view;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_doujin_list);
+
+		app = (FakkuDroidApplication) getActivity().getApplication();
+
+	}
+	
+	private View findViewById(int resource){
+		return view.findViewById(resource);
+	}
+	
+	public void setUser(String user){
+		this.user = user;
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		view = inflater.inflate(R.layout.fragment_favorite, container,
+				false);
+		gvFavorites = (GridView) findViewById(R.id.gvFavorites);
+		gvFavorites.setOnItemClickListener(this);
 
 		mFormView = findViewById(R.id.view_form);
 		mStatusView = findViewById(R.id.view_status);
-
-		app = (FakkuDroidApplication) getApplication();
-
+		
+		title = getResources().getString(R.string.favorite);
+		title = title.replace("usr", user);
 		if(llDoujin==null||llDoujin.isEmpty())
 			loadPage();
+		return view;
+	}
+
+	private void loadPage() {
+		getActivity().setTitle(app.getTitle(nroPage, title));
+		TextView tvPage = (TextView) findViewById(R.id.tvPage);
+		tvPage.setText("Page " + nroPage);
+		new DownloadCatalog().execute(app.getUrlFavorite(nroPage, user));
 	}
 
 	public void nextPage(View view) {
 		nroPage++;
 		loadPage();
-		Context context = getApplicationContext();
 		CharSequence text = "Page " + nroPage;
 		int duration = Toast.LENGTH_SHORT;
 
-		Toast toast = Toast.makeText(context, text, duration);
+		Toast toast = Toast.makeText(getActivity(), text, duration);
 		toast.show();
 	}
 
 	public void previousPage(View view) {
 		if (nroPage - 1 == 0) {
-
-			Context context = getApplicationContext();
 			CharSequence text = "There aren't more pages.";
 			int duration = Toast.LENGTH_SHORT;
 
-			Toast toast = Toast.makeText(context, text, duration);
+			Toast toast = Toast.makeText(getActivity(), text, duration);
 			toast.show();
 		} else {
 			nroPage--;
 			loadPage();
-			Context context = getApplicationContext();
 			CharSequence text = "Page " + nroPage;
 			int duration = Toast.LENGTH_SHORT;
 
-			Toast toast = Toast.makeText(context, text, duration);
+			Toast toast = Toast.makeText(getActivity(), text, duration);
 			toast.show();
 		}
 	}
 
 	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
-		viewBrowser.setData(Uri.parse(app.getCurrent().getUrl()));
-		RelatedContentListActivity.this.startActivity(viewBrowser);
+		viewBrowser.setData(Uri.parse(app.getUrlFavorite(nroPage, user)));
+		this.startActivity(viewBrowser);
 	}
 
 	public void refresh(View view) {
 		loadPage();
-	}
-
-	private void loadPage() {
-		TextView tvPage = (TextView) findViewById(R.id.tvPage);
-		tvPage.setText("Page " + nroPage);
-		new DownloadCatalog().execute(app.getCurrent().urlRelated(nroPage));
 	}
 
 	/**
@@ -115,40 +138,8 @@ public class RelatedContentListActivity extends ListActivity {
 	 * crea un adaptador para poblar al ListView del dise�o
 	 * */
 	private void setData() {
-		da = new DoujinListAdapter(this, R.layout.row_doujin, 0, llDoujin);
-		this.setListAdapter(da);
-	}
-
-	protected void onListItemClick(ListView l, View v, int position, long id) {
-		super.onListItemClick(l, v, position, id);
-		DoujinBean data = llDoujin.get(position);
-		app.setCurrent(data);
-		Intent it = new Intent(this, DoujinActivity.class);
-		this.startActivity(it);
-	}
-	
-	@Override
-	public File getCacheDir(){
-		File file = null;
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		String settingDir = prefs.getString("dir_download", "0");
-		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
-			String state = Environment.getExternalStorageState();
-			if(Environment.MEDIA_MOUNTED.equals(state)){
-				file = new File(Environment.getExternalStorageDirectory() + Constants.CACHE_DIRECTORY);
-				boolean success = true;
-				if(!file.exists()){
-					success = file.mkdirs();
-				}
-				
-				if(!success)
-					file = null;
-			}
-		}
-		if(file == null)
-			file = new File(Environment.getRootDirectory() + Constants.CACHE_DIRECTORY);
-		
-		return file;
+		da = new FavoriteListAdapter(this.getActivity(), R.layout.row_doujin, 0, llDoujin);
+		gvFavorites.setAdapter(da);
 	}
 
 	/**
@@ -202,29 +193,30 @@ public class RelatedContentListActivity extends ListActivity {
 			try {
 				Log.i(DownloadCatalog.class.toString(), "URL Catalog: "
 						+ urls[0]);
-				llDoujin = FakkuConnection.parseHTMLCatalog(urls[0]);
+				llDoujin = FakkuConnection.parseHTMLFavorite(urls[0]);
 			} catch (ClientProtocolException e1) {
 				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
 			} catch (IOException e1) {
 				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
 			} catch (URISyntaxException e1) {
 				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
+			} catch (Exception e) {
+				Log.e(DownloadCatalog.class.toString(), "Exception", e);
 			}
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
+
 			for (DoujinBean bean : llDoujin) {
 				try {
-					File dir = getCacheDir();
+					File dir = getActivity().getCacheDir();
 
 					File myFile = new File(dir, bean.getFileImageTitle());
 					Util.saveInStorage(myFile, bean.getUrlImageTitle());
-
-					myFile = new File(dir, bean.getFileImagePage());
-					Util.saveInStorage(myFile, bean.getUrlImagePage());
 				} catch (Exception e) {
 					Log.e(DownloadCatalog.class.toString(), "Exception", e);
 				}
 			}
+
 			return llDoujin.size();
 		}
 
@@ -232,6 +224,14 @@ public class RelatedContentListActivity extends ListActivity {
 			setData();
 			showProgress(false);
 		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+		DoujinBean data = llDoujin.get(arg2);
+		app.setCurrent(data);
+		Intent it = new Intent(getActivity(), DoujinActivity.class);
+		this.startActivity(it);
 	}
 
 }

@@ -26,7 +26,6 @@
                 class="com.fakkudroid.component.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/previous_page"
-                android:onClick="previousPage"
                 android:scaleType="fitXY"
                 android:src="@drawable/navigation_previous_item" />
 
@@ -36,7 +35,7 @@
                 android:layout_height="fill_parent"
                 android:layout_weight="0.6"
                 android:gravity="center"
-                android:text="1"
+                android:text="Page 1"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/main_color" />
 
@@ -47,7 +46,6 @@
                 class="com.fakkudroid.component.ActionImageButton"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/next_page"
-                android:onClick="nextPage"
                 android:scaleType="fitXY"
                 android:src="@drawable/navigation_next_item" />
         </LinearLayout>

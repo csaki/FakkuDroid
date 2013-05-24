@@ -20,5 +20,9 @@
         android:title="@string/pref_title_password" 
         android:summary="@string/pref_description_password"/>
 	
-    
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="perfect_viewer_checkbox"
+        android:summary="@string/pref_description_perfect_viewer"
+        android:title="@string/pref_title_perfect_viewer" />
 </PreferenceScreen>

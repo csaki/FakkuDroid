@@ -26,6 +26,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.fakkudroid.fragment.DoujinListFragment;
 import com.fakkudroid.fragment.DownloadListFragment;
+import com.fakkudroid.fragment.FavoriteFragment;
 import com.fakkudroid.fragment.MenuListFragment;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
@@ -33,14 +34,20 @@ import com.fakkudroid.util.Util;
 public class MainActivity extends SherlockFragmentActivity implements
 		SearchView.OnQueryTextListener {
 
+	public final static String INTENT_VAR_URL = "intentVarUrl";
+	public final static String INTENT_VAR_TITLE = "intentVarTitle";
+	public final static String INTENT_VAR_USER = "intentVarUser";
+	
 	private DrawerLayout mDrawerLayout;
 	private MenuListFragment frmMenu;
+	private FavoriteFragment frmFavorite;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private DoujinListFragment frmDoujinList;
 	private DownloadListFragment frmDownloadListFragment;
 	private int currentContent = DOUJIN_LIST;
 	private static final int DOUJIN_LIST = 1;
 	private static final int DOWNLOADS = 2;
+	private static final int FAVORITES = 3;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +65,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 
+		frmDoujinList = new DoujinListFragment();
 		frmMenu = new MenuListFragment();
 		frmMenu.setMainActivity(this);
-		frmDoujinList = new DoujinListFragment();
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.menu_frame, frmMenu)
@@ -90,7 +97,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		if (currentContent==DOUJIN_LIST||currentContent==DOWNLOADS) {
+		if (currentContent == DOUJIN_LIST || currentContent == DOWNLOADS) {
 			// Used to put dark icons on light action bar
 			boolean isLight = false;
 
@@ -390,7 +397,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public boolean onQueryTextChange(String arg0) {
 		String query = arg0.trim();
-		if (currentContent!=DOUJIN_LIST) {
+		if (currentContent != DOUJIN_LIST) {
 			frmDownloadListFragment.search(query);
 		}
 		return true;
@@ -398,7 +405,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public boolean onQueryTextSubmit(String arg0) {
-		if (currentContent==DOUJIN_LIST) {
+		if (currentContent == DOUJIN_LIST) {
 			String query = arg0.trim();
 			String url, title;
 			if (!query.equals("")) {
@@ -411,56 +418,89 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 			loadPageDoujinList(title, url);
 		}
-		InputMethodManager im = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-	    im.hideSoftInputFromWindow(getCurrentFocus()
-	            .getWindowToken(), 0);
+		InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		im.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
 		return true;
 	}
 
 	public void nextPage(View view) {
-		if(currentContent==DOUJIN_LIST)
+		if (currentContent == DOUJIN_LIST)
 			frmDoujinList.nextPage(view);
-		else
+		else if (currentContent == DOWNLOADS)
 			frmDownloadListFragment.nextPage(view);
+		else
+			frmFavorite.nextPage(view);
 	}
 
 	public void previousPage(View view) {
-		if(currentContent==DOUJIN_LIST)
+		if (currentContent == DOUJIN_LIST)
 			frmDoujinList.previousPage(view);
-		else
+		else if (currentContent == DOWNLOADS)
 			frmDownloadListFragment.previousPage(view);
+		else
+			frmFavorite.previousPage(view);
 	}
 
 	public void viewInBrowser(View view) {
-		frmDoujinList.viewInBrowser(view);
+		if (currentContent == DOUJIN_LIST)
+			frmDoujinList.viewInBrowser(view);
+		else
+			frmFavorite.viewInBrowser(view);
 	}
 
 	public void refresh(View view) {
-		frmDoujinList.refresh(view);
+		if (currentContent == DOUJIN_LIST)
+			frmDoujinList.refresh(view);
+		else
+			frmFavorite.refresh(view);
 	}
-	
-	public void goToDownload(){
-		currentContent=DOWNLOADS;
+
+	public void goToFavorites(String user) {
+		currentContent = FAVORITES;
+		mDrawerLayout.closeDrawers();
+		if (frmFavorite == null)
+			frmFavorite = new FavoriteFragment();
+		frmFavorite.setUser(user);
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, frmFavorite).commit();
+	}
+
+	public void goToDownloads() {
+		currentContent = DOWNLOADS;
 		mDrawerLayout.closeDrawers();
 		setTitle(R.string.download);
-		if(frmDownloadListFragment==null)
+		if (frmDownloadListFragment == null)
 			frmDownloadListFragment = new DownloadListFragment();
 		getSupportFragmentManager().beginTransaction()
-		.replace(R.id.content_frame, frmDownloadListFragment).commit();
+				.replace(R.id.content_frame, frmDownloadListFragment).commit();
 	}
 
 	public void loadPageDoujinList(String title, String url) {
-		
-		
 		mDrawerLayout.closeDrawers();
 		this.setTitle(title);
+		
+		if(frmDoujinList==null)
+			frmDoujinList = new DoujinListFragment();
+		
 		frmDoujinList.setUrl(url);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.content_frame, frmDoujinList).commit();
-		if(currentContent==DOUJIN_LIST){
+		if (currentContent == DOUJIN_LIST) {
 			frmDoujinList.loadPage();
 		}
-		currentContent=DOUJIN_LIST;
+		currentContent = DOUJIN_LIST;
+	}
+	
+	private void relatedContent(){
+		setTitle(R.string.related_content);
+		if(frmDoujinList==null)
+			frmDoujinList = new DoujinListFragment();
+		frmDoujinList.setRelated(true);
+		if (currentContent == DOUJIN_LIST) {
+			frmDoujinList.loadPage();
+		}
+		getSupportFragmentManager().beginTransaction()
+		.replace(R.id.content_frame, frmDoujinList).commit();
 	}
 
 	public File getCacheDir() {
@@ -520,10 +560,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 		return file;
 	}
-	
+
 	@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		frmMenu.createMainMenu();
+		if(resultCode==1){
+			relatedContent();
+		}else if(resultCode==2){
+			loadPageDoujinList(data.getStringExtra(INTENT_VAR_TITLE), data.getStringExtra(INTENT_VAR_URL));
+		}else if(resultCode==3){
+			goToFavorites(data.getStringExtra(INTENT_VAR_USER));
+		}
 	}
 }

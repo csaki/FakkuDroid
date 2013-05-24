@@ -24,9 +24,13 @@ import org.apache.http.protocol.HttpContext;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.URLBean;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.widget.Toast;
 
 public class Util {
 
@@ -216,5 +220,16 @@ public class Util {
 	public static URLBean castURLBean(String urlBean){
 		URLBean result = new URLBean(urlBean.split("\\|")[1],urlBean.split("\\|")[0]);		
 		return result;
+	}
+	
+	public static void openPerfectViewer(String firstImage, Activity activity){
+		try {
+			Intent intent = activity.getPackageManager().getLaunchIntentForPackage("com.rookiestudio.perfectviewer");
+			intent.setAction(android.content.Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(new File(firstImage)), "image/*");
+			activity.startActivity(intent);
+		} catch (Exception e) {
+			Toast.makeText(activity, R.string.error_open_perfect_viewer, Toast.LENGTH_SHORT).show();
+		}
 	}
 }

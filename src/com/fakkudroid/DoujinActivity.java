@@ -95,6 +95,8 @@ public class DoujinActivity extends SherlockFragmentActivity {
 
 		setTitle(app.getCurrent().getTitle());
 	}
+	
+	
 
 	@Override
 	public File getCacheDir() {
@@ -219,8 +221,18 @@ public class DoujinActivity extends SherlockFragmentActivity {
 	}
 
 	public void relatedContent(View view) {
-		Intent it = new Intent(this, RelatedContentListActivity.class);
-		this.startActivity(it);
+		setResult(1, null);
+		finish();
+	}
+	
+	public void goToList(Intent data) {
+		setResult(2, data);
+		finish();
+	}
+	
+	public void goToFavorite(Intent data) {
+		setResult(3, data);
+		finish();
 	}
 
 	public void addOrRemoveFavorite(View view) {

@@ -11,13 +11,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +45,7 @@ public class DoujinListFragment extends SherlockListFragment{
 	private View mFormView;
 	private View mStatusView;
 	private View view;
+	boolean related = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -111,13 +109,22 @@ public class DoujinListFragment extends SherlockListFragment{
 		loadPage();
 	}
 	
+	public void setRelated(boolean related) {
+		this.numPage = 1;
+		this.related = related;
+	}
+
 	public void loadPage() {
 		TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
 		tvPage.setText("Page " + numPage);
-		new DownloadCatalog().execute(app.getUrl(numPage, url));
+		if(related)
+			new DownloadCatalog().execute(app.getCurrent().urlRelated(numPage));
+		else
+			new DownloadCatalog().execute(app.getUrl(numPage, url));
 	}
 	
 	public void setUrl(String url){
+		related = false;
 		this.numPage = 1;
 		this.url = url;
 	}
@@ -132,7 +139,7 @@ public class DoujinListFragment extends SherlockListFragment{
 		DoujinBean data = llDoujin.get(position);
 		app.setCurrent(data);
 		Intent it = new Intent(this.getActivity(), DoujinActivity.class);
-		this.startActivity(it);
+		this.startActivityForResult(it, 1);
 	}
 	
 	/**
