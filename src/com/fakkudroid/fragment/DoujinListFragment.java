@@ -130,7 +130,7 @@ public class DoujinListFragment extends SherlockListFragment{
 	}
 	
 	private void setData() {
-		da = new DoujinListAdapter(this.getActivity(), R.layout.row_doujin, 0, llDoujin);
+		da = new DoujinListAdapter(this.getActivity(), R.layout.row_doujin, 0, llDoujin,related);
 		this.setListAdapter(da);
 	}
 
@@ -203,6 +203,8 @@ public class DoujinListFragment extends SherlockListFragment{
 			}
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
+			if(related)
+				llDoujin.add(app.getCurrent());
 			for (DoujinBean bean : llDoujin) {
 				try {
 					File dir = DoujinListFragment.this.getActivity().getCacheDir();

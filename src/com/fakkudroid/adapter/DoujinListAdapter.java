@@ -1,33 +1,33 @@
 package com.fakkudroid.adapter;
 
-import java.io.File;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.DoujinBean;
-import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 import com.fakkudroid.R;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 
 	LayoutInflater inf;
 	LinkedList<DoujinBean> objects;
-
+	boolean related = false;
+	
 	public DoujinListAdapter(Context context, int resource,
-			int textViewResourceId, LinkedList<DoujinBean> objects) {
+			int textViewResourceId, LinkedList<DoujinBean> objects, boolean related) {
 		super(context, resource, textViewResourceId, objects);
 		this.inf = LayoutInflater.from(context);
 		this.objects = objects;
+		this.related = related;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -46,10 +46,16 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 			holder.tvTags = (TextView) convertView.findViewById(R.id.tvTags);
 			holder.ivTitle = (ImageView) convertView.findViewById(R.id.ivTitle);
 			holder.ivPage = (ImageView) convertView.findViewById(R.id.ivPage);
+			holder.ll = (LinearLayout) convertView.findViewById(R.id.ll);
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
+		if(related&&position==0)
+			holder.ll.setBackgroundColor(convertView.getResources().getColor(R.color.abs__background_holo_light));
+		else
+			holder.ll.setBackgroundColor(convertView.getResources().getColor(android.R.color.white));
+		
 		holder.tvDoujin.setText(Util.limitString(s.getTitle(), 36, "..."));
 		holder.tvArtist.setText(Util.limitString(
 				s.getArtist().getDescription(), 36, "..."));
@@ -70,6 +76,7 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		TextView tvArtist;
 		TextView tvTags;
 		TextView tvDescription;
+		LinearLayout ll;
 
 		ImageView ivTitle;
 		ImageView ivPage;
