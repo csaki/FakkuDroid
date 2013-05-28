@@ -9,6 +9,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
@@ -47,9 +48,9 @@ public class FavoriteFragment extends SherlockFragment implements
 	LinkedList<DoujinBean> llDoujin;
 	FavoriteListAdapter da;
 	GridView gvFavorites;
-	String user;
-	String title;
-	int nroPage = 1;
+	static String user;
+	static String title;
+	static int nroPage = 1;
 	private View mFormView;
 	private View mStatusView;
 	private View view;
@@ -60,6 +61,18 @@ public class FavoriteFragment extends SherlockFragment implements
 
 		app = (FakkuDroidApplication) getActivity().getApplication();
 
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+	}
+
+	@Override
+	public void onStart(){
+		super.onStart();
+		if(llDoujin==null||llDoujin.isEmpty())
+			loadPage();
 	}
 	
 	private View findViewById(int resource){
@@ -80,19 +93,23 @@ public class FavoriteFragment extends SherlockFragment implements
 
 		mFormView = findViewById(R.id.view_form);
 		mStatusView = findViewById(R.id.view_status);
-		
-		title = getResources().getString(R.string.favorite);
-		title = title.replace("usr", user);
-		if(llDoujin==null||llDoujin.isEmpty())
-			loadPage();
 		return view;
 	}
 
+	@SuppressLint("NewApi")
 	private void loadPage() {
+		title = getResources().getString(R.string.favorite);
+		title = title.replace("usr", user);
+		
 		getActivity().setTitle(app.getTitle(nroPage, title));
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
 		tvPage.setText("Page " + nroPage);
-		new DownloadCatalog().execute(app.getUrlFavorite(nroPage, user));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			new DownloadCatalog()
+					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,app.getUrlFavorite(nroPage, user));
+		} else {
+			new DownloadCatalog().execute(app.getUrlFavorite(nroPage, user));
+		}
 	}
 
 	public void nextPage(View view) {
@@ -231,7 +248,7 @@ public class FavoriteFragment extends SherlockFragment implements
 		DoujinBean data = llDoujin.get(arg2);
 		app.setCurrent(data);
 		Intent it = new Intent(getActivity(), DoujinActivity.class);
-		this.startActivity(it);
+		this.startActivityForResult(it, 1);
 	}
 
 }

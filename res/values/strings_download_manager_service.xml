@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="download_complete">Download completed</string>
+	<string name="download_cancelled">Download cancelled</string>
+	<string name="downloading">Downloading&#8230;</string>
+	<string name="already_queue">Already in queue</string>
+	<string name="in_queue">In queue</string>
+</resources>

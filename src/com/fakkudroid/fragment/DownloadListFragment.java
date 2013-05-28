@@ -34,7 +34,7 @@ import com.fakkudroid.util.Util;
 public class DownloadListFragment extends SherlockListFragment{
 	private FakkuDroidApplication app;
 	DownloadListAdapter da;
-	int numPage = 1;
+	static int numPage = 1;
 	private String query = "";
 	private View view;
 
@@ -141,7 +141,7 @@ public class DownloadListFragment extends SherlockListFragment{
 	public void showDetails(DoujinBean bean) {
 		app.setCurrent(bean);
 		Intent it = new Intent(this.getActivity(), DoujinActivity.class);
-		this.startActivity(it);
+		this.startActivityForResult(it, 1);
 	}
 
 	public void read(DoujinBean bean) {

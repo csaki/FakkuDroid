@@ -7,8 +7,8 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -20,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,7 +35,6 @@ import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 
 @SuppressLint("ValidFragment")
@@ -45,19 +43,28 @@ public class DoujinDetailFragment extends Fragment {
 	private FakkuDroidApplication app;
 	DoujinActivity doujinActivity;
 	boolean alreadyDownloaded = false;
-
-	public DoujinDetailFragment(){}
+	DoujinBean currentBean;
 	
+	public DoujinDetailFragment() {}
+
 	@SuppressLint("ValidFragment")
 	public DoujinDetailFragment(DoujinActivity doujinActivity) {
 		this.doujinActivity = doujinActivity;
+		this.currentBean = doujinActivity.getCurrentBean();
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (FakkuDroidApplication) getActivity().getApplication();
-		new CompleteDoujin().execute(app.getCurrent());
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			new CompleteDoujin()
+					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, currentBean);
+		} else {
+			new CompleteDoujin().execute(currentBean);
+		}
 
 	}
 
@@ -74,8 +81,14 @@ public class DoujinDetailFragment extends Fragment {
 		return view;
 	}
 
+	@SuppressLint("NewApi")
 	public void refresh() {
-		new CompleteDoujin().execute(app.getCurrent());
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			new CompleteDoujin()
+					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, currentBean);
+		} else {
+			new CompleteDoujin().execute(currentBean);
+		}
 	}
 
 	public void setComponents() {
@@ -103,51 +116,53 @@ public class DoujinDetailFragment extends Fragment {
 
 		String s = getResources().getString(R.string.content_pages);
 
-		s = s.replace("rpc1", "" + app.getCurrent().getQtyPages());
-		s = s.replace("rpc2", "" + app.getCurrent().getQtyFavorites());
+		s = s.replace("rpc1", "" + currentBean.getQtyPages());
+		s = s.replace("rpc2", "" + currentBean.getQtyFavorites());
 
 		tvQtyPages.setText(s);
 
 		s = getResources().getString(R.string.content_uploader);
 
-		s = s.replace("rpc1", app.getCurrent().getUploader().getDescription());
-		s = s.replace("rpc2", app.getCurrent().getFecha());
+		s = s.replace("rpc1", currentBean.getUploader().getDescription());
+		s = s.replace("rpc2", currentBean.getFecha());
 
 		SpannableString content = new SpannableString(s);
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvUploader.setText(content);
 
-		tvDescription.setText(Html.fromHtml(app.getCurrent().getDescription()
+		tvDescription.setText(Html.fromHtml(currentBean.getDescription()
 				.replace("<br>", "<br/>")));
 		tvDescription.setMovementMethod(LinkMovementMethod.getInstance());
 
-		content = new SpannableString(app.getCurrent().getTitle());
+		content = new SpannableString(currentBean.getTitle());
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvDoujin.setText(content);
 
-		content = new SpannableString(app.getCurrent().getArtist()
+		content = new SpannableString(currentBean.getArtist()
 				.getDescription());
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvArtist.setText(content);
 
-		content = new SpannableString(app.getCurrent().getSerie()
+		content = new SpannableString(currentBean.getSerie()
 				.getDescription());
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvSerie.setText(content);
 
-		content = new SpannableString(app.getCurrent().getLanguage()
+		content = new SpannableString(currentBean.getLanguage()
 				.getDescription());
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvLanguage.setText(content);
 
-		content = new SpannableString(app.getCurrent().getTranslator()
+		content = new SpannableString(currentBean.getTranslator()
 				.getDescription());
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvTranslator.setText(content);
 
-		ivTitle.setImageBitmap(app.getCurrent().getBitmapImageTitle(getActivity().getCacheDir()));
-		ivPage.setImageBitmap(app.getCurrent().getBitmapImagePage(getActivity().getCacheDir()));
-		
+		ivTitle.setImageBitmap(currentBean.getBitmapImageTitle(
+				getActivity().getCacheDir()));
+		ivPage.setImageBitmap(currentBean.getBitmapImagePage(
+				getActivity().getCacheDir()));
+
 		tvUploader.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -158,16 +173,16 @@ public class DoujinDetailFragment extends Fragment {
 				doujinActivity.goToFavorite(itFavorites);
 			}
 		});
-		tvArtist.setOnClickListener(new URLListener(app.getCurrent()
+		tvArtist.setOnClickListener(new URLListener(currentBean
 				.getArtist(), R.string.tile_artist));
-		tvLanguage.setOnClickListener(new URLListener(app.getCurrent()
+		tvLanguage.setOnClickListener(new URLListener(currentBean
 				.getLanguage(), R.string.tile_language));
-		tvSerie.setOnClickListener(new URLListener(app.getCurrent().getSerie(),
+		tvSerie.setOnClickListener(new URLListener(currentBean.getSerie(),
 				R.string.tile_serie));
-		tvTranslator.setOnClickListener(new URLListener(app.getCurrent()
+		tvTranslator.setOnClickListener(new URLListener(currentBean
 				.getTranslator(), R.string.tile_translator));
 
-		for (URLBean urlBean : app.getCurrent().getLstTags()) {
+		for (URLBean urlBean : currentBean.getLstTags()) {
 			TextView tv = (TextView) getActivity().getLayoutInflater().inflate(
 					R.layout.textview_custom, null);
 			content = new SpannableString(urlBean.getDescription());
@@ -182,8 +197,8 @@ public class DoujinDetailFragment extends Fragment {
 				.findViewById(R.id.btnAddToFavorite);
 		alreadyDownloaded = verifyAlreadyDownloaded();
 
-		if (app.getCurrent() != null) {
-			if (app.getCurrent().isAddedInFavorite()) {
+		if (currentBean != null) {
+			if (currentBean.isAddedInFavorite()) {
 				btnAddToFavorite.setImageResource(R.drawable.rating_important);
 				btnAddToFavorite.setContentDescription(getResources()
 						.getString(R.string.remove_favorite));
@@ -220,11 +235,12 @@ public class DoujinDetailFragment extends Fragment {
 	public boolean verifyAlreadyDownloaded() {
 		try {
 			DataBaseHandler db = new DataBaseHandler(this.getActivity());
-			return db.getDoujinBean(app.getCurrent().getId())!=null;
+			return db.getDoujinBean(currentBean.getId()) != null;
 		} catch (Exception e) {
-			Log.e(DoujinDetailFragment.class.getName(), "Error verifing if exists doujin in the db.", e);
+			Log.e(DoujinDetailFragment.class.getName(),
+					"Error verifing if exists doujin in the db.", e);
 		}
-		
+
 		return false;
 	}
 
@@ -302,8 +318,7 @@ public class DoujinDetailFragment extends Fragment {
 		public void onClick(View v) {
 
 			Intent it = new Intent();
-			it.putExtra(MainActivity.INTENT_VAR_TITLE,
-					urlBean.getDescription());
+			it.putExtra(MainActivity.INTENT_VAR_TITLE, urlBean.getDescription());
 			it.putExtra(MainActivity.INTENT_VAR_URL, urlBean.getUrl());
 			doujinActivity.goToList(it);
 

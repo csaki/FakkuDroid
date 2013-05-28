@@ -36,9 +36,10 @@
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="5dp" 
+            android:layout_height="10dp" 
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"/>
+            android:layout_alignParentLeft="true"
+            android:max="100"/>
 
         <LinearLayout
             android:id="@+id/ll2"

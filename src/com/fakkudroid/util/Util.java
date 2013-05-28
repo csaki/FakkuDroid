@@ -188,7 +188,7 @@ public class Util {
 		return html;
 	}
 
-	public static void saveInStorage(File file, String imageUrl) throws IOException {
+	public static void saveInStorage(File file, String imageUrl) throws Exception {
 		imageUrl = Util.escapeURL(imageUrl);
 		String fakkuExtentionFile = file.getAbsolutePath();
 		fakkuExtentionFile = fakkuExtentionFile.replaceAll("\\.jpg", "\\.fakku");

@@ -1,8 +1,5 @@
 package com.fakkudroid.core;
 
-
-import java.util.HashMap;
-
 import android.app.Application;
 
 import com.fakkudroid.bean.DoujinBean;
@@ -50,19 +47,6 @@ public class FakkuDroidApplication extends Application {
 	}
 	public String getUrlFavorite(int nroPage, String user) {
 		return Util.escapeURL(Constants.SITEFAVORITE.replace("usr", user) + ((nroPage-1)*30));
-	}
-	private static HashMap<String, DoujinBean> hsDoujin = new HashMap<String, DoujinBean>();
-	
-	public void putDoujin(DoujinBean bean){
-		hsDoujin.put(bean.getId(), bean);
-	}
-	
-	public void removeDoujin(DoujinBean bean){
-		hsDoujin.remove(bean.getId());
-	}
-	
-	public boolean isDownloading(DoujinBean bean){
-		return hsDoujin.containsKey(bean.getId());
 	}
 	
 	

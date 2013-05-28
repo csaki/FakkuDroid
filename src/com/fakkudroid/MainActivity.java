@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -37,17 +38,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public final static String INTENT_VAR_URL = "intentVarUrl";
 	public final static String INTENT_VAR_TITLE = "intentVarTitle";
 	public final static String INTENT_VAR_USER = "intentVarUser";
-	
+
 	private DrawerLayout mDrawerLayout;
 	private MenuListFragment frmMenu;
 	private FavoriteFragment frmFavorite;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private DoujinListFragment frmDoujinList;
 	private DownloadListFragment frmDownloadListFragment;
-	private int currentContent = DOUJIN_LIST;
 	private static final int DOUJIN_LIST = 1;
 	private static final int DOWNLOADS = 2;
 	private static final int FAVORITES = 3;
+	private static int currentContent = DOUJIN_LIST;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,16 +65,31 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// enable ActionBar app icon to behave as action to toggle nav drawer
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
-
-		frmDoujinList = new DoujinListFragment();
+		
+		Fragment frmCurrent = null;
+		if(currentContent==DOUJIN_LIST){
+			if(frmDoujinList==null)
+				frmDoujinList = new DoujinListFragment();
+			frmCurrent = frmDoujinList;	
+		}else if(currentContent==DOWNLOADS){
+			if(frmDownloadListFragment==null)
+				frmDownloadListFragment = new DownloadListFragment();
+			frmCurrent = frmDownloadListFragment;	
+		}else if(currentContent==FAVORITES){
+			if(frmFavorite==null)
+				frmFavorite = new FavoriteFragment();
+			frmCurrent = frmFavorite;	
+		}
+		
 		frmMenu = new MenuListFragment();
 		frmMenu.setMainActivity(this);
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.menu_frame, frmMenu)
 				.commit();
+		
 		fragmentManager.beginTransaction()
-				.replace(R.id.content_frame, frmDoujinList).commit();
+				.replace(R.id.content_frame, frmCurrent).commit();
 
 		// ActionBarDrawerToggle ties together the the proper interactions
 		// between the sliding drawer and the action bar app icon
@@ -97,6 +113,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+
 		if (currentContent == DOUJIN_LIST || currentContent == DOWNLOADS) {
 			// Used to put dark icons on light action bar
 			boolean isLight = false;
@@ -106,7 +123,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 					.getThemedContext());
 			searchView.setQueryHint(getResources().getText(R.string.search));
 			searchView.setOnQueryTextListener(this);
-			menu.add(getResources().getText(R.string.search))
+			String hint = "";
+			if (currentContent == DOUJIN_LIST)
+				getResources().getText(R.string.search);
+			else
+				getResources().getText(R.string.search_by);
+			menu.add(hint)
 					.setIcon(
 							isLight ? R.drawable.ic_search_inverse
 									: R.drawable.abs__ic_search)
@@ -127,6 +149,202 @@ public class MainActivity extends SherlockFragmentActivity implements
 			return true;
 		}
 		return true;
+	}
+
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+		// Sync the toggle state after onRestoreInstanceState has occurred.
+		mDrawerToggle.syncState();
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		// Pass any configuration change to the drawer toggls
+		mDrawerToggle.onConfigurationChanged(newConfig);
+	}
+
+	@Override
+	public boolean onQueryTextChange(String arg0) {
+		String query = arg0.trim();
+		if (currentContent != DOUJIN_LIST) {
+			frmDownloadListFragment.search(query);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String arg0) {
+		if (currentContent == DOUJIN_LIST) {
+			String query = arg0.trim();
+			String url, title;
+			if (!query.equals("")) {
+				String strSearch = getResources().getString(R.string.search);
+				url = Constants.SITESEARCH + Util.escapeURL(query.trim());
+				title = strSearch + ": " + query.trim();
+			} else {
+				title = getResources().getString(R.string.app_name);
+				url = Constants.SITEROOT;
+			}
+			loadPageDoujinList(title, url);
+		}
+		InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		im.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+		return true;
+	}
+
+	public void nextPage(View view) {
+		if (currentContent == DOUJIN_LIST)
+			frmDoujinList.nextPage(view);
+		else if (currentContent == DOWNLOADS)
+			frmDownloadListFragment.nextPage(view);
+		else
+			frmFavorite.nextPage(view);
+	}
+
+	public void previousPage(View view) {
+		if (currentContent == DOUJIN_LIST)
+			frmDoujinList.previousPage(view);
+		else if (currentContent == DOWNLOADS)
+			frmDownloadListFragment.previousPage(view);
+		else
+			frmFavorite.previousPage(view);
+	}
+
+	public void viewInBrowser(View view) {
+		if (currentContent == DOUJIN_LIST)
+			frmDoujinList.viewInBrowser(view);
+		else
+			frmFavorite.viewInBrowser(view);
+	}
+
+	public void refresh(View view) {
+		if (currentContent == DOUJIN_LIST)
+			frmDoujinList.refresh(view);
+		else
+			frmFavorite.refresh(view);
+	}
+
+	public void goToFavorites(String user) {
+		currentContent = FAVORITES;
+		mDrawerLayout.closeDrawers();
+		if (frmFavorite == null)
+			frmFavorite = new FavoriteFragment();
+		frmFavorite.setUser(user);
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, frmFavorite).commit();
+	}
+
+	public void goToDownloads() {
+		currentContent = DOWNLOADS;
+		mDrawerLayout.closeDrawers();
+		setTitle(R.string.download);
+		if (frmDownloadListFragment == null)
+			frmDownloadListFragment = new DownloadListFragment();
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, frmDownloadListFragment).commit();
+	}
+
+	public void loadPageDoujinList(String title, String url) {
+		mDrawerLayout.closeDrawers();
+		this.setTitle(title);
+
+		if (frmDoujinList == null)
+			frmDoujinList = new DoujinListFragment();
+
+		frmDoujinList.setUrl(url);
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, frmDoujinList).commit();
+		if (currentContent == DOUJIN_LIST) {
+			frmDoujinList.loadPage();
+		}
+		currentContent = DOUJIN_LIST;
+	}
+
+	private void relatedContent() {
+		setTitle(R.string.related_content);
+		if (frmDoujinList == null)
+			frmDoujinList = new DoujinListFragment();
+		frmDoujinList.setRelated(true);
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, frmDoujinList).commit();
+		if (currentContent == DOUJIN_LIST) {
+			frmDoujinList.loadPage();
+		}
+		currentContent = DOUJIN_LIST;
+	}
+
+	public File getCacheDir() {
+		File file = null;
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
+			String state = Environment.getExternalStorageState();
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.CACHE_DIRECTORY);
+				boolean success = true;
+				if (!file.exists()) {
+					success = file.mkdirs();
+				}
+
+				if (!success)
+					file = null;
+			}
+		}
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.CACHE_DIRECTORY);
+
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		return file;
+	}
+
+	public File getDir(String dir, int mode) {
+		File file = null;
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		String settingDir = prefs.getString("dir_download", "0");
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
+			String state = Environment.getExternalStorageState();
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.LOCAL_DIRECTORY + "/" + dir);
+				boolean success = true;
+				if (!file.exists()) {
+					success = file.mkdirs();
+				}
+
+				if (!success)
+					file = null;
+			}
+		}
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.LOCAL_DIRECTORY + "/" + dir);
+
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		return file;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		frmMenu.createMainMenu();
+		if (resultCode == 1) {
+			relatedContent();
+		} else if (resultCode == 2) {
+			loadPageDoujinList(data.getStringExtra(INTENT_VAR_TITLE),
+					data.getStringExtra(INTENT_VAR_URL));
+		} else if (resultCode == 3) {
+			goToFavorites(data.getStringExtra(INTENT_VAR_USER));
+		}
 	}
 
 	private android.view.MenuItem getMenuItem(final MenuItem item) {
@@ -378,199 +596,5 @@ public class MainActivity extends SherlockFragmentActivity implements
 				return null;
 			}
 		};
-	}
-
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-		// Sync the toggle state after onRestoreInstanceState has occurred.
-		mDrawerToggle.syncState();
-	}
-
-	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
-		super.onConfigurationChanged(newConfig);
-		// Pass any configuration change to the drawer toggls
-		mDrawerToggle.onConfigurationChanged(newConfig);
-	}
-
-	@Override
-	public boolean onQueryTextChange(String arg0) {
-		String query = arg0.trim();
-		if (currentContent != DOUJIN_LIST) {
-			frmDownloadListFragment.search(query);
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onQueryTextSubmit(String arg0) {
-		if (currentContent == DOUJIN_LIST) {
-			String query = arg0.trim();
-			String url, title;
-			if (!query.equals("")) {
-				String strSearch = getResources().getString(R.string.search);
-				url = Constants.SITESEARCH + Util.escapeURL(query.trim());
-				title = strSearch + ": " + query.trim();
-			} else {
-				title = getResources().getString(R.string.app_name);
-				url = Constants.SITEROOT;
-			}
-			loadPageDoujinList(title, url);
-		}
-		InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		im.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-		return true;
-	}
-
-	public void nextPage(View view) {
-		if (currentContent == DOUJIN_LIST)
-			frmDoujinList.nextPage(view);
-		else if (currentContent == DOWNLOADS)
-			frmDownloadListFragment.nextPage(view);
-		else
-			frmFavorite.nextPage(view);
-	}
-
-	public void previousPage(View view) {
-		if (currentContent == DOUJIN_LIST)
-			frmDoujinList.previousPage(view);
-		else if (currentContent == DOWNLOADS)
-			frmDownloadListFragment.previousPage(view);
-		else
-			frmFavorite.previousPage(view);
-	}
-
-	public void viewInBrowser(View view) {
-		if (currentContent == DOUJIN_LIST)
-			frmDoujinList.viewInBrowser(view);
-		else
-			frmFavorite.viewInBrowser(view);
-	}
-
-	public void refresh(View view) {
-		if (currentContent == DOUJIN_LIST)
-			frmDoujinList.refresh(view);
-		else
-			frmFavorite.refresh(view);
-	}
-
-	public void goToFavorites(String user) {
-		currentContent = FAVORITES;
-		mDrawerLayout.closeDrawers();
-		if (frmFavorite == null)
-			frmFavorite = new FavoriteFragment();
-		frmFavorite.setUser(user);
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.content_frame, frmFavorite).commit();
-	}
-
-	public void goToDownloads() {
-		currentContent = DOWNLOADS;
-		mDrawerLayout.closeDrawers();
-		setTitle(R.string.download);
-		if (frmDownloadListFragment == null)
-			frmDownloadListFragment = new DownloadListFragment();
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.content_frame, frmDownloadListFragment).commit();
-	}
-
-	public void loadPageDoujinList(String title, String url) {
-		mDrawerLayout.closeDrawers();
-		this.setTitle(title);
-		
-		if(frmDoujinList==null)
-			frmDoujinList = new DoujinListFragment();
-		
-		frmDoujinList.setUrl(url);
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.content_frame, frmDoujinList).commit();
-		if (currentContent == DOUJIN_LIST) {
-			frmDoujinList.loadPage();
-		}
-		currentContent = DOUJIN_LIST;
-	}
-	
-	private void relatedContent(){
-		setTitle(R.string.related_content);
-		if(frmDoujinList==null)
-			frmDoujinList = new DoujinListFragment();
-		frmDoujinList.setRelated(true);
-		if (currentContent == DOUJIN_LIST) {
-			frmDoujinList.loadPage();
-		}
-		getSupportFragmentManager().beginTransaction()
-		.replace(R.id.content_frame, frmDoujinList).commit();
-	}
-
-	public File getCacheDir() {
-		File file = null;
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		String settingDir = prefs.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.CACHE_DIRECTORY);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
-
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.CACHE_DIRECTORY);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
-	}
-
-	public File getDir(String dir, int mode) {
-		File file = null;
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		String settingDir = prefs.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.LOCAL_DIRECTORY + "/" + dir);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
-
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.LOCAL_DIRECTORY + "/" + dir);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		frmMenu.createMainMenu();
-		if(resultCode==1){
-			relatedContent();
-		}else if(resultCode==2){
-			loadPageDoujinList(data.getStringExtra(INTENT_VAR_TITLE), data.getStringExtra(INTENT_VAR_URL));
-		}else if(resultCode==3){
-			goToFavorites(data.getStringExtra(INTENT_VAR_USER));
-		}
 	}
 }

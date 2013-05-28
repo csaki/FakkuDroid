@@ -9,6 +9,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.net.Uri;
@@ -39,13 +40,13 @@ public class DoujinListFragment extends SherlockListFragment{
 	FakkuDroidApplication app;
 	LinkedList<DoujinBean> llDoujin;
 	DoujinListAdapter da;
-	String url = Constants.SITEROOT;;
-	String title;
-	int numPage = 1;
+	static String url = Constants.SITEROOT;;
+	static String title;
+	static int numPage = 1;
 	private View mFormView;
 	private View mStatusView;
 	private View view;
-	boolean related = false;
+	static boolean related = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,12 @@ public class DoujinListFragment extends SherlockListFragment{
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 	}
+
+	@Override
+	public void onStart(){
+		super.onStart();
+		loadPage();
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,8 +73,6 @@ public class DoujinListFragment extends SherlockListFragment{
 
 		mFormView = view.findViewById(R.id.view_form);
 		mStatusView = view.findViewById(R.id.view_status);
-		
-		loadPage();
 		return view;
 	}
 
@@ -114,13 +119,24 @@ public class DoujinListFragment extends SherlockListFragment{
 		this.related = related;
 	}
 
+	@SuppressLint("NewApi")
 	public void loadPage() {
 		TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
 		tvPage.setText("Page " + numPage);
 		if(related)
-			new DownloadCatalog().execute(app.getCurrent().urlRelated(numPage));
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+				new DownloadCatalog()
+						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,app.getCurrent().urlRelated(numPage));
+			} else {
+				new DownloadCatalog().execute(app.getCurrent().urlRelated(numPage));
+			}
 		else
-			new DownloadCatalog().execute(app.getUrl(numPage, url));
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+				new DownloadCatalog()
+						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,app.getUrl(numPage, url));
+			} else {
+				new DownloadCatalog().execute(app.getUrl(numPage, url));
+			}
 	}
 	
 	public void setUrl(String url){
@@ -204,7 +220,7 @@ public class DoujinListFragment extends SherlockListFragment{
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
 			if(related)
-				llDoujin.add(app.getCurrent());
+				llDoujin.add(0, app.getCurrent());
 			for (DoujinBean bean : llDoujin) {
 				try {
 					File dir = DoujinListFragment.this.getActivity().getCacheDir();

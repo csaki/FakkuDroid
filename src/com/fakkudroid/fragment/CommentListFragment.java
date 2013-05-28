@@ -24,6 +24,7 @@ import com.fakkudroid.LoginActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.adapter.CommentListAdapter;
 import com.fakkudroid.bean.CommentBean;
+import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
@@ -39,12 +40,14 @@ public class CommentListFragment extends SherlockListFragment {
 	private boolean listCharged;
 	private boolean lastPage = false;
 	private int currentPage = 1;
+	DoujinBean currentBean;
 
-	public CommentListFragment(){}
+	public CommentListFragment() {}
 	
 	@SuppressLint("ValidFragment")
 	public CommentListFragment(DoujinActivity doujinActivity) {
 		this.doujinActivity = doujinActivity;
+		this.currentBean = doujinActivity.getCurrentBean();
 	}
 
 	@Override
@@ -71,12 +74,12 @@ public class CommentListFragment extends SherlockListFragment {
 		listCharged = true;
 		currentPage = 1;
 		da.clear();
-		new DownloadComments().execute(app.getCurrent().urlComments(0));
+		new DownloadComments().execute(currentBean.urlComments(0));
 	}
 
 	public void loadMoreComments() {
 		listCharged = true;
-		new DownloadComments().execute(app.getCurrent().urlComments(
+		new DownloadComments().execute(currentBean.urlComments(
 				currentPage++));
 	}
 
