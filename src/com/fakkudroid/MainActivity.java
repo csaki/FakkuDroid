@@ -2,11 +2,19 @@ package com.fakkudroid;
 
 import java.io.File;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -15,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.ActionProvider;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.SubMenu;
@@ -25,6 +34,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
+import com.fakkudroid.bean.VersionBean;
+import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.fragment.DoujinListFragment;
 import com.fakkudroid.fragment.DownloadListFragment;
 import com.fakkudroid.fragment.FavoriteFragment;
@@ -35,6 +46,7 @@ import com.fakkudroid.util.Util;
 public class MainActivity extends SherlockFragmentActivity implements
 		SearchView.OnQueryTextListener {
 
+	private final static String TAG = MainActivity.class.toString();
 	public final static String INTENT_VAR_URL = "intentVarUrl";
 	public final static String INTENT_VAR_TITLE = "intentVarTitle";
 	public final static String INTENT_VAR_USER = "intentVarUser";
@@ -50,6 +62,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private static final int FAVORITES = 3;
 	private static int currentContent = DOUJIN_LIST;
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,29 +78,29 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// enable ActionBar app icon to behave as action to toggle nav drawer
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
-		
+
 		Fragment frmCurrent = null;
-		if(currentContent==DOUJIN_LIST){
-			if(frmDoujinList==null)
+		if (currentContent == DOUJIN_LIST) {
+			if (frmDoujinList == null)
 				frmDoujinList = new DoujinListFragment();
-			frmCurrent = frmDoujinList;	
-		}else if(currentContent==DOWNLOADS){
-			if(frmDownloadListFragment==null)
+			frmCurrent = frmDoujinList;
+		} else if (currentContent == DOWNLOADS) {
+			if (frmDownloadListFragment == null)
 				frmDownloadListFragment = new DownloadListFragment();
-			frmCurrent = frmDownloadListFragment;	
-		}else if(currentContent==FAVORITES){
-			if(frmFavorite==null)
+			frmCurrent = frmDownloadListFragment;
+		} else if (currentContent == FAVORITES) {
+			if (frmFavorite == null)
 				frmFavorite = new FavoriteFragment();
-			frmCurrent = frmFavorite;	
+			frmCurrent = frmFavorite;
 		}
-		
+
 		frmMenu = new MenuListFragment();
 		frmMenu.setMainActivity(this);
 
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		fragmentManager.beginTransaction().replace(R.id.menu_frame, frmMenu)
 				.commit();
-		
+
 		fragmentManager.beginTransaction()
 				.replace(R.id.content_frame, frmCurrent).commit();
 
@@ -108,7 +121,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			new CheckerVersion().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
+		} else {
+			new CheckerVersion().execute("");
+		}
 	}
 
 	@Override
@@ -331,6 +348,56 @@ public class MainActivity extends SherlockFragmentActivity implements
 			file.mkdirs();
 		}
 		return file;
+	}
+
+	class CheckerVersion extends AsyncTask<String, Float, VersionBean> {
+
+		@Override
+		protected VersionBean doInBackground(String... arg0) {
+			VersionBean versionBean = null;
+			try {
+				versionBean = FakkuConnection.getLastversion();
+			} catch (Exception e) {
+				Log.e(TAG, "error in verifing if exists new version", e);
+			}
+			return versionBean;
+		}
+
+		protected void onPostExecute(final VersionBean result) {
+			if (result != null) {
+				PackageInfo pInfo = null;
+				try {
+					pInfo = MainActivity.this.getPackageManager()
+							.getPackageInfo(MainActivity.this.getPackageName(),
+									0);
+					String currentVersion = pInfo.versionName;
+					if (currentVersion.compareToIgnoreCase(result
+							.getVersion_code()) < 0) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(
+								MainActivity.this);
+						builder.setMessage(R.string.msg_new_version)
+								.setPositiveButton(R.string.visit_page,
+										new DialogInterface.OnClickListener() {
+											@Override
+											public void onClick(
+													DialogInterface arg0,
+													int arg1) {
+												Intent itVersion = new Intent(
+														Intent.ACTION_VIEW);
+												itVersion.setData(Uri.parse(result
+														.getVersion_url()));
+												MainActivity.this
+														.startActivity(itVersion);
+											}
+										})
+								.setNegativeButton(R.string.remind_later, null)
+								.show();
+					}
+				} catch (NameNotFoundException e) {
+					Log.e(TAG, "error getting current version", e);
+				}
+			}
+		}
 	}
 
 	@Override

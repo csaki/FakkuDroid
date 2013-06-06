@@ -34,20 +34,18 @@ import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
 
-
-public class DoujinListFragment extends SherlockListFragment{
+public class DoujinListFragment extends SherlockListFragment {
 
 	FakkuDroidApplication app;
 	LinkedList<DoujinBean> llDoujin;
 	DoujinListAdapter da;
 	static String url = Constants.SITEROOT;;
-	static String title;
 	static int numPage = 1;
 	private View mFormView;
 	private View mStatusView;
 	private View view;
 	static boolean related = false;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,16 +58,16 @@ public class DoujinListFragment extends SherlockListFragment{
 	}
 
 	@Override
-	public void onStart(){
+	public void onStart() {
 		super.onStart();
 		loadPage();
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.fragment_doujin_list, container,
-				false);
+		view = inflater
+				.inflate(R.layout.fragment_doujin_list, container, false);
 
 		mFormView = view.findViewById(R.id.view_form);
 		mStatusView = view.findViewById(R.id.view_status);
@@ -113,40 +111,42 @@ public class DoujinListFragment extends SherlockListFragment{
 	public void refresh(View view) {
 		loadPage();
 	}
-	
+
 	public void setRelated(boolean related) {
-		this.numPage = 1;
-		this.related = related;
+		numPage = 1;
+		DoujinListFragment.related = related;
 	}
 
 	@SuppressLint("NewApi")
 	public void loadPage() {
 		TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
 		tvPage.setText("Page " + numPage);
-		if(related)
+		if (related)
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				new DownloadCatalog()
-						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,app.getCurrent().urlRelated(numPage));
+				new DownloadCatalog().executeOnExecutor(
+						AsyncTask.THREAD_POOL_EXECUTOR, app.getCurrent()
+								.urlRelated(numPage));
 			} else {
-				new DownloadCatalog().execute(app.getCurrent().urlRelated(numPage));
+				new DownloadCatalog().execute(app.getCurrent().urlRelated(
+						numPage));
 			}
-		else
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				new DownloadCatalog()
-						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,app.getUrl(numPage, url));
-			} else {
-				new DownloadCatalog().execute(app.getUrl(numPage, url));
-			}
+		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			new DownloadCatalog().executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, app.getUrl(numPage, url));
+		} else {
+			new DownloadCatalog().execute(app.getUrl(numPage, url));
+		}
 	}
-	
-	public void setUrl(String url){
+
+	public void setUrl(String url) {
 		related = false;
 		this.numPage = 1;
 		this.url = url;
 	}
-	
+
 	private void setData() {
-		da = new DoujinListAdapter(this.getActivity(), R.layout.row_doujin, 0, llDoujin,related);
+		da = new DoujinListAdapter(this.getActivity(), R.layout.row_doujin, 0,
+				llDoujin, related);
 		this.setListAdapter(da);
 	}
 
@@ -157,7 +157,7 @@ public class DoujinListFragment extends SherlockListFragment{
 		Intent it = new Intent(this.getActivity(), DoujinActivity.class);
 		this.startActivityForResult(it, 1);
 	}
-	
+
 	/**
 	 * Shows the progress UI and hides the login form.
 	 */
@@ -197,7 +197,7 @@ public class DoujinListFragment extends SherlockListFragment{
 			mFormView.setVisibility(show ? View.GONE : View.VISIBLE);
 		}
 	}
-	
+
 	class DownloadCatalog extends AsyncTask<String, Float, Integer> {
 
 		protected void onPreExecute() {
@@ -219,11 +219,12 @@ public class DoujinListFragment extends SherlockListFragment{
 			}
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
-			if(related)
+			if (related)
 				llDoujin.add(0, app.getCurrent());
 			for (DoujinBean bean : llDoujin) {
 				try {
-					File dir = DoujinListFragment.this.getActivity().getCacheDir();
+					File dir = DoujinListFragment.this.getActivity()
+							.getCacheDir();
 
 					File myFile = new File(dir, bean.getFileImageTitle());
 					Util.saveInStorage(myFile, bean.getUrlImageTitle());
@@ -238,9 +239,11 @@ public class DoujinListFragment extends SherlockListFragment{
 		}
 
 		protected void onPostExecute(Integer size) {
-			setData();
-			showProgress(false);
+			if(DoujinListFragment.this.getActivity()!=null){
+				setData();
+				showProgress(false);	
+			}
 		}
 	}
-	
+
 }

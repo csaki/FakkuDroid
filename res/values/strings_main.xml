@@ -2,4 +2,7 @@
 <resources>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="msg_new_version">Exist a new version.\nDon\'t forget to do a click in the ads :D</string>
+    <string name="visit_page">Visit the page</string>
+    <string name="remind_later">Remind me later</string>
 </resources>

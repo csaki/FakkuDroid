@@ -66,14 +66,21 @@ public class CommentListFragment extends SherlockListFragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_comment_list, container,
 				false);
-		setData();
 		return view;
+	}
+	
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		setData();
 	}
 
 	public void refresh() {
 		listCharged = true;
 		currentPage = 1;
-		da.clear();
+		if(da!=null)
+			da.clear();
 		new DownloadComments().execute(currentBean.urlComments(0));
 	}
 

@@ -7,18 +7,19 @@
     <ImageView 
         android:id="@+id/iv"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:src="@drawable/av_play"/>
     
     <TextView
         android:id="@+id/tvMenu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/darker_gray"
         android:layout_toRightOf="@id/iv"
-        android:paddingLeft="10dp"/>
+        android:paddingLeft="10dp"
+        android:gravity="center_vertical"/>
 	
 </RelativeLayout>

@@ -51,7 +51,7 @@
         android:layout_above="@+id/ll"
         android:layout_margin="5dp"
         android:background="@android:color/white"
-        android:scrollbars="horizontal" >
+        android:scrollbars="horizontal">
     </ListView>
 
 </RelativeLayout>

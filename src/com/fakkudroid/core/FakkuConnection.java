@@ -10,7 +10,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import  org.apache.http.client.CookieStore;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -23,8 +23,10 @@ import android.util.Log;
 import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
+import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Util;
+import com.google.gson.Gson;
 
 public class FakkuConnection {
 
@@ -216,6 +218,16 @@ public class FakkuConnection {
 			result.add(c);
 		}
 		
+		return result;
+	}
+	
+	public static VersionBean getLastversion() throws IOException{
+		VersionBean result = null;
+		String html = Util.getHTML(Constants.UPDATE_SERVICE);
+		if(!html.equals("null")){
+			Gson gson = new Gson();
+			result = gson.fromJson(html, VersionBean.class);
+		}
 		return result;
 	}
 	

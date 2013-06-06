@@ -71,8 +71,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	@Override
 	public void onStart(){
 		super.onStart();
-		if(llDoujin==null||llDoujin.isEmpty())
-			loadPage();
+		loadPage();
 	}
 	
 	private View findViewById(int resource){

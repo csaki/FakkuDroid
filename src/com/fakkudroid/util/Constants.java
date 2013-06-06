@@ -10,10 +10,11 @@ public class Constants {
 	public static String SITEABOUT = "http://fakkudroid.blogspot.com/2013/01/about-fakkudroid.html"; 
 	public static String SITEROOT = "http://www.fakku.net"; 
 	public static String SITEIMAGEROOT = "http://www.fakku.net"; 
-	public static String SITEIMAGE = "http://cdn.fakku.net/8041E1/c";
+	public static String SITEIMAGE = "http://c.fakku.net";
 	public static String SITECOMMENTS = "http://www.fakku.net/get/comments/@id/@page";
 	public static String SITEFAVORITE = "http://www.fakku.net/users/usr/favorites?mode=viewfavorites&u=2&start=";
 	public static String PAGE = "/page/";
+	public static String UPDATE_SERVICE = "http://fakkudroid.herokuapp.com/versions/max.json";
 
 	public static String SITESEARCH = "http://www.fakku.net/search/"; 
 	

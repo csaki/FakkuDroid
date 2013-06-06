@@ -7,6 +7,7 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -113,10 +114,16 @@ public class MenuListFragment extends SherlockListFragment {
 		toast.show();
 	}
 	
+	@SuppressLint("NewApi")
 	private void loadPage(){
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
 		tvPage.setText("Page " + nroPage);
-		new DownloadList().execute(typeView);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			new DownloadList().executeOnExecutor(
+					AsyncTask.THREAD_POOL_EXECUTOR, typeView);
+		}else{
+			new DownloadList().execute(typeView);
+		}
 	}
 	
 	public void previousPage(){
@@ -208,6 +215,7 @@ public class MenuListFragment extends SherlockListFragment {
 				R.layout.row_menu, 0, lstURL, false));
 	}
 
+	@SuppressLint("NewApi")
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		URLBean bean = lstURL.get(position);
 		if (level == 1) {
@@ -267,7 +275,11 @@ public class MenuListFragment extends SherlockListFragment {
 				}else{
 					typeView = TYPE_LIST_SERIES;
 				}
-				new DownloadList().execute(typeView);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+					new DownloadList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, typeView);
+				}else{
+					new DownloadList().execute(typeView);
+				}
 			}else{
 				if(position==lstURL.size()-1){
 					Intent it = new Intent(mainActivity,
