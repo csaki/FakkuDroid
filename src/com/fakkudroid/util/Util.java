@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,9 +22,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import com.fakkudroid.R;
-import com.fakkudroid.bean.URLBean;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -32,16 +30,35 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.widget.Toast;
 
+import com.fakkudroid.R;
+import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.bean.URLBean;
+import com.google.gson.Gson;
+
 public class Util {
 
-	public static void saveBitmap(File file, Bitmap bitmap) throws IOException{
+	public static void saveBitmap(File file, Bitmap bitmap) throws IOException {
 		FileOutputStream fOut = new FileOutputStream(file);
 
-	    bitmap.compress(Bitmap.CompressFormat.PNG, 85, fOut);
-	    fOut.flush();
-	    fOut.close();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 85, fOut);
+		fOut.flush();
+		fOut.close();
 	}
-	
+
+	public static void saveJsonDoujin(DoujinBean doujin, File dir) throws IOException {
+		File file = new File(dir, "data.json");
+		
+		if(!file.exists()){
+			Gson gson = new Gson();
+			// convert java object to JSON format,
+			// and returned as JSON formatted string
+			String json = gson.toJson(doujin);
+			FileWriter writer = new FileWriter(file);
+			writer.write(json);
+			writer.close();
+		}
+	}
+
 	public static int calculateInSampleSize(BitmapFactory.Options options,
 			int reqWidth, int reqHeight) {
 		// Raw height and width of image
@@ -188,12 +205,14 @@ public class Util {
 		return html;
 	}
 
-	public static void saveInStorage(File file, String imageUrl) throws Exception {
+	public static void saveInStorage(File file, String imageUrl)
+			throws Exception {
 		imageUrl = Util.escapeURL(imageUrl);
 		String fakkuExtentionFile = file.getAbsolutePath();
-		fakkuExtentionFile = fakkuExtentionFile.replaceAll("\\.jpg", "\\.fakku");
+		fakkuExtentionFile = fakkuExtentionFile
+				.replaceAll("\\.jpg", "\\.fakku");
 		File fakkuFile = new File(fakkuExtentionFile);
-		if(fakkuFile.exists()){
+		if (fakkuFile.exists()) {
 			fakkuFile.renameTo(file);
 		}
 		if (!file.exists()) {
@@ -216,20 +235,24 @@ public class Util {
 			input.close();
 		}
 	}
-	
-	public static URLBean castURLBean(String urlBean){
-		URLBean result = new URLBean(urlBean.split("\\|")[1],urlBean.split("\\|")[0]);		
+
+	public static URLBean castURLBean(String urlBean) {
+		URLBean result = new URLBean(urlBean.split("\\|")[1],
+				urlBean.split("\\|")[0]);
 		return result;
 	}
-	
-	public static void openPerfectViewer(String firstImage, Activity activity){
+
+	public static void openPerfectViewer(String firstImage, Activity activity) {
 		try {
-			Intent intent = activity.getPackageManager().getLaunchIntentForPackage("com.rookiestudio.perfectviewer");
+			Intent intent = activity
+					.getPackageManager()
+					.getLaunchIntentForPackage("com.rookiestudio.perfectviewer");
 			intent.setAction(android.content.Intent.ACTION_VIEW);
 			intent.setDataAndType(Uri.fromFile(new File(firstImage)), "image/*");
 			activity.startActivity(intent);
 		} catch (Exception e) {
-			Toast.makeText(activity, R.string.error_open_perfect_viewer, Toast.LENGTH_SHORT).show();
+			Toast.makeText(activity, R.string.error_open_perfect_viewer,
+					Toast.LENGTH_SHORT).show();
 		}
 	}
 }

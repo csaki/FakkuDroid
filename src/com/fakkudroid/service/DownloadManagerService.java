@@ -1,8 +1,11 @@
 package com.fakkudroid.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.FileUtils;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -162,7 +165,7 @@ public class DownloadManagerService extends Service {
 			if (percent >= 0){
 				mBuilder.setContentText(
 						getResources().getString(resource) + percent + "%");
-				mBuilder.setProgress(100, 0, false);
+				mBuilder.setProgress(100, percent, false);
 			}else{
 				mBuilder.setContentText(
 						getResources().getString(resource));
@@ -181,6 +184,24 @@ public class DownloadManagerService extends Service {
 			List<String> lstFiles = bean.getImagesFiles();
 			String folder = bean.getId();
 			File dir = getDir(folder, Context.MODE_PRIVATE);
+			File cacheDir = getCacheDir();
+			//Copy thumb file to folder
+			File titleBitmap = new File(cacheDir, bean.getFileImageTitle());
+			File titleBitmapCP = new File(dir,"thumb.jpg");
+			try {
+				if(!titleBitmapCP.exists())
+					FileUtils.copyFile(titleBitmap, titleBitmapCP);
+			} catch (IOException e) {
+				Log.e(TAG, e.getMessage(), e);
+			}
+			
+			//Save data.json
+			try {
+				Util.saveJsonDoujin(bean, dir);
+			} catch (IOException e) {
+				Log.e(TAG, e.getMessage(), e);
+			}
+			
 			for (int i = 0; i < lstUrls.size(); i++) {
 				File myFile = new File(dir, lstFiles.get(i));
 				if (!cancel) {

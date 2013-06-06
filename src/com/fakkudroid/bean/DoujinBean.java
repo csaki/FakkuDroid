@@ -28,7 +28,7 @@ public class DoujinBean {
 	private List<URLBean> lstTags;
 	private boolean addedInFavorite;
 	private String timeAgo;
-	private Bitmap titleBitmap,pageBitmap;
+	private transient Bitmap titleBitmap,pageBitmap;
 
 	public String getTimeAgo() {
 		return timeAgo;
