@@ -32,7 +32,7 @@ import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class DoujinListFragment extends SherlockListFragment {
 
@@ -122,26 +122,16 @@ public class DoujinListFragment extends SherlockListFragment {
 		TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
 		tvPage.setText("Page " + numPage);
 		if (related)
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				new DownloadCatalog().executeOnExecutor(
-						AsyncTask.THREAD_POOL_EXECUTOR, app.getCurrent()
+			Helper.executeAsyncTask(new DownloadCatalog(), app.getCurrent()
 								.urlRelated(numPage));
-			} else {
-				new DownloadCatalog().execute(app.getCurrent().urlRelated(
-						numPage));
-			}
-		else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new DownloadCatalog().executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, app.getUrl(numPage, url));
-		} else {
-			new DownloadCatalog().execute(app.getUrl(numPage, url));
-		}
+		else 
+			Helper.executeAsyncTask(new DownloadCatalog(), app.getUrl(numPage, url));
 	}
 
 	public void setUrl(String url) {
 		related = false;
-		this.numPage = 1;
-		this.url = url;
+		DoujinListFragment.numPage = 1;
+		DoujinListFragment.url = url;
 	}
 
 	private void setData() {
@@ -210,29 +200,30 @@ public class DoujinListFragment extends SherlockListFragment {
 				Log.i(DownloadCatalog.class.toString(), "URL Catalog: "
 						+ urls[0]);
 				llDoujin = FakkuConnection.parseHTMLCatalog(urls[0]);
-			} catch (ClientProtocolException e1) {
-				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
-			} catch (IOException e1) {
-				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
-			} catch (URISyntaxException e1) {
-				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
+			} catch (ClientProtocolException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (IOException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (URISyntaxException e) {
+				Helper.logError(this, e.getMessage(), e);
 			}
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
 			if (related)
 				llDoujin.add(0, app.getCurrent());
 			for (DoujinBean bean : llDoujin) {
-				try {
-					File dir = DoujinListFragment.this.getActivity()
-							.getCacheDir();
+				if(DoujinListFragment.this.getActivity()!=null){
+					try {
+						File dir = Helper.getCacheDir(getActivity());
 
-					File myFile = new File(dir, bean.getFileImageTitle());
-					Util.saveInStorage(myFile, bean.getUrlImageTitle());
+						File myFile = new File(dir, bean.getFileImageTitle());
+						Helper.saveInStorage(myFile, bean.getUrlImageTitle());
 
-					myFile = new File(dir, bean.getFileImagePage());
-					Util.saveInStorage(myFile, bean.getUrlImagePage());
-				} catch (Exception e) {
-					Log.e(DownloadCatalog.class.toString(), "Exception", e);
+						myFile = new File(dir, bean.getFileImagePage());
+						Helper.saveInStorage(myFile, bean.getUrlImagePage());
+					} catch (Exception e) {
+						Helper.logError(this, e.getMessage(), e);
+					}
 				}
 			}
 			return llDoujin.size();

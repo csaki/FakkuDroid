@@ -28,8 +28,8 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.LoginActivity;
 import com.fakkudroid.MainActivity;
+import com.fakkudroid.PreferencesActivity;
 import com.fakkudroid.R;
-import com.fakkudroid.SettingsActivity;
 import com.fakkudroid.adapter.MenuListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
@@ -39,6 +39,7 @@ import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
+import com.fakkudroid.util.Helper;
 
 public class MenuListFragment extends SherlockListFragment {
 
@@ -55,15 +56,15 @@ public class MenuListFragment extends SherlockListFragment {
 	int typeView;
 	private String url;
 	public final static int BROWSER_MANGA = 0;
-	public final static int BROWSER_DOUJIN = 0;
+	public final static int BROWSER_DOUJIN = 1;
 	public final static int TYPE_LIST_TAGS = 0;
 	public final static int TYPE_LIST_SERIES = 1;
 
 	public void setMainActivity(MainActivity mainActivity) {
 		this.mainActivity = mainActivity;
 	}
-	
-	private View findViewById(int resource){
+
+	private View findViewById(int resource) {
 		return view.findViewById(resource);
 	}
 
@@ -87,24 +88,24 @@ public class MenuListFragment extends SherlockListFragment {
 		ll = findViewById(R.id.ll);
 		ActionImageButton btnPreviousPage = (ActionImageButton) findViewById(R.id.btnPreviousPage);
 		ActionImageButton btnNextPage = (ActionImageButton) findViewById(R.id.btnNextPage);
-		
+
 		btnPreviousPage.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				previousPage();
 			}
 		});
-		
+
 		btnNextPage.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				nextPage();
 			}
 		});
-		
+
 		createMainMenu();
 		return view;
 	}
-	
-	public void nextPage(){
+
+	public void nextPage() {
 		nroPage++;
 		loadPage();
 		CharSequence text = "Page " + nroPage;
@@ -113,22 +114,17 @@ public class MenuListFragment extends SherlockListFragment {
 		Toast toast = Toast.makeText(getActivity(), text, duration);
 		toast.show();
 	}
-	
+
 	@SuppressLint("NewApi")
-	private void loadPage(){
+	private void loadPage() {
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
 		tvPage.setText("Page " + nroPage);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new DownloadList().executeOnExecutor(
-					AsyncTask.THREAD_POOL_EXECUTOR, typeView);
-		}else{
-			new DownloadList().execute(typeView);
-		}
+		Helper.executeAsyncTask(new DownloadList(), typeView);
 	}
-	
-	public void previousPage(){
-		if (nroPage-1 == 0) {
-			
+
+	public void previousPage() {
+		if (nroPage - 1 == 0) {
+
 			CharSequence text = "There aren't more pages.";
 			int duration = Toast.LENGTH_SHORT;
 
@@ -147,7 +143,7 @@ public class MenuListFragment extends SherlockListFragment {
 
 	public void createMainMenu() {
 		level = 1;
-		
+
 		boolean connected = app.getSettingBean().isChecked();
 		if (!connected)
 			connected = FakkuConnection.isConnected();
@@ -156,9 +152,9 @@ public class MenuListFragment extends SherlockListFragment {
 				R.array.main_menu);
 		int[] lstIcons = new int[] { R.drawable.home,
 				R.drawable.navigation_forward, R.drawable.rating_important,
-				R.drawable.navigation_back, -1, R.drawable.av_play,
-				R.drawable.av_play, R.drawable.device_access_sd_storage,
-				R.drawable.av_upload, R.drawable.action_settings };
+				R.drawable.navigation_back, -1, -2, -2,
+				R.drawable.device_access_sd_storage, R.drawable.av_upload,
+				R.drawable.action_settings };
 		lstURL = new LinkedList<URLBean>();
 
 		for (int i = 0; i < lstMainMenu.length; i++) {
@@ -187,7 +183,7 @@ public class MenuListFragment extends SherlockListFragment {
 		lstURL = new LinkedList<URLBean>();
 
 		for (int i = 0; i < lstBrowseManga.length; i++) {
-			URLBean bean = new URLBean(lstURLBrowseManga[i], lstBrowseManga[i]);			
+			URLBean bean = new URLBean(lstURLBrowseManga[i], lstBrowseManga[i]);
 			lstURL.add(bean);
 		}
 		lstURL.get(0).setIcon(R.drawable.content_undo);
@@ -215,45 +211,71 @@ public class MenuListFragment extends SherlockListFragment {
 				R.layout.row_menu, 0, lstURL, false));
 	}
 
+	private void createTags() {
+		ll.setVisibility(View.GONE);
+		level = 3;
+		String[] lstURLTags = null;
+		if(currentList == BROWSER_DOUJIN){
+			lstURLTags = getActivity().getResources().getStringArray(
+					R.array.url_tags_doujinshis);
+		}else{
+			lstURLTags = getActivity().getResources()
+					.getStringArray(R.array.url_tags_manga);
+		}
+		lstURL = new LinkedList<URLBean>();
+
+		for (int i = 0; i < lstURLTags.length; i++) {
+			URLBean bean = new URLBean(lstURLTags[i], lstURLTags[i].substring(
+					lstURLTags[i].lastIndexOf("/")+1, lstURLTags[i].length()));
+			lstURL.add(bean);
+		}
+		setData();
+	}
+
 	@SuppressLint("NewApi")
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		URLBean bean = lstURL.get(position);
 		if (level == 1) {
-			if(bean.getDescription().equals("Manga")){
+			if (bean.getDescription().equals("Manga")) {
 				createBrowseManga();
-			}else if(bean.getDescription().equals("Doujinshi")){
+			} else if (bean.getDescription().equals("Doujinshi")) {
 				createBrowseDoujin();
-			}else if(position==0){
-				mainActivity.loadPageDoujinList(getResources().getString(R.string.app_name), com.fakkudroid.util.Constants.SITEROOT);
-			}else if(bean.getDescription().equals("Downloads")){
+			} else if (position == 0) {
+				mainActivity.loadPageDoujinList(
+						getResources().getString(R.string.app_name),
+						com.fakkudroid.util.Constants.SITEROOT);
+			} else if (bean.getDescription().equals("Downloads")) {
 				mainActivity.goToDownloads();
-			}else if(bean.getDescription().equals("My favorites")){
+			} else if (bean.getDescription().equals("My favorites")) {
 				mainActivity.goToFavorites(app.getSettingBean().getUser());
-			}else if(bean.getDescription().startsWith("Sign")){
-				Intent itLogin = new Intent(this.getActivity(), LoginActivity.class);
+			} else if (bean.getDescription().startsWith("Sign")) {
+				Intent itLogin = new Intent(this.getActivity(),
+						LoginActivity.class);
 				this.startActivityForResult(itLogin, 2);
-			}else if(bean.getDescription().equals("Settings")){
-				Intent itSettings = new Intent(this.getActivity(), SettingsActivity.class);
-				getActivity().startActivity(itSettings);
-			}else if(bean.getDescription().equals("Logout")){
+			} else if (bean.getDescription().equals("Preferences")) {
+				Intent itPreference = new Intent(this.getActivity(),
+						PreferencesActivity.class);
+				getActivity().startActivity(itPreference);
+			} else if (bean.getDescription().equals("Logout")) {
 				UserBean sb = app.getSettingBean();
 				sb.setChecked(false);
 				new DataBaseHandler(getActivity()).updateSetting(sb);
 				app.setSettingBean(null);
 				FakkuConnection.disconnect();
-				Toast.makeText(getActivity(), getResources().getString(R.string.loggedout),
+				Toast.makeText(getActivity(),
+						getResources().getString(R.string.loggedout),
 						Toast.LENGTH_SHORT).show();
 				createMainMenu();
-			}else if(bean.getDescription().startsWith("Check")){
+			} else if (bean.getDescription().startsWith("Check")) {
 				Intent it3 = new Intent(Intent.ACTION_VIEW);
 				it3.setData(Uri.parse(Constants.SITEDOWNLOAD));
 
 				PackageInfo pInfo = null;
 				try {
-					pInfo = getActivity().getPackageManager().getPackageInfo(getActivity().getPackageName(), 0);
+					pInfo = getActivity().getPackageManager().getPackageInfo(
+							getActivity().getPackageName(), 0);
 				} catch (NameNotFoundException e) {
-					Log.e(MenuListFragment.class.toString(),
-							"onOptionsItemSelected", e);
+					Helper.logError(this, "onOptionsItemSelected", e);
 				}
 				String version = pInfo.versionName;
 
@@ -265,46 +287,42 @@ public class MenuListFragment extends SherlockListFragment {
 				toast.show();
 			}
 		} else if (level == 2) {
-			if(bean.getUrl()==null||bean.getUrl().equals("")){
+			if (bean.getUrl() == null || bean.getUrl().equals("")) {
 				createMainMenu();
-			}else if(bean.getDescription().endsWith("Tags")||bean.getDescription().endsWith("Artist")||bean.getDescription().endsWith("Series")){
+			} else if (bean.getDescription().endsWith("Tags")) {
+				createTags();
+			} else if (bean.getDescription().endsWith("Artist")
+					|| bean.getDescription().endsWith("Series")) {
 				url = bean.getUrl();
 				nroPage = 1;
-				if(bean.getDescription().contains("Tags")){
-					typeView = TYPE_LIST_TAGS;
-				}else{
-					typeView = TYPE_LIST_SERIES;
-				}
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-					new DownloadList().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, typeView);
-				}else{
-					new DownloadList().execute(typeView);
-				}
-			}else{
-				if(position==lstURL.size()-1){
-					Intent it = new Intent(mainActivity,
-							DoujinActivity.class);
+				typeView = TYPE_LIST_SERIES;
+				Helper.executeAsyncTask(new DownloadList(), typeView);
+			} else {
+				if (position == lstURL.size() - 1) {
+					Intent it = new Intent(mainActivity, DoujinActivity.class);
 					DoujinBean dBean = new DoujinBean();
 					dBean.setUrl(bean.getUrl());
-					app.setCurrent(dBean);		
+					app.setCurrent(dBean);
 					mainActivity.startActivity(it);
-				}else{
-					mainActivity.loadPageDoujinList(bean.getDescription(), bean.getUrl());
+				} else {
+					mainActivity.loadPageDoujinList(bean.getDescription(),
+							bean.getUrl());
 				}
 			}
-		}else if (level == 3) {
-			if(bean.getUrl()==null){
-				if(currentList==BROWSER_DOUJIN){
+		} else if (level == 3) {
+			if (bean.getUrl() == null) {
+				if (currentList == BROWSER_DOUJIN) {
 					createBrowseDoujin();
-				}else{
+				} else {
 					createBrowseManga();
 				}
-			}else{
-				mainActivity.loadPageDoujinList(bean.getDescription(), bean.getUrl());
+			} else {
+				mainActivity.loadPageDoujinList(bean.getDescription(),
+						bean.getUrl());
 			}
 		}
 	}
-	
+
 	/**
 	 * Shows the progress UI and hides the login form.
 	 */
@@ -344,37 +362,37 @@ public class MenuListFragment extends SherlockListFragment {
 			mFormView.setVisibility(show ? View.GONE : View.VISIBLE);
 		}
 	}
-	
-	private void setData(){
+
+	private void setData() {
 		level = 3;
 		URLBean bean = new URLBean();
 		bean.setDescription(getResources().getString(R.string.back));
 		bean.setUrl(null);
 		bean.setIcon(R.drawable.content_undo);
 		lstURL.add(0, bean);
-		this.setListAdapter(new MenuListAdapter(getActivity(), R.layout.row_menu, 0, lstURL, false));
+		this.setListAdapter(new MenuListAdapter(getActivity(),
+				R.layout.row_menu, 0, lstURL, false));
 	}
-	
+
 	class DownloadList extends AsyncTask<Integer, Float, Integer> {
 
 		protected void onPreExecute() {
 			showProgress(true);
 		}
-		
+
 		protected Integer doInBackground(Integer... type) {
-			
+
 			try {
-				Log.i(DownloadList.class.toString(), "URL List: " + app.getUrl(nroPage, url));
-				if(typeView==TYPE_LIST_SERIES)
-					lstURL = FakkuConnection.parseHTMLSeriesList(app.getUrl(nroPage, url));
-				else
-					lstURL = FakkuConnection.parseHTMLTagsList(app.getUrl(nroPage, url));				
-			} catch (ClientProtocolException e1) {
-				Log.e(DownloadList.class.toString(), "Exception", e1);
-			} catch (IOException e1) {
-				Log.e(DownloadList.class.toString(), "Exception", e1);
-			} 
-			if(lstURL==null)
+				Log.i(DownloadList.class.toString(),
+						"URL List: " + app.getUrl(nroPage, url));
+				lstURL = FakkuConnection.parseHTMLSeriesList(app.getUrl(
+						nroPage, url));
+			} catch (ClientProtocolException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (IOException e) {
+				Helper.logError(this, e.getMessage(), e);
+			}
+			if (lstURL == null)
 				lstURL = new LinkedList<URLBean>();
 			return lstURL.size();
 		}

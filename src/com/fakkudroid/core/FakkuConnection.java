@@ -25,7 +25,7 @@ import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 import com.google.gson.Gson;
 
 public class FakkuConnection {
@@ -103,7 +103,7 @@ public class FakkuConnection {
 		if(cookiesStore==null)
 			throw new ExceptionNotLoggedIn();
 		
-		String html = Util.getHTML(url, cookiesStore);
+		String html = Helper.getHTML(url, cookiesStore);
 		
 		if(html.contains("Please enter your username and password to login"))
 			throw new ExceptionNotLoggedIn();
@@ -113,7 +113,7 @@ public class FakkuConnection {
 			throws ClientProtocolException, IOException, URISyntaxException {
 		LinkedList<CommentBean> result = new LinkedList<CommentBean>();
 		
-		String html = Util.getHTML(url, cookiesStore);
+		String html = Helper.getHTML(url, cookiesStore);
 		
 		String token = "<div class=\"manga_ comment-row\">|<div class=\"reply_ comment-row\">|<div class=\"tree_ comment-row\">";
 		html = html.replaceAll("<div class=\"manga_ comment-row\">", "<div class=\"manga_ comment-row\">manga");
@@ -223,7 +223,7 @@ public class FakkuConnection {
 	
 	public static VersionBean getLastversion() throws IOException{
 		VersionBean result = null;
-		String html = Util.getHTML(Constants.UPDATE_SERVICE);
+		String html = Helper.getHTML(Constants.UPDATE_SERVICE);
 		if(!html.equals("null")){
 			Gson gson = new Gson();
 			result = gson.fromJson(html, VersionBean.class);
@@ -235,7 +235,7 @@ public class FakkuConnection {
 			throws ClientProtocolException, IOException, URISyntaxException {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
 
-		String html = Util.getHTML(url);
+		String html = Helper.getHTML(url);
 
 		String token = "content-row manga|content-row doujinshi";
 		String[] sections = html.split(token);
@@ -344,7 +344,7 @@ public class FakkuConnection {
 			throws ClientProtocolException, IOException, URISyntaxException {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
 
-		String html = Util.getHTML(url);
+		String html = Helper.getHTML(url);
 
 		String token = "<div class=\"favorite\">";
 		String[] sections = html.split(token);
@@ -391,11 +391,11 @@ public class FakkuConnection {
 			throws ClientProtocolException, IOException {
 		String url = bean.getUrl();
 
-		String html = Util.getHTML(url, cookiesStore);
+		String html = Helper.getHTML(url, cookiesStore);
 
 		bean.setAddedInFavorite(!html.contains("Add To Favorites"));
 		
-		html = Util.getHTML(url);
+		html = Helper.getHTML(url);
 		// Qty Pages
 		String token = "</b> pages";
 		int idxStart = html.indexOf(token);
@@ -551,7 +551,7 @@ public class FakkuConnection {
 	public static LinkedList<URLBean> parseHTMLTagsList(String url)
 			throws IOException {
 		LinkedList<URLBean> result = new LinkedList<URLBean>();
-		String html = Util.getHTML(url);
+		String html = Helper.getHTML(url);
 
 		String token = "<strong>Tags:</strong>";
 		int idxStart = html.indexOf(token);
@@ -592,7 +592,7 @@ public class FakkuConnection {
 	public static LinkedList<URLBean> parseHTMLSeriesList(String url)
 			throws IOException {
 		LinkedList<URLBean> result = new LinkedList<URLBean>();
-		String html = Util.getHTML(url);
+		String html = Helper.getHTML(url);
 
 		String token = "series_wrap";
 		String[] sections = html.split(token);

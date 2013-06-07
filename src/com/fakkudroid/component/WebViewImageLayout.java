@@ -10,7 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.fakkudroid.R;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 import com.fakkudroid.component.NoZoomControlWebView;
 
 public class WebViewImageLayout extends RelativeLayout{
@@ -72,7 +72,7 @@ public class WebViewImageLayout extends RelativeLayout{
 	public void startLoader(int width, int height, boolean japaneseMode){
 		height-= getBarHeight();
 		wb.loadDataWithBaseURL(null,
-				Util.createHTMLImage(imageFile, width/wb.getScale(), height/wb.getScale(), japaneseMode, this.getResources()),
+				Helper.createHTMLImage(imageFile, width/wb.getScale(), height/wb.getScale(), japaneseMode, this.getResources()),
 				"text/html", "utf-8", null);
 	}
 	

@@ -3,13 +3,12 @@ package com.fakkudroid;
 import java.io.File;
 import java.io.IOException;
 
-import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
+import com.fakkudroid.util.Helper;
 
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -19,14 +18,10 @@ import android.content.SharedPreferences;
 
 public class PasswordActivity extends Activity {
 
-	private FakkuDroidApplication app;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_password);
-
-		app = (FakkuDroidApplication) getApplication();
 
 		createFolders();
 		
@@ -66,7 +61,7 @@ public class PasswordActivity extends Activity {
 		try {
 			nomedia.createNewFile();
 		} catch (IOException e) {
-			Log.e(PasswordActivity.class.getName(), "Error creating .nomedia file.", e);
+			Helper.logError(this, "Error creating .nomedia file.", e);
 		}
 	}
 	

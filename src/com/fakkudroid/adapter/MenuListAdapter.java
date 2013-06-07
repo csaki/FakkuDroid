@@ -49,7 +49,7 @@ public class MenuListAdapter extends ArrayAdapter<URLBean> {
 				holder.tvMenu.setTextAppearance(getContext(), android.R.style.TextAppearance_Small);
 				holder.tvMenu.setTextColor(Color.BLACK);			
 			}
-			if(s.getIcon()==R.drawable.av_play){
+			if(s.getIcon()==-2){
 				holder.iv.setPadding(40, holder.iv.getPaddingRight(), holder.iv.getPaddingTop(), holder.iv.getPaddingBottom());
 			}
 		}

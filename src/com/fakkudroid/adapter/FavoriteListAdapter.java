@@ -1,11 +1,8 @@
 package com.fakkudroid.adapter;
 
-import java.io.File;
 import java.util.LinkedList;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +12,7 @@ import android.widget.TextView;
 
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
-import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 
@@ -43,9 +39,9 @@ public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		holder.tvDoujin.setText(Util.limitString(s.getTitle(), 36, "..."));
+		holder.tvDoujin.setText(Helper.limitString(s.getTitle(), 36, "..."));
 
-		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(getContext().getCacheDir()));
+		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
 		return convertView;
 	}
 

@@ -22,12 +22,20 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.fakkudroid.R;
@@ -35,8 +43,66 @@ import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.google.gson.Gson;
 
-public class Util {
+public class Helper {
 
+	public static File getCacheDir(Context context) {
+		File file = null;
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		String settingDir = prefs.getString("dir_download", "0");
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
+			String state = Environment.getExternalStorageState();
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.CACHE_DIRECTORY);
+				boolean success = true;
+				if (!file.exists()) {
+					success = file.mkdirs();
+				}
+
+				if (!success)
+					file = null;
+			}
+		}
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.CACHE_DIRECTORY);
+
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		return file;
+	}
+
+	public static File getDir(String dir, int mode, Context context) {
+		File file = null;
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		String settingDir = prefs.getString("dir_download", "0");
+		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
+			String state = Environment.getExternalStorageState();
+			if (Environment.MEDIA_MOUNTED.equals(state)) {
+				file = new File(Environment.getExternalStorageDirectory()
+						+ Constants.LOCAL_DIRECTORY + "/" + dir);
+				boolean success = true;
+				if (!file.exists()) {
+					success = file.mkdirs();
+				}
+
+				if (!success)
+					file = null;
+			}
+		}
+		if (file == null)
+			file = new File(Environment.getRootDirectory()
+					+ Constants.LOCAL_DIRECTORY + "/" + dir);
+
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		return file;
+	}
+	
 	public static void saveBitmap(File file, Bitmap bitmap) throws IOException {
 		FileOutputStream fOut = new FileOutputStream(file);
 
@@ -44,11 +110,26 @@ public class Util {
 		fOut.flush();
 		fOut.close();
 	}
+	
+	public static void logError(Object errorClass, String msg, Exception e){
+		Log.e(errorClass.getClass().toString(), msg, e);
+	}
 
-	public static void saveJsonDoujin(DoujinBean doujin, File dir) throws IOException {
+	@SuppressLint("NewApi")
+	public static <T> void executeAsyncTask(AsyncTask<T, ?, ?> task,
+			T... params) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, params);
+		} else {
+			task.execute(params);
+		}
+	}
+
+	public static void saveJsonDoujin(DoujinBean doujin, File dir)
+			throws IOException {
 		File file = new File(dir, "data.json");
-		
-		if(!file.exists()){
+
+		if (!file.exists()) {
 			Gson gson = new Gson();
 			// convert java object to JSON format,
 			// and returned as JSON formatted string
@@ -186,7 +267,7 @@ public class Util {
 
 	public static String createHTMLImage(String url, float width, float height,
 			boolean japaneseMode, Resources res) {
-		url = Util.escapeURL(url);
+		url = Helper.escapeURL(url);
 		String html = res.getString(R.string.image_html);
 		html = html.replace("@width", width + "");
 		html = html.replace("@height", height + "");
@@ -198,7 +279,7 @@ public class Util {
 
 	public static String createHTMLImagePercentage(String url, int pct,
 			Resources res) {
-		url = Util.escapeURL(url);
+		url = Helper.escapeURL(url);
 		String html = res.getString(R.string.image_html_percent);
 		html = html.replace("@percentage", pct + "");
 		html = html.replace("@url", url);
@@ -207,7 +288,8 @@ public class Util {
 
 	public static void saveInStorage(File file, String imageUrl)
 			throws Exception {
-		imageUrl = Util.escapeURL(imageUrl);
+
+		imageUrl = Helper.escapeURL(imageUrl);
 		String fakkuExtentionFile = file.getAbsolutePath();
 		fakkuExtentionFile = fakkuExtentionFile
 				.replaceAll("\\.jpg", "\\.fakku");
@@ -215,24 +297,39 @@ public class Util {
 		if (fakkuFile.exists()) {
 			fakkuFile.renameTo(file);
 		}
-		if (!file.exists()) {
-			URL url = new URL(imageUrl);
-			URLConnection connection = url.openConnection();
-			connection.connect();
 
-			InputStream input = new BufferedInputStream(url.openStream());
+		OutputStream output = null;
+		InputStream input = null;
 
-			OutputStream output = new FileOutputStream(file);
+		try {
+			if (!file.exists()) {
+				URL url = new URL(imageUrl);
+				URLConnection connection = url.openConnection();
+				connection.connect();
 
-			byte data[] = new byte[1024];
-			int count;
-			while ((count = input.read(data)) != -1) {
-				output.write(data, 0, count);
+				input = new BufferedInputStream(url.openStream());
+
+				output = new FileOutputStream(file);
+
+				byte data[] = new byte[1024];
+				int count;
+				while ((count = input.read(data)) != -1) {
+					output.write(data, 0, count);
+				}
+				output.flush();
 			}
-
-			output.flush();
-			output.close();
-			input.close();
+		} catch (Exception e) {
+			if (file.exists()) {
+				file.delete();
+			}
+			throw e;
+		} finally {
+			if (output != null) {
+				output.close();
+			}
+			if (input != null) {
+				input.close();
+			}
 		}
 	}
 

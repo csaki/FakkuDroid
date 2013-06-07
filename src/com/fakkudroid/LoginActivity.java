@@ -8,6 +8,7 @@ import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Helper;
 import com.fakkudroid.R;
 
 import android.animation.Animator;
@@ -18,7 +19,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -137,8 +137,7 @@ public class LoginActivity extends Activity {
 			// perform the user login attempt.
 			mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
 			showProgress(true);
-			mAuthTask = new UserLoginTask();
-			mAuthTask.execute((Void) null);
+			Helper.executeAsyncTask(new UserLoginTask(), (Void)null);
 		}
 	}
 
@@ -205,9 +204,9 @@ public class LoginActivity extends Activity {
 				new DataBaseHandler(LoginActivity.this).updateSetting(s);
 				app.setSettingBean(null);
 			} catch (ClientProtocolException e) {
-				Log.e(this.getClass().toString(), e.getMessage(), e);
+				Helper.logError(this, e.getMessage(), e);
 			} catch (IOException e) {
-				Log.e(this.getClass().toString(), e.getMessage(), e);
+				Helper.logError(this, e.getMessage(), e);
 			}
 			
 			// TODO: register the new account here.

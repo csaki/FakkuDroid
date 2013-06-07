@@ -8,7 +8,7 @@ import java.util.List;
 import android.graphics.Bitmap;
 
 import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class DoujinBean {
 
@@ -28,7 +28,7 @@ public class DoujinBean {
 	private List<URLBean> lstTags;
 	private boolean addedInFavorite;
 	private String timeAgo;
-	private transient Bitmap titleBitmap,pageBitmap;
+	private transient Bitmap titleBitmap, pageBitmap;
 
 	public String getTimeAgo() {
 		return timeAgo;
@@ -82,23 +82,44 @@ public class DoujinBean {
 	public String getFileImagePage() {
 		return getId() + "page.jpg";
 	}
-	
-	public Bitmap getBitmapImageTitle(File dir){
-		if(titleBitmap==null){
-			File titleFile = new File(dir,
-					getFileImageTitle());
-			titleBitmap = Util.decodeSampledBitmapFromFile(titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+
+	public Bitmap getBitmapImageTitle(File dir) {
+		if (titleBitmap == null) {
+			File titleFile = new File(dir, getFileImageTitle());
+			if (titleFile.exists())
+				titleBitmap = Helper.decodeSampledBitmapFromFile(
+						titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
+						Constants.HEIGHT_STANDARD);
 		}
 		return titleBitmap;
 	}
-	
-	public Bitmap getBitmapImagePage(File dir){
-		if(pageBitmap==null){
-			File titlePage = new File(dir,
-					getFileImagePage());
-			pageBitmap = Util.decodeSampledBitmapFromFile(titlePage.getAbsolutePath(), Constants.WIDTH_STANDARD, Constants.HEIGHT_STANDARD);
+
+	public Bitmap getBitmapImagePage(File dir) {
+		if (pageBitmap == null) {
+			File titlePage = new File(dir, getFileImagePage());
+			if (titlePage.exists())
+				pageBitmap = Helper.decodeSampledBitmapFromFile(
+						titlePage.getAbsolutePath(), Constants.WIDTH_STANDARD,
+						Constants.HEIGHT_STANDARD);
 		}
 		return pageBitmap;
+	}
+
+	public void loadImages(File dir) {
+		if (pageBitmap == null) {
+			File titlePage = new File(dir, getFileImagePage());
+			if (titlePage.exists())
+				pageBitmap = Helper.decodeSampledBitmapFromFile(
+						titlePage.getAbsolutePath(), Constants.WIDTH_STANDARD,
+						Constants.HEIGHT_STANDARD);
+		}
+		if (titleBitmap == null) {
+			File titleFile = new File(dir, getFileImageTitle());
+			if (titleFile.exists())
+				titleBitmap = Helper.decodeSampledBitmapFromFile(
+						titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
+						Constants.HEIGHT_STANDARD);
+		}
 	}
 
 	public String getTitle() {
@@ -233,7 +254,7 @@ public class DoujinBean {
 		}
 		return result;
 	}
-	
+
 	public List<String> getOldImagesFiles() {
 		List<String> result = new ArrayList<String>();
 		for (int i = 1; i <= qtyPages; i++) {

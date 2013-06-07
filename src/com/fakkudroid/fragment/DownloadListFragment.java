@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,7 @@ import com.fakkudroid.adapter.DownloadListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class DownloadListFragment extends SherlockListFragment{
 	private FakkuDroidApplication app;
@@ -116,12 +115,11 @@ public class DownloadListFragment extends SherlockListFragment{
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								String folder = bean.getId();
-								File dir = DownloadListFragment.this.getActivity().getDir(folder, Context.MODE_PRIVATE);
+								File dir = Helper.getDir(folder, Context.MODE_PRIVATE, getActivity());
 								try {
 									FileUtils.deleteDirectory(dir);
 								} catch (IOException e) {
-									Log.e(DownloadListFragment.class.toString(),
-											"Exception", e);
+									Helper.logError(this, e.getMessage(), e);
 								}
 								DataBaseHandler db = new DataBaseHandler(
 										DownloadListFragment.this.getActivity());
@@ -150,9 +148,9 @@ public class DownloadListFragment extends SherlockListFragment{
 				.getDefaultSharedPreferences(getActivity());
 		if(prefs.getBoolean("perfect_viewer_checkbox", false)){
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
-			File dir = getActivity().getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
+			File dir = Helper.getDir(app.getCurrent().getId(), Context.MODE_PRIVATE, getActivity());
 			File myFile = new File(dir, lstFiles.get(0));
-			Util.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
+			Helper.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
 		}else{
 			Intent it = new Intent(this.getActivity(), GallerySwipeActivity.class);
 			this.startActivity(it);

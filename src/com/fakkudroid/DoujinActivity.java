@@ -20,14 +20,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -45,7 +43,7 @@ import com.fakkudroid.fragment.CommentListFragment;
 import com.fakkudroid.fragment.DoujinDetailFragment;
 import com.fakkudroid.service.DownloadManagerService;
 import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class DoujinActivity extends SherlockFragmentActivity {
 
@@ -57,12 +55,11 @@ public class DoujinActivity extends SherlockFragmentActivity {
 	private View mStatusView;
 	private DoujinBean currentBean;
 	private ProgressBar progressBar;
+	SharedPreferences preferenceManager;
 
 	public DoujinBean getCurrentBean() {
 		return currentBean;
 	}
-
-	SharedPreferences preferenceManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -118,74 +115,8 @@ public class DoujinActivity extends SherlockFragmentActivity {
 		preferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
 
 		if (DownloadManagerService.DoujinMap.exists(currentBean)) {
-			startThread();
+			Helper.executeAsyncTask(new UpdateStatus());
 		}
-	}
-
-	@SuppressLint("NewApi")
-	private void startThread() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new UpdateStatus()
-					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		} else {
-			new UpdateStatus().execute(true);
-		}
-	}
-
-	@Override
-	public File getCacheDir() {
-		File file = null;
-		String settingDir = preferenceManager.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.CACHE_DIRECTORY);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
-
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.CACHE_DIRECTORY);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
-	}
-
-	@Override
-	public File getDir(String dir, int mode) {
-		File file = null;
-		String settingDir = preferenceManager.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.LOCAL_DIRECTORY + "/" + dir);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
-
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.LOCAL_DIRECTORY + "/" + dir);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
 	}
 
 	public void viewInBrowser(View view) {
@@ -217,7 +148,7 @@ public class DoujinActivity extends SherlockFragmentActivity {
 				}
 			} else {
 				startService(new Intent(this, DownloadManagerService.class));
-				startThread();
+				Helper.executeAsyncTask(new UpdateStatus());
 			}
 		} else {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -227,13 +158,12 @@ public class DoujinActivity extends SherlockFragmentActivity {
 								public void onClick(DialogInterface dialog,
 										int id) {
 									String folder = currentBean.getId();
-									File dir = getDir(folder,
-											Context.MODE_PRIVATE);
+									File dir = Helper.getDir(folder,
+											Context.MODE_PRIVATE, getApplicationContext());
 									try {
 										FileUtils.deleteDirectory(dir);
 									} catch (IOException e) {
-										Log.e(DoujinActivity.class.toString(),
-												"Exception", e);
+										Helper.logError(this, e.getMessage(), e);
 									}
 									DataBaseHandler db = new DataBaseHandler(
 											DoujinActivity.this);
@@ -262,9 +192,9 @@ public class DoujinActivity extends SherlockFragmentActivity {
 	public void read(View view) {
 		if (preferenceManager.getBoolean("perfect_viewer_checkbox", false)&&adapter.getDoujinDetail().isAlreadyDownloaded()) {
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
-			File dir = getDir(app.getCurrent().getId(), Context.MODE_PRIVATE);
+			File dir = Helper.getDir(app.getCurrent().getId(), Context.MODE_PRIVATE, this);
 			File myFile = new File(dir, lstFiles.get(0));
-			Util.openPerfectViewer(myFile.getAbsolutePath(), this);
+			Helper.openPerfectViewer(myFile.getAbsolutePath(), this);
 		} else {
 			Intent it = new Intent(this, GallerySwipeActivity.class);
 			this.startActivity(it);
@@ -312,19 +242,9 @@ public class DoujinActivity extends SherlockFragmentActivity {
 		app.setSettingBean(null);
 		if (app.getSettingBean().isChecked())
 			if (!currentBean.isAddedInFavorite()) {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-					new FavoriteDoujin()
-							.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,true);
-				} else {
-					new FavoriteDoujin().execute(true);
-				}
+				Helper.executeAsyncTask(new FavoriteDoujin(),true);
 			} else {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-					new FavoriteDoujin()
-							.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,false);
-				} else {
-					new FavoriteDoujin().execute(false);
-				}
+				Helper.executeAsyncTask(new FavoriteDoujin(),false);
 			}
 	}
 
@@ -429,11 +349,9 @@ public class DoujinActivity extends SherlockFragmentActivity {
 					isConnected = FakkuConnection.connect(app.getSettingBean()
 							.getUser(), app.getSettingBean().getPassword());
 				} catch (ClientProtocolException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				} catch (IOException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				}
 
 			if (!isConnected) {
@@ -451,11 +369,9 @@ public class DoujinActivity extends SherlockFragmentActivity {
 						FakkuConnection.transaction(currentBean
 								.urlFavorite(Constants.SITEREMOVEFAVORITE));
 				} catch (ExceptionNotLoggedIn e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				} catch (IOException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				}
 				currentBean.setAddedInFavorite(b);
 			}

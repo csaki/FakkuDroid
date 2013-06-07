@@ -3,7 +3,7 @@ package com.fakkudroid.adapter;
 import java.util.LinkedList;
 
 import com.fakkudroid.bean.DoujinBean;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 import com.fakkudroid.R;
 
 import android.content.Context;
@@ -56,8 +56,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		else
 			holder.ll.setBackgroundColor(convertView.getResources().getColor(android.R.color.white));
 		
-		holder.tvDoujin.setText(Util.limitString(s.getTitle(), 36, "..."));
-		holder.tvArtist.setText(Util.limitString(
+		holder.tvDoujin.setText(Helper.limitString(s.getTitle(), 36, "..."));
+		holder.tvArtist.setText(Helper.limitString(
 				s.getArtist().getDescription(), 36, "..."));
 		holder.tvSerie.setText(s.getSerie().getDescription());
 		holder.tvDescription.setText(Html.fromHtml(s.getDescription().replace(
@@ -65,8 +65,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		;
 		holder.tvTags.setText(s.getTags());
 		
-		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(getContext().getCacheDir()));
-		holder.ivPage.setImageBitmap(s.getBitmapImagePage(getContext().getCacheDir()));
+		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
+		holder.ivPage.setImageBitmap(s.getBitmapImagePage(Helper.getCacheDir(getContext())));
 		return convertView;
 	}
 

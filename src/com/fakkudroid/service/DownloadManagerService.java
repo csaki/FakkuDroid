@@ -2,7 +2,7 @@ package com.fakkudroid.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -16,13 +16,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.fakkudroid.DoujinActivity;
@@ -30,16 +27,15 @@ import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class DownloadManagerService extends Service {
 
-	private final String TAG = DownloadManagerService.class.toString();
 	private FakkuDroidApplication app;
 	public static boolean started;
 	public static DoujinBean currentBean;
 	public static int percent;
+	public static boolean cancel;
 	SharedPreferences preferenceManager;
 
 	@SuppressLint("NewApi")
@@ -49,11 +45,7 @@ public class DownloadManagerService extends Service {
 		started = true;
 		app = (FakkuDroidApplication) getApplication();
 		DoujinMap.add(app.getCurrent());
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new DownloadDoujin()
-					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		} else
-			new DownloadDoujin().execute("");
+		Helper.executeAsyncTask(new DownloadDoujin());
 		preferenceManager = PreferenceManager.getDefaultSharedPreferences(this);
 	}
 
@@ -67,73 +59,17 @@ public class DownloadManagerService extends Service {
 	public void onDestroy() {
 		started = false;
 	}
+	
 
-	@Override
-	public File getCacheDir() {
-		File file = null;
-		;
-		String settingDir = preferenceManager.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.CACHE_DIRECTORY);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
+	class DownloadDoujin extends AsyncTask<String, Integer, Integer> {
 
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.CACHE_DIRECTORY);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
-	}
-
-	@Override
-	public File getDir(String dir, int mode) {
-		File file = null;
-		String settingDir = preferenceManager.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.LOCAL_DIRECTORY + "/" + dir);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
-
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.LOCAL_DIRECTORY + "/" + dir);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
-	}
-
-	class DownloadDoujin extends AsyncTask<String, Integer, String> {
-
-		NotificationCompat.Builder mBuilder;
 		NotificationManager mNotificationManager;
-
-		boolean cancel;
+		Exception lastException;
+		
 		DoujinBean bean;
 
 		public DownloadDoujin() {
+			cancel = false;
 			this.bean = DoujinMap.next();
 			mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		}
@@ -147,7 +83,7 @@ public class DownloadManagerService extends Service {
 			Intent resultIntent = new Intent(DownloadManagerService.this,
 					DoujinActivity.class);
 			resultIntent.putExtra(DoujinActivity.INTENT_VAR_URL, bean.getUrl());
-			
+
 			TaskStackBuilder stackBuilder = TaskStackBuilder
 					.create(DownloadManagerService.this);
 			// Adds the back stack
@@ -156,100 +92,106 @@ public class DownloadManagerService extends Service {
 			stackBuilder.addNextIntent(resultIntent);
 			// Gets a PendingIntent containing the entire back stack
 			PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
-					0, PendingIntent.FLAG_UPDATE_CURRENT);
-			mBuilder = new NotificationCompat.Builder(
-					DownloadManagerService.this)
-					.setSmallIcon(R.drawable.ic_launcher)
-					.setContentTitle(bean.getTitle());
-					
-			if (percent >= 0){
-				mBuilder.setContentText(
-						getResources().getString(resource) + percent + "%");
+					0, PendingIntent.FLAG_ONE_SHOT);
+			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+					DownloadManagerService.this).setSmallIcon(
+					R.drawable.ic_launcher).setContentTitle(bean.getTitle());
+
+			if (percent >= 0) {
+				mBuilder.setContentText(getResources().getString(resource)
+						+ percent + "%");
 				mBuilder.setProgress(100, percent, false);
-			}else{
-				mBuilder.setContentText(
-						getResources().getString(resource));
+			} else {
+				mBuilder.setContentText(getResources().getString(resource));
 			}
 			Notification notif = mBuilder.build();
 			notif.contentIntent = resultPendingIntent;
 			if (percent >= 0)
 				notif.flags = Notification.FLAG_ONGOING_EVENT;
 
+			notif.flags = notif.flags | Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
 			mNotificationManager.notify(bean.getId().hashCode(), notif);
 		}
 
 		@Override
-		protected String doInBackground(String... args) {
+		protected Integer doInBackground(String... args) {
 			List<String> lstUrls = bean.getImages();
 			List<String> lstFiles = bean.getImagesFiles();
 			String folder = bean.getId();
-			File dir = getDir(folder, Context.MODE_PRIVATE);
-			File cacheDir = getCacheDir();
-			//Copy thumb file to folder
+			File dir = Helper.getDir(folder, Context.MODE_PRIVATE, getApplicationContext());
+			File cacheDir = Helper.getCacheDir(getApplicationContext());
+			// Copy thumb file to folder
 			File titleBitmap = new File(cacheDir, bean.getFileImageTitle());
-			File titleBitmapCP = new File(dir,"thumb.jpg");
+			File titleBitmapCP = new File(dir, "thumb.jpg");
 			try {
-				if(!titleBitmapCP.exists())
+				if (!titleBitmapCP.exists())
 					FileUtils.copyFile(titleBitmap, titleBitmapCP);
 			} catch (IOException e) {
-				Log.e(TAG, e.getMessage(), e);
+				Helper.logError(this, e.getMessage(), e);
 			}
-			
-			//Save data.json
+
+			// Save data.json
 			try {
-				Util.saveJsonDoujin(bean, dir);
+				Helper.saveJsonDoujin(bean, dir);
 			} catch (IOException e) {
-				Log.e(TAG, e.getMessage(), e);
+				Helper.logError(this, e.getMessage(), e);
 			}
-			
-			for (int i = 0; i < lstUrls.size(); i++) {
-				File myFile = new File(dir, lstFiles.get(i));
-				if (!cancel) {
-					if (!myFile.exists()) {
-						try {
-							Util.saveInStorage(myFile, lstUrls.get(i));
-						} catch (Exception e) {
-							Log.e(TAG, e.getMessage(), e);
+
+			try {
+				for (int i = 0; i < lstUrls.size(); i++) {
+					File myFile = new File(dir, lstFiles.get(i));
+					if (!cancel) {
+						if (!myFile.exists()) {
+							Helper.saveInStorage(myFile, lstUrls.get(i));
+							publishProgress(i + 1);
 						}
-						publishProgress(i + 1);
-					}
-				} else
-					return null;
+					} else
+						return R.string.download_cancelled;
+				}
+
+				DataBaseHandler db = new DataBaseHandler(
+						DownloadManagerService.this);
+				db.deleteDoujin(bean.getId());
+				db.addDoujin(bean);
+			} catch (Exception e) {
+				lastException = e;
+				Helper.logError(this, e.getMessage(), e);
+				return R.string.download_error;
 			}
-			DataBaseHandler db = new DataBaseHandler(
-					DownloadManagerService.this);
-			db.deleteDoujin(bean.getId());
-			db.addDoujin(bean);
-			return null;
+			return R.string.download_completed;
 		}
 
 		@Override
 		protected void onProgressUpdate(Integer... progress) {
 			super.onProgressUpdate(progress);
-			percent = progress[0] * 100 / bean.getQtyPages();
-			showNotification(percent, R.string.downloading);
+			if(DoujinMap.exists(bean)){
+				percent = progress[0] * 100 / bean.getQtyPages();
+				showNotification(percent, R.string.downloading);
+			}
 		}
 
 		@SuppressLint("NewApi")
 		@Override
-		protected void onPostExecute(String bytes) {
-			DoujinMap.remove(bean);
-			if (!cancel) {
-				showNotification(-1, R.string.download_complete);
-			} else {
-				showNotification(-1, R.string.download_cancelled);
+		protected void onPostExecute(Integer result) {
+			if(DoujinMap.exists(bean)){
+				showNotification(-1, result);
+				DoujinMap.remove(bean);
+
+				if(result==R.string.download_completed)
+					Toast.makeText(DownloadManagerService.this,
+							getResources().getString(R.string.completed_download).replace("@doujin", bean.getTitle()), Toast.LENGTH_SHORT)
+							.show();
+				else if(result==R.string.download_error)
+					Toast.makeText(DownloadManagerService.this,
+							getResources().getString(R.string.error_downloading).replace("@doujin", bean.getTitle()).replace("@error", lastException.getMessage()), Toast.LENGTH_SHORT)
+							.show();
+				else
+					Toast.makeText(DownloadManagerService.this,
+							getResources().getString(R.string.download_cancelled).replace("@doujin", bean.getTitle()), Toast.LENGTH_SHORT)
+							.show();
 			}
-			Toast.makeText(DownloadManagerService.this,
-					bean.getTitle() + " is finished.", Toast.LENGTH_SHORT)
-					.show();
 			if (DoujinMap.next() != null) {
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-					new DownloadDoujin()
-							.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-				} else {
-					new DownloadDoujin().execute("");
-				}
-				new DownloadDoujin().execute("");
+				Helper.executeAsyncTask(new DownloadDoujin());
 			} else {
 				stopSelf();
 			}
@@ -258,7 +200,7 @@ public class DownloadManagerService extends Service {
 
 	public static class DoujinMap {
 
-		static List<DoujinBean> list = new ArrayList<DoujinBean>();
+		static LinkedList<DoujinBean> list = new LinkedList<DoujinBean>();
 
 		public static void add(DoujinBean bean) {
 			list.add(bean);
@@ -269,12 +211,12 @@ public class DownloadManagerService extends Service {
 		}
 
 		public static boolean exists(DoujinBean bean) {
-
-			for (DoujinBean b : list) {
-				if (b.getId().hashCode() == bean.getId().hashCode()) {
-					return true;
+			if(list.indexOf(bean)!=-1)
+				for (DoujinBean b : list) {
+					if (b.getId().hashCode() == bean.getId().hashCode()) {
+						return true;
+					}
 				}
-			}
 			return false;
 		}
 
@@ -283,6 +225,10 @@ public class DownloadManagerService extends Service {
 				return (currentBean = list.get(0));
 			else
 				return (currentBean = null);
+		}
+
+		public static LinkedList<DoujinBean> getList() {
+			return list;
 		}
 	}
 

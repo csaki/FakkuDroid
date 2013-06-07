@@ -30,7 +30,7 @@ import com.fakkudroid.adapter.FavoriteListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.R;
 
@@ -79,7 +79,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	}
 	
 	public void setUser(String user){
-		this.user = user;
+		FavoriteFragment.user = user;
 	}
 	
 	@Override
@@ -103,12 +103,7 @@ public class FavoriteFragment extends SherlockFragment implements
 		getActivity().setTitle(app.getTitle(nroPage, title));
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
 		tvPage.setText("Page " + nroPage);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new DownloadCatalog()
-					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,app.getUrlFavorite(nroPage, user));
-		} else {
-			new DownloadCatalog().execute(app.getUrlFavorite(nroPage, user));
-		}
+		Helper.executeAsyncTask(new DownloadCatalog(),app.getUrlFavorite(nroPage, user));
 	}
 
 	public void nextPage(View view) {
@@ -210,26 +205,26 @@ public class FavoriteFragment extends SherlockFragment implements
 				Log.i(DownloadCatalog.class.toString(), "URL Catalog: "
 						+ urls[0]);
 				llDoujin = FakkuConnection.parseHTMLFavorite(urls[0]);
-			} catch (ClientProtocolException e1) {
-				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
-			} catch (IOException e1) {
-				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
-			} catch (URISyntaxException e1) {
-				Log.e(DownloadCatalog.class.toString(), "Exception", e1);
+			} catch (ClientProtocolException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (IOException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (URISyntaxException e) {
+				Helper.logError(this, e.getMessage(), e);
 			} catch (Exception e) {
-				Log.e(DownloadCatalog.class.toString(), "Exception", e);
+				Helper.logError(this, e.getMessage(), e);
 			}
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
 
 			for (DoujinBean bean : llDoujin) {
 				try {
-					File dir = getActivity().getCacheDir();
+					File dir = Helper.getCacheDir(getActivity());
 
 					File myFile = new File(dir, bean.getFileImageTitle());
-					Util.saveInStorage(myFile, bean.getUrlImageTitle());
+					Helper.saveInStorage(myFile, bean.getUrlImageTitle());
 				} catch (Exception e) {
-					Log.e(DownloadCatalog.class.toString(), "Exception", e);
+					Helper.logError(this, e.getMessage(), e);
 				}
 			}
 

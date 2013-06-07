@@ -16,7 +16,7 @@ import android.util.Log;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class DataBaseHandler extends SQLiteOpenHelper {
 
@@ -184,15 +184,15 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 			result = new DoujinBean();
 			result.setTitle(cursor.getString(1));
 			result.setDescription(cursor.getString(2));
-			result.setArtist(Util.castURLBean(cursor.getString(3)));
+			result.setArtist(Helper.castURLBean(cursor.getString(3)));
 			List<URLBean> lstTags = new ArrayList<URLBean>();
 			String tags = cursor.getString(4);
 			String[] tags_list = tags.split(",");
 			for (String str : tags_list) {
-				lstTags.add(Util.castURLBean(str));
+				lstTags.add(Helper.castURLBean(str));
 			}
 			result.setLstTags(lstTags);
-			result.setSerie(Util.castURLBean(cursor.getString(5)));
+			result.setSerie(Helper.castURLBean(cursor.getString(5)));
 			result.setQtyPages(cursor.getInt(6));
 			result.setUrl(cursor.getString(7));
 		}
@@ -225,15 +225,15 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 				DoujinBean bean = new DoujinBean();
 				bean.setTitle(cursor.getString(1));
 				bean.setDescription(cursor.getString(2));
-				bean.setArtist(Util.castURLBean(cursor.getString(3)));
+				bean.setArtist(Helper.castURLBean(cursor.getString(3)));
 				List<URLBean> lstTags = new ArrayList<URLBean>();
 				String tags = cursor.getString(4);
 				String[] tags_list = tags.split(",");
 				for (String str : tags_list) {
-					lstTags.add(Util.castURLBean(str));
+					lstTags.add(Helper.castURLBean(str));
 				}
 				bean.setLstTags(lstTags);
-				bean.setSerie(Util.castURLBean(cursor.getString(5)));
+				bean.setSerie(Helper.castURLBean(cursor.getString(5)));
 				bean.setQtyPages(cursor.getInt(6));
 				bean.setUrl(cursor.getString(7));
 				result.add(bean);

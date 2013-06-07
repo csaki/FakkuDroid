@@ -1,29 +1,22 @@
 package com.fakkudroid;
 
-import java.io.File;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.ActionProvider;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.SubMenu;
@@ -38,15 +31,15 @@ import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.fragment.DoujinListFragment;
 import com.fakkudroid.fragment.DownloadListFragment;
+import com.fakkudroid.fragment.DownloadQueueListFragment;
 import com.fakkudroid.fragment.FavoriteFragment;
 import com.fakkudroid.fragment.MenuListFragment;
 import com.fakkudroid.util.Constants;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		SearchView.OnQueryTextListener {
 
-	private final static String TAG = MainActivity.class.toString();
 	public final static String INTENT_VAR_URL = "intentVarUrl";
 	public final static String INTENT_VAR_TITLE = "intentVarTitle";
 	public final static String INTENT_VAR_USER = "intentVarUser";
@@ -57,9 +50,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ActionBarDrawerToggle mDrawerToggle;
 	private DoujinListFragment frmDoujinList;
 	private DownloadListFragment frmDownloadListFragment;
+	private DownloadQueueListFragment frmDownloadQueueListFragment;
 	private static final int DOUJIN_LIST = 1;
 	private static final int DOWNLOADS = 2;
 	private static final int FAVORITES = 3;
+	private static final int DOWNLOADS_QUEUE = 4;
 	private static int currentContent = DOUJIN_LIST;
 
 	@SuppressLint("NewApi")
@@ -92,6 +87,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 			if (frmFavorite == null)
 				frmFavorite = new FavoriteFragment();
 			frmCurrent = frmFavorite;
+		}  else if (currentContent == DOWNLOADS_QUEUE) {
+			if (frmDownloadQueueListFragment == null)
+				frmDownloadQueueListFragment = new DownloadQueueListFragment();
+			frmCurrent = frmDownloadQueueListFragment;
 		}
 
 		frmMenu = new MenuListFragment();
@@ -121,20 +120,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new CheckerVersion().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
-		} else {
-			new CheckerVersion().execute("");
-		}
+		Helper.executeAsyncTask(new CheckerVersion());
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		if (currentContent == DOUJIN_LIST || currentContent == DOWNLOADS) {
-			// Used to put dark icons on light action bar
-			boolean isLight = false;
-
 			// Create the search view
 			SearchView searchView = new SearchView(getSupportActionBar()
 					.getThemedContext());
@@ -146,14 +137,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 			else
 				getResources().getText(R.string.search_by);
 			menu.add(hint)
-					.setIcon(
-							isLight ? R.drawable.ic_search_inverse
-									: R.drawable.abs__ic_search)
+					.setIcon(R.drawable.action_search)
 					.setActionView(searchView)
 					.setShowAsAction(
 							MenuItem.SHOW_AS_ACTION_IF_ROOM
 									| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 
+		}
+		if (currentContent == DOWNLOADS_QUEUE || currentContent == DOWNLOADS) {
+			menu.add(Menu.NONE, R.string.go_other_list, Menu.NONE,R.string.go_other_list)
+            .setIcon(R.drawable.content_import_export)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 		return true;
 	}
@@ -164,6 +158,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// ActionBarDrawerToggle will take care of this.
 		if (mDrawerToggle.onOptionsItemSelected(getMenuItem(item))) {
 			return true;
+		}else if(item.getItemId()==R.string.go_other_list){
+			if (currentContent == DOWNLOADS_QUEUE) {
+				goToDownloads();
+			}else if(currentContent == DOWNLOADS){
+				goToDownloadsQueue();
+			}
+			supportInvalidateOptionsMenu();
 		}
 		return true;
 	}
@@ -198,7 +199,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			String url, title;
 			if (!query.equals("")) {
 				String strSearch = getResources().getString(R.string.search);
-				url = Constants.SITESEARCH + Util.escapeURL(query.trim());
+				url = Constants.SITESEARCH + Helper.escapeURL(query.trim());
 				title = strSearch + ": " + query.trim();
 			} else {
 				title = getResources().getString(R.string.app_name);
@@ -262,6 +263,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.content_frame, frmDownloadListFragment).commit();
 	}
+	
+	public void goToDownloadsQueue() {
+		currentContent = DOWNLOADS_QUEUE;
+		mDrawerLayout.closeDrawers();
+		setTitle(R.string.download);
+		if (frmDownloadQueueListFragment == null)
+			frmDownloadQueueListFragment = new DownloadQueueListFragment();
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
+	}
 
 	public void loadPageDoujinList(String title, String url) {
 		mDrawerLayout.closeDrawers();
@@ -292,64 +303,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		currentContent = DOUJIN_LIST;
 	}
 
-	public File getCacheDir() {
-		File file = null;
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		String settingDir = prefs.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.CACHE_DIRECTORY);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
-
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.CACHE_DIRECTORY);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
-	}
-
-	public File getDir(String dir, int mode) {
-		File file = null;
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		String settingDir = prefs.getString("dir_download", "0");
-		if (settingDir.equals(Constants.EXTERNAL_STORAGE + "")) {
-			String state = Environment.getExternalStorageState();
-			if (Environment.MEDIA_MOUNTED.equals(state)) {
-				file = new File(Environment.getExternalStorageDirectory()
-						+ Constants.LOCAL_DIRECTORY + "/" + dir);
-				boolean success = true;
-				if (!file.exists()) {
-					success = file.mkdirs();
-				}
-
-				if (!success)
-					file = null;
-			}
-		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.LOCAL_DIRECTORY + "/" + dir);
-
-		if (!file.exists()) {
-			file.mkdirs();
-		}
-		return file;
-	}
-
 	class CheckerVersion extends AsyncTask<String, Float, VersionBean> {
 
 		@Override
@@ -358,7 +311,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			try {
 				versionBean = FakkuConnection.getLastversion();
 			} catch (Exception e) {
-				Log.e(TAG, "error in verifing if exists new version", e);
+				Helper.logError(this, "error in verifing if exists new version.", e);
 			}
 			return versionBean;
 		}
@@ -394,7 +347,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 								.show();
 					}
 				} catch (NameNotFoundException e) {
-					Log.e(TAG, "error getting current version", e);
+					Helper.logError(this, "error getting current version", e);
 				}
 			}
 		}

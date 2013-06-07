@@ -8,14 +8,12 @@ import org.apache.http.client.ClientProtocolException;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.style.UnderlineSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,7 +33,7 @@ import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
-import com.fakkudroid.util.Util;
+import com.fakkudroid.util.Helper;
 
 @SuppressLint("ValidFragment")
 public class DoujinDetailFragment extends Fragment {
@@ -58,14 +56,7 @@ public class DoujinDetailFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (FakkuDroidApplication) getActivity().getApplication();
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new CompleteDoujin()
-					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, currentBean);
-		} else {
-			new CompleteDoujin().execute(currentBean);
-		}
-
+		Helper.executeAsyncTask(new CompleteDoujin(), currentBean);
 	}
 
 	@Override
@@ -83,15 +74,15 @@ public class DoujinDetailFragment extends Fragment {
 
 	@SuppressLint("NewApi")
 	public void refresh() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			new CompleteDoujin()
-					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, currentBean);
-		} else {
-			new CompleteDoujin().execute(currentBean);
-		}
+		Helper.executeAsyncTask(new CompleteDoujin(), currentBean);
 	}
 
 	public void setComponents() {
+		if(getActivity()==null)
+			return;
+		
+		getActivity().setTitle(currentBean.getTitle());
+		
 		RelativeLayout rl = (RelativeLayout) getView().findViewById(
 				R.id.doujinDetail);
 		rl.setVisibility(View.VISIBLE);
@@ -158,10 +149,8 @@ public class DoujinDetailFragment extends Fragment {
 		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
 		tvTranslator.setText(content);
 
-		ivTitle.setImageBitmap(currentBean.getBitmapImageTitle(
-				getActivity().getCacheDir()));
-		ivPage.setImageBitmap(currentBean.getBitmapImagePage(
-				getActivity().getCacheDir()));
+		ivTitle.setImageBitmap(currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity())));
+		ivPage.setImageBitmap(currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity())));
 
 		tvUploader.setOnClickListener(new OnClickListener() {
 
@@ -237,8 +226,7 @@ public class DoujinDetailFragment extends Fragment {
 			DataBaseHandler db = new DataBaseHandler(this.getActivity());
 			return db.getDoujinBean(currentBean.getId()) != null;
 		} catch (Exception e) {
-			Log.e(DoujinDetailFragment.class.getName(),
-					"Error verifing if exists doujin in the db.", e);
+			Helper.logError(this, "Error verifing if exists doujin in the db.", e);
 		}
 
 		return false;
@@ -257,39 +245,32 @@ public class DoujinDetailFragment extends Fragment {
 					FakkuConnection.connect(app.getSettingBean().getUser(), app
 							.getSettingBean().getPassword());
 				} catch (ClientProtocolException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				} catch (IOException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				}
 			DoujinBean bean = beans[0];
 
 			try {
 				FakkuConnection.parseHTMLDoujin(bean);
-			} catch (ClientProtocolException e) {
-				Log.e(CompleteDoujin.class.toString(), "Exception", e);
-			} catch (IOException e) {
-				Log.e(CompleteDoujin.class.toString(), "Exception", e);
-			}
-
-			try {
-				File dir = getActivity().getCacheDir();
+				File dir = Helper.getCacheDir(getActivity());
 
 				File myFile = new File(dir, bean.getFileImageTitle());
-				Util.saveInStorage(myFile, bean.getUrlImageTitle());
+				Helper.saveInStorage(myFile, bean.getUrlImageTitle());
 
 				myFile = new File(dir, bean.getFileImagePage());
-				Util.saveInStorage(myFile, bean.getUrlImagePage());
+				Helper.saveInStorage(myFile, bean.getUrlImagePage());
 			} catch (Exception e) {
-				Log.e(CompleteDoujin.class.toString(), "Exception", e);
+				bean=null;
+				Helper.logError(this, e.getMessage(), e);
 			}
+
 			return bean;
 		}
 
 		protected void onPostExecute(DoujinBean bean) {
 			try {
-				if (bean.getTitle() != null) {
+				if (bean!=null&&bean.getTitle() != null) {
 					setComponents();
 					doujinActivity.showProgress(false);
 				} else {
@@ -299,7 +280,7 @@ public class DoujinDetailFragment extends Fragment {
 					getActivity().finish();
 				}
 			} catch (Exception e) {
-				Log.e(CompleteDoujin.class.toString(), "Exception", e);
+				Helper.logError(this, e.getMessage(), e);
 			}
 		}
 	}

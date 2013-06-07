@@ -30,6 +30,7 @@ import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.ExceptionNotLoggedIn;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.util.Helper;
 
 @SuppressLint("ValidFragment")
 public class CommentListFragment extends SherlockListFragment {
@@ -81,12 +82,12 @@ public class CommentListFragment extends SherlockListFragment {
 		currentPage = 1;
 		if(da!=null)
 			da.clear();
-		new DownloadComments().execute(currentBean.urlComments(0));
+		Helper.executeAsyncTask(new DownloadComments(), currentBean.urlComments(0));
 	}
 
 	public void loadMoreComments() {
 		listCharged = true;
-		new DownloadComments().execute(currentBean.urlComments(
+		Helper.executeAsyncTask(new DownloadComments(), currentBean.urlComments(
 				currentPage++));
 	}
 
@@ -141,7 +142,7 @@ public class CommentListFragment extends SherlockListFragment {
 		}
 		app.setSettingBean(null);
 		if (app.getSettingBean().isChecked()) {
-			new TransactionLike().execute(b, like);
+			Helper.executeAsyncTask(new TransactionLike(), like);
 		}
 	}
 
@@ -160,14 +161,14 @@ public class CommentListFragment extends SherlockListFragment {
 						+ urls[0]);
 				llComments = FakkuConnection.parseComments(urls[0],
 						moreComments);
-			} catch (ClientProtocolException e1) {
-				Log.e(DownloadComments.class.toString(), "Exception", e1);
-			} catch (IOException e1) {
-				Log.e(DownloadComments.class.toString(), "Exception", e1);
-			} catch (URISyntaxException e1) {
-				Log.e(DownloadComments.class.toString(), "Exception", e1);
-			} catch (Exception e1) {
-				Log.e(DownloadComments.class.toString(), "Exception", e1);
+			} catch (ClientProtocolException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (IOException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (URISyntaxException e) {
+				Helper.logError(this, e.getMessage(), e);
+			} catch (Exception e) {
+				Helper.logError(this, e.getMessage(), e);
 			}
 			lastPage = !(Boolean) moreComments[0];
 			return llComments;
@@ -193,11 +194,9 @@ public class CommentListFragment extends SherlockListFragment {
 					isConnected = FakkuConnection.connect(app.getSettingBean()
 							.getUser(), app.getSettingBean().getPassword());
 				} catch (ClientProtocolException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				} catch (IOException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				}
 
 			if (!isConnected) {
@@ -235,11 +234,9 @@ public class CommentListFragment extends SherlockListFragment {
 					}
 
 				} catch (ExceptionNotLoggedIn e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				} catch (IOException e) {
-					Log.e(this.getClass().toString(), e.getLocalizedMessage(),
-							e);
+					Helper.logError(this, e.getMessage(), e);
 				}
 			}
 			return isConnected;
