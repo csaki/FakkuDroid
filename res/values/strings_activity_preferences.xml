@@ -12,7 +12,7 @@
 	<string name="pref_title_page_number">Show page number</string>
 	<string name="pref_title_reading_mode">Reading mode</string>
 	<string name="pref_title_perfect_viewer">Use Perfect Viewer</string>
-	<string name="pref_description_perfect_viewer">Use Perfect Viewer (only downloaded files)</string>
+	<string name="pref_description_perfect_viewer">If enabled, Fakkudroid will open downloaded doujinshi with Perfect Viewer. (only works with downloaded files!)</string>
 	
 	<string-array name="pref_reading_mode_list">
         <item>Right to Left</item>
@@ -39,11 +39,11 @@
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
     <string name="pref_title_dir_download">Cache and Download Directory</string>
-    <string name="pref_title_password">Password to unlock</string>
-    <string name="pref_description_password">Put a password to open the app. If it is empty, it is deactivated</string>
+    <string name="pref_title_password">Application Lock</string>
+    <string name="pref_description_password">Will prompt the user for a password to unlock the app. Leave empty to disable the application lock.</string>
     
     <string-array name="pref_download_dir_list">
-        <item>External Storage if exists</item>
+        <item>External Storage (if available)</item>
         <item>Always Local Storage</item>
     </string-array>
     
