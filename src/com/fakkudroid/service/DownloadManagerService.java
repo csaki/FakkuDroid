@@ -1,7 +1,13 @@
 package com.fakkudroid.service;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,13 +65,12 @@ public class DownloadManagerService extends Service {
 	public void onDestroy() {
 		started = false;
 	}
-	
 
 	class DownloadDoujin extends AsyncTask<String, Integer, Integer> {
 
 		NotificationManager mNotificationManager;
 		Exception lastException;
-		
+
 		DoujinBean bean;
 
 		public DownloadDoujin() {
@@ -109,7 +114,8 @@ public class DownloadManagerService extends Service {
 			if (percent >= 0)
 				notif.flags = Notification.FLAG_ONGOING_EVENT;
 
-			notif.flags = notif.flags | Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
+			notif.flags = notif.flags | Notification.DEFAULT_LIGHTS
+					| Notification.FLAG_AUTO_CANCEL;
 			mNotificationManager.notify(bean.getId().hashCode(), notif);
 		}
 
@@ -118,8 +124,14 @@ public class DownloadManagerService extends Service {
 			List<String> lstUrls = bean.getImages();
 			List<String> lstFiles = bean.getImagesFiles();
 			String folder = bean.getId();
-			File dir = Helper.getDir(folder, Context.MODE_PRIVATE, getApplicationContext());
+			File dir = Helper.getDir(folder, Context.MODE_PRIVATE,
+					getApplicationContext());
 			File cacheDir = Helper.getCacheDir(getApplicationContext());
+			
+			OutputStream output = null;
+			InputStream input = null;
+			File tempZip = new File(dir, bean.getId() + ".zip");
+			
 			// Copy thumb file to folder
 			File titleBitmap = new File(cacheDir, bean.getFileImageTitle());
 			File titleBitmapCP = new File(dir, "thumb.jpg");
@@ -138,15 +150,43 @@ public class DownloadManagerService extends Service {
 			}
 
 			try {
-				for (int i = 0; i < lstUrls.size(); i++) {
-					File myFile = new File(dir, lstFiles.get(i));
-					if (!cancel) {
-						if (!myFile.exists()) {
-							Helper.saveInStorage(myFile, lstUrls.get(i));
-							publishProgress(i + 1);
+				if(bean.getUrlDownload()==null){
+					for (int i = 0; i < lstUrls.size(); i++) {
+						File myFile = new File(dir, lstFiles.get(i));
+						if (!cancel) {
+							if (!myFile.exists()) {
+								Helper.saveInStorage(myFile, lstUrls.get(i));
+								publishProgress(i + 1);
+							}
+						} else
+							return R.string.download_cancelled;
+					}
+				}else{
+					if(tempZip.exists())
+						tempZip.delete();
+					URL url = new URL(bean.getUrlDownload());
+					URLConnection connection = url.openConnection();
+					connection.connect();
+
+					input = new BufferedInputStream(url.openStream());
+
+					output = new FileOutputStream(tempZip);
+
+					byte data[] = new byte[1024];
+					int count;
+					int downloaded = 0;
+					int total = connection.getContentLength();
+					while ((count = input.read(data)) != -1) {
+						if (!cancel) {
+							output.write(data, 0, count);
+							downloaded+=count;
+							publishProgress(downloaded, total);
+						}else{
+							return R.string.download_cancelled;
 						}
-					} else
-						return R.string.download_cancelled;
+					}
+					output.flush();
+					Helper.zipDecompress(tempZip.getAbsolutePath(), dir.getAbsolutePath());
 				}
 
 				DataBaseHandler db = new DataBaseHandler(
@@ -157,6 +197,21 @@ public class DownloadManagerService extends Service {
 				lastException = e;
 				Helper.logError(this, e.getMessage(), e);
 				return R.string.download_error;
+			} finally{
+				if (output != null) {
+					try {
+						output.close();
+					} catch (IOException e1) {
+					}
+				}
+				if (input != null) {
+					try {
+						input.close();
+					} catch (IOException e1) {
+					}
+				}
+				if(tempZip.exists())
+					tempZip.delete();
 			}
 			return R.string.download_completed;
 		}
@@ -164,31 +219,52 @@ public class DownloadManagerService extends Service {
 		@Override
 		protected void onProgressUpdate(Integer... progress) {
 			super.onProgressUpdate(progress);
-			if(DoujinMap.exists(bean)){
-				percent = progress[0] * 100 / bean.getQtyPages();
-				showNotification(percent, R.string.downloading);
+			if (bean.getUrlDownload() == null){
+				if (DoujinMap.exists(bean)) {
+					percent = progress[0] * 100 / bean.getQtyPages();
+					showNotification(percent, R.string.downloading);
+				}
+			}else{
+				int downloaded = progress[0];
+				int total = progress[1];
+				int percent = downloaded * 100 / total;
+				if(percent>DownloadManagerService.percent){
+					showNotification(percent, R.string.downloading);
+				}
+				DownloadManagerService.percent = percent;
 			}
 		}
 
 		@SuppressLint("NewApi")
 		@Override
 		protected void onPostExecute(Integer result) {
-			if(DoujinMap.exists(bean)){
+			if (DoujinMap.exists(bean)) {
 				showNotification(-1, result);
 				DoujinMap.remove(bean);
 
-				if(result==R.string.download_completed)
-					Toast.makeText(DownloadManagerService.this,
-							getResources().getString(R.string.completed_download).replace("@doujin", bean.getTitle()), Toast.LENGTH_SHORT)
-							.show();
-				else if(result==R.string.download_error)
-					Toast.makeText(DownloadManagerService.this,
-							getResources().getString(R.string.error_downloading).replace("@doujin", bean.getTitle()).replace("@error", lastException.getMessage()), Toast.LENGTH_SHORT)
-							.show();
+				if (result == R.string.download_completed)
+					Toast.makeText(
+							DownloadManagerService.this,
+							getResources().getString(
+									R.string.completed_download).replace(
+									"@doujin", bean.getTitle()),
+							Toast.LENGTH_SHORT).show();
+				else if (result == R.string.download_error)
+					Toast.makeText(
+							DownloadManagerService.this,
+							getResources()
+									.getString(R.string.error_downloading)
+									.replace("@doujin", bean.getTitle())
+									.replace("@error",
+											lastException.getMessage()),
+							Toast.LENGTH_SHORT).show();
 				else
-					Toast.makeText(DownloadManagerService.this,
-							getResources().getString(R.string.download_cancelled).replace("@doujin", bean.getTitle()), Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(
+							DownloadManagerService.this,
+							getResources().getString(
+									R.string.download_cancelled).replace(
+									"@doujin", bean.getTitle()),
+							Toast.LENGTH_SHORT).show();
 			}
 			if (DoujinMap.next() != null) {
 				Helper.executeAsyncTask(new DownloadDoujin());
@@ -211,7 +287,7 @@ public class DownloadManagerService extends Service {
 		}
 
 		public static boolean exists(DoujinBean bean) {
-			if(list.indexOf(bean)!=-1)
+			if (list.indexOf(bean) != -1)
 				for (DoujinBean b : list) {
 					if (b.getId().hashCode() == bean.getId().hashCode()) {
 						return true;

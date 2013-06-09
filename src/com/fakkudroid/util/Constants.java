@@ -2,16 +2,16 @@ package com.fakkudroid.util;
 
 public class Constants {
 
-	public static String SITEADDFAVORITE = "http://www.fakku.net/get/favorite/add/";
-	public static String SITEREMOVEFAVORITE = "http://www.fakku.net/get/favorite/remove/";
+	public static String SITEADDFAVORITE = "http://www.fakku.net/favorite/@id/add/";
+	public static String SITEREMOVEFAVORITE = "http://www.fakku.net/favorite/@id/remove/";
 	public static String SITERELATED = "http://www.fakku.net/get/related/";
-	public static String SITELOGIN = "http://www.fakku.net/login";
+	public static String SITELOGIN = "http://www.fakku.net/login/submit";
 	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html"; 
 	public static String SITEABOUT = "http://fakkudroid.blogspot.com/2013/01/about-fakkudroid.html"; 
 	public static String SITEROOT = "http://www.fakku.net"; 
 	public static String SITEIMAGEROOT = "http://www.fakku.net"; 
 	public static String SITEIMAGE = "http://c.fakku.net";
-	public static String SITECOMMENTS = "http://www.fakku.net/get/comments/@id/@page";
+	public static String SITECOMMENTS = "http://www.fakku.net/comments/@id/@page";
 	public static String SITEFAVORITE = "http://www.fakku.net/users/usr/favorites?mode=viewfavorites&u=2&start=";
 	public static String PAGE = "/page/";
 	public static String UPDATE_SERVICE = "http://fakkudroid.herokuapp.com/versions/max.json";
@@ -55,7 +55,7 @@ public class Constants {
 	public static final int SCREEN_ORIENTATION_PORTRAIT = 1;
 	public static final int SCREEN_ORIENTATION_LANDSCAPE = 2;
 	
-	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.0";
+	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.1";
 
 	public static final int WIDTH_STANDARD = 119;
 	public static final int HEIGHT_STANDARD = 163;

@@ -3,6 +3,7 @@ package com.fakkudroid.util;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,6 +12,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Formatter;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -102,7 +106,7 @@ public class Helper {
 		}
 		return file;
 	}
-	
+
 	public static void saveBitmap(File file, Bitmap bitmap) throws IOException {
 		FileOutputStream fOut = new FileOutputStream(file);
 
@@ -110,9 +114,13 @@ public class Helper {
 		fOut.flush();
 		fOut.close();
 	}
+
+	public static void logError(Object errorClass, String msg, Exception e) {
+		logError(errorClass.getClass().toString(), msg, e);
+	}
 	
-	public static void logError(Object errorClass, String msg, Exception e){
-		Log.e(errorClass.getClass().toString(), msg, e);
+	public static void logError(String errorClass, String msg, Exception e) {
+		Log.e(errorClass, msg, e);
 	}
 
 	@SuppressLint("NewApi")
@@ -247,7 +255,9 @@ public class Helper {
 		if (cs != null)
 			localContext.setAttribute(ClientContext.COOKIE_STORE, cs);
 
+		
 		HttpGet get = new HttpGet(url);
+		get.addHeader("Origin", "http://www.fakku.net:80");
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpResponse response = httpClient.execute(get, localContext);
 		HttpEntity ent = response.getEntity();
@@ -330,6 +340,74 @@ public class Helper {
 			if (input != null) {
 				input.close();
 			}
+		}
+	}
+
+	public static void zipDecompress(String zipFile, String outputFolder) {
+		byte[] buffer = new byte[1024];
+
+		try {
+
+			// create output directory is not exists
+			File folder = new File(outputFolder);
+			if (!folder.exists()) {
+				folder.mkdir();
+			}
+			File zip = new File(zipFile);
+			// get the zip file content
+			ZipInputStream zis = new ZipInputStream(
+					new FileInputStream(zipFile));
+			// get the zipped file list entry
+			ZipEntry ze = zis.getNextEntry();
+
+			boolean first = true;
+			int count = 1;
+			while (ze != null) {
+				Formatter fmt = new Formatter();
+				File newFile = new File(outputFolder + File.separator
+						+ fmt.format("%03d", count++) + ".jpg");
+				fmt.close();
+
+				System.out.println("file unzip : " + newFile.getAbsoluteFile());
+
+				// create all non exists folders
+				// else you will hit FileNotFoundException for compressed folder
+				if (ze.isDirectory()) {
+					new File(newFile.getAbsolutePath()).mkdirs();
+				} else {
+					if (first) {
+						File newfolder = new File(zip.getName().substring(0,
+								zip.getName().indexOf(".")),
+								folder.getAbsolutePath());
+						newfolder.mkdirs();
+						folder = newfolder;
+					}
+
+					FileOutputStream fos = null;
+
+					new File(newFile.getParent()).mkdirs();
+					if (!newFile.exists())
+						newFile.createNewFile();
+					fos = new FileOutputStream(newFile);
+
+					int len;
+					while ((len = zis.read(buffer)) > 0) {
+						fos.write(buffer, 0, len);
+					}
+
+					fos.close();
+				}
+				first = false;
+				ze = zis.getNextEntry();
+			}
+
+			zis.closeEntry();
+			zis.close();
+
+			System.out.println("Done");
+
+		} catch (IOException ex) {
+			logError(Helper.class.toString(), "zipDecompress", ex);
 		}
 	}
 

@@ -32,19 +32,19 @@ public class FakkuConnection {
 
 	private static CookieStore cookiesStore = null;
 
-	public static boolean isConnected(){
-		return cookiesStore!=null;
+	public static boolean isConnected() {
+		return cookiesStore != null;
 	}
-	
-	public static void disconnect(){
+
+	public static void disconnect() {
 		cookiesStore = null;
 	}
-	
+
 	public static boolean connect(String user, String password)
 			throws ClientProtocolException, IOException {
-		if(cookiesStore!=null)
+		if (cookiesStore != null)
 			return true;
-		
+
 		boolean result = false;
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 
@@ -53,12 +53,13 @@ public class FakkuConnection {
 		HttpResponse response = httpclient.execute(httpget);
 		HttpEntity entity = response.getEntity();
 
-		Log.d(new FakkuConnection().getClass().toString(),
-				"Login form get: " + response.getStatusLine());
+		Log.d(new FakkuConnection().getClass().toString(), "Login form get: "
+				+ response.getStatusLine());
 		if (entity != null) {
 			entity.consumeContent();
 		}
-		Log.d(new FakkuConnection().getClass().toString(), "Initial set of cookies:");
+		Log.d(new FakkuConnection().getClass().toString(),
+				"Initial set of cookies:");
 		CookieStore cookies = httpclient.getCookieStore();
 
 		HttpPost httpost = new HttpPost(Constants.SITELOGIN);
@@ -74,20 +75,20 @@ public class FakkuConnection {
 		response = httpclient.execute(httpost);
 		entity = response.getEntity();
 
-		Log.d(new FakkuConnection().getClass().toString(),
-				"Login form get: " + response.getStatusLine());
+		Log.d(new FakkuConnection().getClass().toString(), "Login form get: "
+				+ response.getStatusLine());
 		if (entity != null) {
 			entity.consumeContent();
 		}
 
 		cookies = httpclient.getCookieStore();
 		if (cookies.getCookies().isEmpty()) {
-			Log.d(new FakkuConnection().getClass().toString(), "Post logon cookies: None");
+			Log.d(new FakkuConnection().getClass().toString(),
+					"Post logon cookies: None");
 		} else {
 			for (int i = 0; i < cookies.getCookies().size(); i++) {
-				if (cookies.getCookies().get(i).getName().equalsIgnoreCase("NEWFAKKU_sid")
-						|| cookies.getCookies().get(i).getName()
-								.equalsIgnoreCase("NEWFAKKU_data")) {
+				if (cookies.getCookies().get(i).getName()
+						.equalsIgnoreCase("fakku_sid")) {
 					result = true;
 				}
 			}
@@ -98,139 +99,143 @@ public class FakkuConnection {
 			cookiesStore = cookies;
 		return result;
 	}
-	
-	public static void transaction(String url) throws ExceptionNotLoggedIn, IOException{
-		if(cookiesStore==null)
+
+	public static void transaction(String url) throws ExceptionNotLoggedIn,
+			IOException {
+		if (cookiesStore == null)
 			throw new ExceptionNotLoggedIn();
-		
+
 		String html = Helper.getHTML(url, cookiesStore);
-		
-		if(html.contains("Please enter your username and password to login"))
+
+		if (html.contains("Please enter your username and password to login"))
 			throw new ExceptionNotLoggedIn();
 	}
-	
-	public static LinkedList<CommentBean> parseComments(String url, Object[] moreComments)
-			throws ClientProtocolException, IOException, URISyntaxException {
+
+	public static LinkedList<CommentBean> parseComments(String url,
+			Object[] moreComments) throws ClientProtocolException, IOException,
+			URISyntaxException {
 		LinkedList<CommentBean> result = new LinkedList<CommentBean>();
-		
+
 		String html = Helper.getHTML(url, cookiesStore);
-		
+
 		String token = "<div class=\"manga_ comment-row\">|<div class=\"reply_ comment-row\">|<div class=\"tree_ comment-row\">";
-		html = html.replaceAll("<div class=\"manga_ comment-row\">", "<div class=\"manga_ comment-row\">manga");
-		html = html.replaceAll("<div class=\"reply_ comment-row\">", "<div class=\"reply_ comment-row\">reply");
-		html = html.replaceAll("<div class=\"tree_ comment-row\">", "<div class=\"tree_ comment-row\">tree");
+		html = html.replaceAll("<div class=\"manga_ comment-row\">",
+				"<div class=\"manga_ comment-row\">manga");
+		html = html.replaceAll("<div class=\"reply_ comment-row\">",
+				"<div class=\"reply_ comment-row\">reply");
+		html = html.replaceAll("<div class=\"tree_ comment-row\">",
+				"<div class=\"tree_ comment-row\">tree");
 		String[] sections = html.split(token);
 		moreComments[0] = html.contains(">View More<");
-		
-		for(int i = 1; i<sections.length; i++) {
+
+		for (int i = 1; i < sections.length; i++) {
 			String section = sections[i];
 			int level = 0;
-			if(section.startsWith("manga")){
+			if (section.startsWith("manga")) {
 				level = 0;
-			}else if(section.startsWith("reply")){
+			} else if (section.startsWith("reply")) {
 				level = 1;
-			}else if(section.startsWith("tree")){
+			} else if (section.startsWith("tree")) {
 				level = 2;
-			}else{
+			} else {
 				continue;
 			}
 			CommentBean c = new CommentBean();
 			c.setLevel(level);
-			
+
 			token = "<a id=\"";
 			String value = "";
 			int idxStart = section.indexOf(token) + token.length();
 			int idxEnd = section.indexOf("\"", idxStart);
-			value = section.substring(idxStart, idxEnd);			
-			
+			value = section.substring(idxStart, idxEnd);
+
 			c.setId(value);
 
 			URLBean user = new URLBean();
-			
+
 			token = "<a href=\"";
 			idxStart = section.indexOf(token) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			value = section.substring(idxStart, idxEnd);
-			
-			user.setUrl(Constants.SITEROOT+value);
-			
+
+			user.setUrl(Constants.SITEROOT + value);
+
 			token = ">";
 			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxEnd = section.indexOf("<", idxStart);
 			value = section.substring(idxStart, idxEnd);
-			
+
 			user.setDescription(value);
-			
+
 			c.setUser(user);
-			
+
 			token = "<span itemprop=\"commentTime\">";
 			idxStart = section.indexOf(token) + token.length();
 			idxEnd = section.indexOf("<", idxStart);
 			value = section.substring(idxStart, idxEnd);
-			
+
 			c.setDate(value);
-			
+
 			idxStart = section.indexOf("class=\"rank\"");
-			
+
 			token = "href=\"";
-			idxStart = section.indexOf(token,idxStart) + token.length();
+			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			value = section.substring(idxStart, idxEnd);
-			
+
 			c.setUrlLike(value);
-			
+
 			token = "href=\"";
-			idxStart = section.indexOf(token,idxStart) + token.length();
+			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			value = section.substring(idxStart, idxEnd);
-			
+
 			c.setUrlDislike(value);
-			
-			if(section.contains("class=\"arrow selected like\"")){
+
+			if (section.contains("class=\"arrow selected like\"")) {
 				c.setSelectLike(1);
-			}else if(section.contains("class=\"arrow selected dislike\"")){
+			} else if (section.contains("class=\"arrow selected dislike\"")) {
 				c.setSelectLike(-1);
 			}
-			
+
 			token = "<i class=\"plus\">";
-			if(!section.contains(token)){
+			if (!section.contains(token)) {
 				token = "<i class=\"minus\">";
 			}
-			if(section.contains(token)){
+			if (section.contains(token)) {
 				idxStart = section.indexOf(token) + token.length();
 				idxEnd = section.indexOf(" ", idxStart);
 				value = section.substring(idxStart, idxEnd);
-				
-				if(value.startsWith("+"))
+
+				if (value.startsWith("+"))
 					c.setRank(Integer.parseInt(value.substring(1)));
 				else
 					c.setRank(Integer.parseInt(value));
 			}
-			
-			
+
 			token = "comment_text\" itemprop=\"commentText\">";
 			idxStart = section.indexOf(token) + token.length();
 			idxEnd = section.indexOf("</div>", idxStart);
 			value = section.substring(idxStart, idxEnd);
-			
+
 			c.setComment(value);
-			
+
 			result.add(c);
 		}
-		
+
 		return result;
 	}
-	
-	public static VersionBean getLastversion() throws IOException{
+
+	public static VersionBean getLastversion() throws IOException {
 		VersionBean result = null;
 		String html = Helper.getHTML(Constants.UPDATE_SERVICE);
-		if(!html.equals("null")){
+		if (!html.equals("null")) {
 			Gson gson = new Gson();
 			result = gson.fromJson(html, VersionBean.class);
 		}
 		return result;
 	}
-	
+
 	public static LinkedList<DoujinBean> parseHTMLCatalog(String url)
 			throws ClientProtocolException, IOException, URISyntaxException {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
@@ -246,32 +251,7 @@ public class FakkuConnection {
 
 			int idxStart = -1;
 			int idxEnd = -1;
-
-			// Images
 			String s = "";
-			token = "data-cfsrc=\"";
-			idxStart = section.indexOf(token) + token.length();
-			if(idxStart==token.length()-1){
-				token = "src=\"";
-				idxStart = section.indexOf(token) + token.length();
-			}
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
-
-			bean.setUrlImageTitle(s);
-			
-			//Look for the next image tag
-			idxStart = section.indexOf("<img", idxStart) + token.length();
-			int idxStartAux = section.indexOf(token, idxStart) + token.length();
-			if(idxStart==token.length()-1){
-				token = "src=\"";
-				idxStart = section.indexOf(token) + token.length();
-			}else{
-				idxStart = idxStartAux;
-			}
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
-			bean.setUrlImagePage(s);
 
 			// url
 			token = "<a href=\"";
@@ -279,6 +259,23 @@ public class FakkuConnection {
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);
 			bean.setUrl(Constants.SITEROOT + s);
+
+			// Images
+			token = "src=\"";
+			idxStart = section.indexOf(token, idxStart) + token.length();
+			idxEnd = section.indexOf("\"", idxStart);
+			s = section.substring(idxStart, idxEnd);
+			s = Constants.SITEROOT + s;
+			bean.setUrlImageTitle(s);
+
+			// Look for the next image tag
+			idxStart = section.indexOf("<img", idxStart) + token.length();
+			token = "src=\"";
+			idxStart = section.indexOf(token, idxStart) + token.length();
+			idxEnd = section.indexOf("\"", idxStart);
+			s = section.substring(idxStart, idxEnd);
+			s = Constants.SITEROOT + s;
+			bean.setUrlImagePage(s);
 
 			// title
 			token = "title=\"";
@@ -292,7 +289,7 @@ public class FakkuConnection {
 			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxStart = section.indexOf("<a", idxStart);
 			token = "</a>";
-			idxEnd = section.indexOf(token, idxStart) +token.length();
+			idxEnd = section.indexOf(token, idxStart) + token.length();
 			s = section.substring(idxStart, idxEnd);
 			bean.setSerie(parseURLBean(s.trim()));
 
@@ -301,7 +298,7 @@ public class FakkuConnection {
 			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxStart = section.indexOf("<a", idxStart);
 			token = "</a>";
-			idxEnd = section.indexOf(token, idxStart) +token.length();
+			idxEnd = section.indexOf(token, idxStart) + token.length();
 			s = section.substring(idxStart, idxEnd);
 			bean.setArtist(parseURLBean(s.trim()));
 
@@ -319,34 +316,32 @@ public class FakkuConnection {
 			idxEnd = section.indexOf(token, idxStart);
 			s = section.substring(idxStart, idxEnd);
 			token = ",";
-			
+
 			List<URLBean> lstTags = new ArrayList<URLBean>();
-			
+
 			for (String str : s.split(",")) {
 				idxStart = str.indexOf("<a");
 				token = "</a>";
 				idxEnd = str.indexOf(token, idxStart) + token.length();
 				String tag = str.substring(idxStart, idxEnd);
-				
+
 				lstTags.add(parseURLBean(tag));
 			}
 			bean.setLstTags(lstTags);
-			
-			Log.i("HTMLParser", "Read data of: " + bean);
 
 			result.add(bean);
 		}
 
 		return result;
 	}
-	
+
 	public static LinkedList<DoujinBean> parseHTMLFavorite(String url)
 			throws ClientProtocolException, IOException, URISyntaxException {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
 
 		String html = Helper.getHTML(url);
 
-		String token = "<div class=\"favorite\">";
+		String token = "<div class=\"favorite ";
 		String[] sections = html.split(token);
 		for (int i = 1; i < sections.length; i++) {
 			String section = sections[i];
@@ -366,13 +361,13 @@ public class FakkuConnection {
 			bean.setUrlImageTitle(s);
 
 			s = "";
-			token = "title=\"";
+			token = "alt=\"";
 			idxStart = section.indexOf(token) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);
 
 			bean.setTitle(s);
-			
+
 			s = "";
 			token = "href=\"";
 			idxStart = section.indexOf(token) + token.length();
@@ -380,7 +375,7 @@ public class FakkuConnection {
 			s = Constants.SITEROOT + section.substring(idxStart, idxEnd);
 
 			bean.setUrl(s);
-			
+
 			result.add(bean);
 		}
 
@@ -394,22 +389,22 @@ public class FakkuConnection {
 		String html = Helper.getHTML(url, cookiesStore);
 
 		bean.setAddedInFavorite(!html.contains("Add To Favorites"));
-		
+
 		html = Helper.getHTML(url);
 		// Qty Pages
 		String token = "</b> pages";
 		int idxStart = html.indexOf(token);
 		token = "<b>";
-		idxStart = html.substring(0, idxStart).lastIndexOf(token) + token.length();
+		idxStart = html.substring(0, idxStart).lastIndexOf(token)
+				+ token.length();
 		int idxEnd = html.indexOf("<", idxStart);
 		String s = html.substring(idxStart, idxEnd);
 
 		int c = 0;
-		try
-		{			
+		try {
 			c = Integer.parseInt(s.replace(",", "").trim());
-		}catch(Exception e){
-			
+		} catch (Exception e) {
+
 		}
 
 		bean.setQtyPages(c);
@@ -426,20 +421,20 @@ public class FakkuConnection {
 		c = Integer.parseInt(s.replace(",", "").trim());
 
 		bean.setQtyFavorites(c);
-		
+
 		// URL
 		token = "<div class=\"wrap\">";
 		idxStart = html.indexOf(token) + token.length();
 		token = "<a href=\"";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		idxEnd = html.indexOf("\"", idxStart);
-		
+
 		s = html.substring(idxStart, idxEnd);
 		s = Constants.SITEROOT + s;
 		idxEnd = s.lastIndexOf("/");
-		s=s.substring(0, idxEnd);
+		s = s.substring(0, idxEnd);
 		bean.setUrl(s);
-		
+
 		// Images
 		token = "<img ";
 		idxStart = html.indexOf(token) + token.length();
@@ -482,7 +477,7 @@ public class FakkuConnection {
 		idxEnd = html.indexOf(token, idxStart) + token.length();
 		s = html.substring(idxStart, idxEnd);
 		bean.setLanguage(parseURLBean(s.trim()));
-		
+
 		// artist
 		token = "<div class=\"left\">Artist:";
 		idxStart = html.indexOf(token) + token.length();
@@ -498,7 +493,7 @@ public class FakkuConnection {
 		idxEnd = html.indexOf("</div>", idxStart);
 		s = html.substring(idxStart, idxEnd);
 		bean.setDescription(s.trim());
-		
+
 		// translator
 		token = "Translator: ";
 		idxStart = html.indexOf(token) + token.length();
@@ -507,7 +502,7 @@ public class FakkuConnection {
 		idxEnd = html.indexOf(token, idxStart) + token.length();
 		s = html.substring(idxStart, idxEnd);
 		bean.setTranslator(parseURLBean(s.trim()));
-		
+
 		// Uploaded by
 		token = "uploaded by";
 		idxStart = html.indexOf(token) + token.length();
@@ -516,7 +511,7 @@ public class FakkuConnection {
 		idxEnd = html.indexOf(token, idxStart) + token.length();
 		s = html.substring(idxStart, idxEnd);
 		bean.setUploader(parseURLBean(s.trim()));
-		
+
 		// fecha
 		token = "<b>";
 		idxStart = html.indexOf(token, idxStart) + token.length();
@@ -524,7 +519,7 @@ public class FakkuConnection {
 		idxEnd = html.indexOf(token, idxStart);
 		s = html.substring(idxStart, idxEnd);
 		bean.setFecha(s);
-		
+
 		// tags
 		token = "Tags:";
 		idxStart = html.indexOf(token) + token.length();
@@ -532,20 +527,44 @@ public class FakkuConnection {
 		idxEnd = html.indexOf(token, idxStart);
 		s = html.substring(idxStart, idxEnd);
 		token = ",";
-		
+
 		List<URLBean> lstTags = new ArrayList<URLBean>();
-		
+
 		for (String str : s.split(",")) {
 			idxStart = str.indexOf("<a");
 			token = "</a>";
 			idxEnd = str.indexOf(token, idxStart) + token.length();
 			String tag = str.substring(idxStart, idxEnd);
-			
+
 			lstTags.add(parseURLBean(tag));
 		}
 		bean.setLstTags(lstTags);
-		
+
+		//Get imageServer link
+		html = Helper.getHTML(url + "/read#page=1");
+		token = "function imgpath(x) {";
 		idxStart = html.indexOf(token, idxStart) + token.length();
+		token = "return '";
+		idxStart = html.indexOf(token, idxStart) + token.length();
+		token = "'";
+		idxEnd = html.indexOf(token, idxStart) + token.length();
+		s = html.substring(idxStart, idxEnd-1);
+		bean.setImageServer(s);
+		
+		//Get download link
+		html = Helper.getHTML(url + "/download");
+		token = "<div class=\"download-row\"><span>fu</span> ";
+		idxStart = html.indexOf(token, idxStart) + token.length();
+		
+		if(idxStart!=-1){
+			token = "href=\"";
+			idxStart = html.indexOf(token, idxStart) + token.length();
+			token = "\"";
+			idxEnd = html.indexOf(token, idxStart) + token.length();
+			s = html.substring(idxStart, idxEnd-1);
+			
+			bean.setUrlDownload(s);
+		}
 	}
 
 	public static LinkedList<URLBean> parseHTMLTagsList(String url)
@@ -571,7 +590,7 @@ public class FakkuConnection {
 			idxEnd = section.indexOf("\"", idxStart);
 
 			URLBean b = new URLBean();
-			b.setUrl("http://"+section.substring(idxStart, idxEnd));
+			b.setUrl("http://" + section.substring(idxStart, idxEnd));
 
 			token = ">";
 
@@ -594,12 +613,12 @@ public class FakkuConnection {
 		LinkedList<URLBean> result = new LinkedList<URLBean>();
 		String html = Helper.getHTML(url);
 
-		String token = "series_wrap";
+		String token = "attribute-row";
 		String[] sections = html.split(token);
 
 		for (int i = 1; i < sections.length; i++) {
 			String section = sections[i];
-			token = "<a href=\"";
+			token = "href=\"";
 
 			int idxStart = section.indexOf(token) + token.length();
 			int idxEnd = section.indexOf("\"", idxStart);
@@ -607,10 +626,10 @@ public class FakkuConnection {
 			URLBean b = new URLBean();
 			b.setUrl(Constants.SITEROOT + section.substring(idxStart, idxEnd));
 
-			token = "title=\"";
+			token = ">";
 
 			idxStart = section.indexOf(token) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
+			idxEnd = section.indexOf("<", idxStart);
 
 			b.setDescription(section.substring(idxStart, idxEnd));
 
@@ -621,25 +640,25 @@ public class FakkuConnection {
 
 		return result;
 	}
-	
-	private static URLBean parseURLBean(String a){		
+
+	private static URLBean parseURLBean(String a) {
 		URLBean b = new URLBean();
 		String token = ">";
 		int idxStart = a.indexOf(token) + token.length();
 		token = "<";
 		int idxEnd = a.indexOf(token, idxStart);
 		String s = a.substring(idxStart, idxEnd);
-		
+
 		b.setDescription(s.trim());
-		
+
 		token = "href=\"";
 		idxStart = a.indexOf(token) + token.length();
 		token = "\"";
 		idxEnd = a.indexOf(token, idxStart);
 		s = a.substring(idxStart, idxEnd);
-		
-		b.setUrl(Constants.SITEROOT+s.trim());
-		
+
+		b.setUrl(Constants.SITEROOT + s.trim());
+
 		return b;
 	}
 

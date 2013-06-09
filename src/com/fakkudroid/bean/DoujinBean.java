@@ -29,6 +29,8 @@ public class DoujinBean {
 	private boolean addedInFavorite;
 	private String timeAgo;
 	private transient Bitmap titleBitmap, pageBitmap;
+	private String imageServer;
+	private String urlDownload;
 
 	public String getTimeAgo() {
 		return timeAgo;
@@ -45,10 +47,8 @@ public class DoujinBean {
 	}
 
 	public String urlFavorite(String urlFavorite) {
-		int idxStart = url.lastIndexOf("/");
-		idxStart = url.substring(0, idxStart).lastIndexOf("/") + 1;
 
-		return urlFavorite + url.substring(idxStart);
+		return urlFavorite.replace("@id",getId()) ;
 	}
 
 	public String urlComments(int page) {
@@ -56,7 +56,7 @@ public class DoujinBean {
 		idxStart = url.substring(0, idxStart).lastIndexOf("/") + 1;
 
 		return Constants.SITECOMMENTS.replace("@id", url.substring(idxStart))
-				.replace("@page", page * 20 + "");
+				.replace("@page", page * 30 + "");
 	}
 
 	public String urlRelated(int nroPage) {
@@ -236,7 +236,7 @@ public class DoujinBean {
 
 	public List<String> getImages() {
 		List<String> result = new ArrayList<String>();
-		String urlImage = getUrlImage();
+		String urlImage = imageServer;
 		for (int i = 1; i <= qtyPages; i++) {
 			Formatter fmt = new Formatter();
 			result.add(urlImage + fmt.format("%03d", i) + ".jpg");
@@ -263,23 +263,6 @@ public class DoujinBean {
 			fmt.close();
 		}
 		return result;
-	}
-
-	public String getUrlImage() {
-		int idxStart = Constants.SITEIMAGEROOT.length();
-		String urlImage = "";
-		if (urlImageTitle != null) {
-			int idxEnd = urlImageTitle.indexOf("thumbs", idxStart);
-
-			if (idxEnd == -1)
-				idxEnd = urlImageTitle.indexOf("xcover", idxStart);
-			if (idxEnd == -1)
-				idxEnd = urlImageTitle.indexOf("cover", idxStart);
-
-			urlImage = urlImageTitle.substring(idxStart, idxEnd);
-			urlImage = Constants.SITEIMAGE + urlImage + "images/";
-		}
-		return urlImage;
 	}
 
 	public String getTags() {
@@ -315,4 +298,20 @@ public class DoujinBean {
 				+ ", lstTags=" + lstTags + "]";
 	}
 
+	public String getImageServer() {
+		return imageServer;
+	}
+
+	public void setImageServer(String imageServer) {
+		this.imageServer = imageServer;
+	}
+
+	public String getUrlDownload() {
+		return urlDownload;
+	}
+
+	public void setUrlDownload(String urlDownload) {
+		this.urlDownload = urlDownload;
+	}
+	
 }
