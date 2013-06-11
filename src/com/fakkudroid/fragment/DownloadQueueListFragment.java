@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,15 +41,9 @@ public class DownloadQueueListFragment extends SherlockListFragment{
 				DoujinActivity.class);
 		resultIntent.putExtra(DoujinActivity.INTENT_VAR_URL, bean.getUrl());
 
-		TaskStackBuilder stackBuilder = TaskStackBuilder
-				.create(getActivity());
-		// Adds the back stack
-		stackBuilder.addParentStack(DoujinActivity.class);
-		// Adds the Intent to the top of the stack
-		stackBuilder.addNextIntent(resultIntent);
 		// Gets a PendingIntent containing the entire back stack
-		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
-				0, PendingIntent.FLAG_ONE_SHOT);
+		PendingIntent resultPendingIntent = PendingIntent.getActivity(getActivity(),
+				0, resultIntent,PendingIntent.FLAG_ONE_SHOT);
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				getActivity()).setSmallIcon(
 				R.drawable.ic_launcher).setContentTitle(bean.getTitle());

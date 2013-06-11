@@ -60,10 +60,7 @@ public class DoujinBean {
 	}
 
 	public String urlRelated(int nroPage) {
-		int idxStart = url.lastIndexOf("/");
-		idxStart = url.substring(0, idxStart).lastIndexOf("/") + 1;
-
-		return Constants.SITERELATED + url.substring(idxStart) + "/"
+		return url + "/related"
 				+ ((nroPage - 1) * 10);
 	}
 

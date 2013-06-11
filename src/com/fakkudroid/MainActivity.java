@@ -43,6 +43,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public final static String INTENT_VAR_URL = "intentVarUrl";
 	public final static String INTENT_VAR_TITLE = "intentVarTitle";
 	public final static String INTENT_VAR_USER = "intentVarUser";
+	public final static String INTENT_VAR_CURRENT_CONTENT = "intentVarCurrentContent";
 
 	private DrawerLayout mDrawerLayout;
 	private MenuListFragment frmMenu;
@@ -51,10 +52,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private DoujinListFragment frmDoujinList;
 	private DownloadListFragment frmDownloadListFragment;
 	private DownloadQueueListFragment frmDownloadQueueListFragment;
-	private static final int DOUJIN_LIST = 1;
-	private static final int DOWNLOADS = 2;
-	private static final int FAVORITES = 3;
-	private static final int DOWNLOADS_QUEUE = 4;
+	public static final int DOUJIN_LIST = 1;
+	public static final int DOWNLOADS = 2;
+	public static final int FAVORITES = 3;
+	public static final int DOWNLOADS_QUEUE = 4;
 	private static int currentContent = DOUJIN_LIST;
 
 	@SuppressLint("NewApi")
@@ -75,6 +76,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		getSupportActionBar().setHomeButtonEnabled(true);
 
 		Fragment frmCurrent = null;
+		
+		int tempCurrentContent = getIntent().getIntExtra(INTENT_VAR_CURRENT_CONTENT, -1);
+		if(tempCurrentContent!=-1)
+			currentContent = tempCurrentContent;
+		
 		if (currentContent == DOUJIN_LIST) {
 			if (frmDoujinList == null)
 				frmDoujinList = new DoujinListFragment();

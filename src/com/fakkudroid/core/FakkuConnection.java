@@ -443,7 +443,7 @@ public class FakkuConnection {
 		idxEnd = html.indexOf("\"", idxStart);
 		s = html.substring(idxStart, idxEnd);
 
-		bean.setUrlImageTitle(s);
+		bean.setUrlImageTitle(Constants.SITEROOT + s);
 
 		token = "<img ";
 		idxStart = html.indexOf(token, idxStart) + token.length();
@@ -451,7 +451,7 @@ public class FakkuConnection {
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		idxEnd = html.indexOf("\"", idxStart);
 		s = html.substring(idxStart, idxEnd);
-		bean.setUrlImagePage(s);
+		bean.setUrlImagePage(Constants.SITEROOT + s);
 
 		// title
 		token = "<h1 itemprop=\"name\">";
@@ -541,7 +541,7 @@ public class FakkuConnection {
 		bean.setLstTags(lstTags);
 
 		//Get imageServer link
-		html = Helper.getHTML(url + "/read#page=1");
+		html = Helper.getHTML(bean.getUrl() + "/read#page=1");
 		token = "function imgpath(x) {";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		token = "return '";
@@ -552,7 +552,7 @@ public class FakkuConnection {
 		bean.setImageServer(s);
 		
 		//Get download link
-		html = Helper.getHTML(url + "/download");
+		html = Helper.getHTML(bean.getUrl() + "/download");
 		token = "<div class=\"download-row\"><span>fu</span> ";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		

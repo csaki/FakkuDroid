@@ -223,6 +223,8 @@ public class FavoriteFragment extends SherlockFragment implements
 
 					File myFile = new File(dir, bean.getFileImageTitle());
 					Helper.saveInStorage(myFile, bean.getUrlImageTitle());
+					
+					bean.loadImages(dir);
 				} catch (Exception e) {
 					Helper.logError(this, e.getMessage(), e);
 				}

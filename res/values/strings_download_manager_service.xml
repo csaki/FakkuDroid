@@ -5,7 +5,7 @@
 	<string name="download_error">Download had an error</string>
 	<string name="completed_download">Download of @doujin is completed</string>
 	<string name="cancelled_download">Download of @doujin is cancelled</string>
-	<string name="error_downloading">Error downloading: @doujin \\nMessage Error: @error</string>
+	<string name="error_downloading">Error downloading: @doujin</string>
 	<string name="starting_download">Starting download of @doujin</string>
 	<string name="downloading">Downloading&#8230;</string>
 	<string name="already_queue">Already in queue</string>

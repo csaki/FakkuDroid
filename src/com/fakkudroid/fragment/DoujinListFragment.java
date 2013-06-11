@@ -221,6 +221,8 @@ public class DoujinListFragment extends SherlockListFragment {
 
 						myFile = new File(dir, bean.getFileImagePage());
 						Helper.saveInStorage(myFile, bean.getUrlImagePage());
+						
+						bean.loadImages(dir);
 					} catch (Exception e) {
 						Helper.logError(this, e.getMessage(), e);
 					}
