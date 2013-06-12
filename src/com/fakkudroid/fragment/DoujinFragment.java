@@ -1,0 +1,587 @@
+package com.fakkudroid.fragment;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.http.client.ClientProtocolException;
+
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.style.UnderlineSpan;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.fakkudroid.GallerySwipeActivity;
+import com.fakkudroid.LoginActivity;
+import com.fakkudroid.R;
+import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.bean.URLBean;
+import com.fakkudroid.bean.UserBean;
+import com.fakkudroid.core.DataBaseHandler;
+import com.fakkudroid.core.ExceptionNotLoggedIn;
+import com.fakkudroid.core.FakkuConnection;
+import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.service.DownloadManagerService;
+import com.fakkudroid.util.Constants;
+import com.fakkudroid.util.Helper;
+
+public class DoujinFragment extends SherlockFragment {
+
+	FakkuDroidApplication app;
+	private View mFormView;
+	private View mStatusView;
+	private View view;
+	private boolean recreate = false;
+	private static DoujinBean currentBean;
+	boolean alreadyDownloaded = false;
+	private ProgressBar progressBar;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		app = (FakkuDroidApplication) getActivity().getApplication();
+		recreate = true;
+		currentBean = app.getCurrent();
+	}
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		if(recreate){
+			Helper.executeAsyncTask(new CompleteDoujin(), currentBean);
+			alreadyDownloaded = verifyAlreadyDownloaded();
+			if (DownloadManagerService.DoujinMap.exists(currentBean)) {
+				Helper.executeAsyncTask(new UpdateStatus());
+			}
+		}
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		view = inflater
+				.inflate(R.layout.fragment_doujin, container, false);
+
+		mFormView = view.findViewById(R.id.view_form);
+		mStatusView = view.findViewById(R.id.view_status);
+		progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+		return view;
+	}
+	
+	public void viewInBrowser(View view) {
+		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
+		viewBrowser.setData(Uri.parse(currentBean.getUrl()));
+		this.startActivity(viewBrowser);
+	}
+	
+	public void refresh() {
+		Helper.executeAsyncTask(new CompleteDoujin(), currentBean);
+	}
+	
+	public void addOrRemoveFavorite(View view) {
+		if (!app.getSettingBean().isChecked()) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setMessage(R.string.login_please)
+					.setPositiveButton(R.string.login,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									Intent it = new Intent(getActivity(),
+											LoginActivity.class);
+									getActivity().startActivity(it);
+								}
+							})
+					.setNegativeButton(android.R.string.cancel,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									return;
+								}
+							}).create().show();
+		}
+		app.setSettingBean(null);
+		if (app.getSettingBean().isChecked())
+			if (!currentBean.isAddedInFavorite()) {
+				Helper.executeAsyncTask(new FavoriteDoujin(),true);
+			} else {
+				Helper.executeAsyncTask(new FavoriteDoujin(),false);
+			}
+	}
+	
+	public void read(View view) {
+		SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		if (preferenceManager.getBoolean("perfect_viewer_checkbox", false)&&alreadyDownloaded) {
+			List<String> lstFiles = app.getCurrent().getImagesFiles();
+			File dir = Helper.getDir(app.getCurrent().getId(), Context.MODE_PRIVATE, getActivity());
+			File myFile = new File(dir, lstFiles.get(0));
+			Helper.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
+		} else {
+			Intent it = new Intent(getActivity(), GallerySwipeActivity.class);
+			this.startActivity(it);
+		}
+	}
+	
+	public void download(View view) {
+		if (!alreadyDownloaded) {
+			if (DownloadManagerService.started) {
+				if (!DownloadManagerService.DoujinMap.exists(app.getCurrent())) {
+					Toast.makeText(getActivity(),
+							getResources().getString(R.string.in_queue),
+							Toast.LENGTH_SHORT).show();
+					DownloadManagerService.DoujinMap.add(app.getCurrent());
+				} else {
+					Toast.makeText(getActivity(),
+							getResources().getString(R.string.already_queue),
+							Toast.LENGTH_SHORT).show();
+				}
+			} else {
+				getActivity().startService(new Intent(getActivity(), DownloadManagerService.class));
+				Helper.executeAsyncTask(new UpdateStatus());
+			}
+		} else {
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setMessage(R.string.ask_delete)
+					.setPositiveButton(android.R.string.yes,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									String folder = currentBean.getId();
+									File dir = Helper.getDir(folder,
+											Context.MODE_PRIVATE, getActivity());
+									try {
+										FileUtils.deleteDirectory(dir);
+									} catch (IOException e) {
+										Helper.logError(this, e.getMessage(), e);
+									}
+									DataBaseHandler db = new DataBaseHandler(
+											getActivity());
+									db.deleteDoujin(currentBean.getId());
+
+									ImageButton btnDownload = (ImageButton) DoujinFragment.this.view.findViewById(R.id.btnDownload);
+									btnDownload
+											.setImageResource(R.drawable.av_download);
+									btnDownload
+											.setContentDescription(getResources()
+													.getString(
+															R.string.download));
+									Toast.makeText(
+											getActivity(),
+											getResources().getString(
+													R.string.deleted),
+											Toast.LENGTH_SHORT).show();
+									alreadyDownloaded = false;
+								}
+							}).setNegativeButton(android.R.string.no, null)
+					.create().show();
+		}
+	}
+	
+	public void setComponents() {
+		getActivity().setTitle(currentBean.getTitle());
+		
+		RelativeLayout rl = (RelativeLayout) view.findViewById(
+				R.id.doujinDetail);
+		rl.setVisibility(View.VISIBLE);
+
+		TextView tvDescription = (TextView) view.findViewById(
+				R.id.tvDescription);
+		TextView tvDoujin = (TextView) view.findViewById(R.id.tvDoujin);
+		TextView tvArtist = (TextView) view.findViewById(R.id.tvArtist);
+		ImageView ivTitle = (ImageView) view.findViewById(R.id.ivTitle);
+		ImageView ivPage = (ImageView) view.findViewById(R.id.ivPage);
+		TextView tvSerie = (TextView) view.findViewById(R.id.tvSerie);
+		TextView tvQtyPages = (TextView) view
+				.findViewById(R.id.tvQtyPages);
+		TextView tvUploader = (TextView) view
+				.findViewById(R.id.tvUploader);
+		TextView tvLanguage = (TextView) view
+				.findViewById(R.id.tvLanguage);
+		TextView tvTranslator = (TextView) view.findViewById(
+				R.id.tvTranslator);
+		LinearLayout llTags = (LinearLayout) view
+				.findViewById(R.id.llTags);
+
+		String s = getResources().getString(R.string.content_pages);
+
+		s = s.replace("rpc1", "" + currentBean.getQtyPages());
+		s = s.replace("rpc2", "" + currentBean.getQtyFavorites());
+
+		tvQtyPages.setText(s);
+
+		s = getResources().getString(R.string.content_uploader);
+
+		s = s.replace("rpc1", currentBean.getUploader().getDescription());
+		s = s.replace("rpc2", currentBean.getFecha());
+
+		SpannableString content = new SpannableString(s);
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvUploader.setText(content);
+
+		tvDescription.setText(Html.fromHtml(currentBean.getDescription()
+				.replace("<br>", "<br/>")));
+		tvDescription.setMovementMethod(LinkMovementMethod.getInstance());
+
+		content = new SpannableString(currentBean.getTitle());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvDoujin.setText(content);
+
+		content = new SpannableString(currentBean.getArtist()
+				.getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvArtist.setText(content);
+
+		content = new SpannableString(currentBean.getSerie()
+				.getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvSerie.setText(content);
+
+		content = new SpannableString(currentBean.getLanguage()
+				.getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvLanguage.setText(content);
+
+		content = new SpannableString(currentBean.getTranslator()
+				.getDescription());
+		content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+		tvTranslator.setText(content);
+
+		ivTitle.setImageBitmap(currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity())));
+		ivPage.setImageBitmap(currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity())));
+
+		tvUploader.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+//				Intent itFavorites = new Intent();
+//				itFavorites.putExtra(MainActivity.INTENT_VAR_USER, app
+//						.getCurrent().getUploader().getDescription());
+//				doujinActivity.goToFavorite(itFavorites);
+			}
+		});
+		tvArtist.setOnClickListener(new URLListener(currentBean
+				.getArtist(), R.string.tile_artist));
+		tvLanguage.setOnClickListener(new URLListener(currentBean
+				.getLanguage(), R.string.tile_language));
+		tvSerie.setOnClickListener(new URLListener(currentBean.getSerie(),
+				R.string.tile_serie));
+		tvTranslator.setOnClickListener(new URLListener(currentBean
+				.getTranslator(), R.string.tile_translator));
+
+		for (URLBean urlBean : currentBean.getLstTags()) {
+			TextView tv = (TextView) getActivity().getLayoutInflater().inflate(
+					R.layout.textview_custom, null);
+			content = new SpannableString(urlBean.getDescription());
+			content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+			tv.setText(content);
+
+			tv.setOnClickListener(new URLListener(urlBean, R.string.tile_tag));
+			llTags.addView(tv);
+		}
+
+		ImageButton btnAddToFavorite = (ImageButton) view
+				.findViewById(R.id.btnAddToFavorite);
+		alreadyDownloaded = verifyAlreadyDownloaded();
+
+		if (currentBean != null) {
+			if (currentBean.isAddedInFavorite()) {
+				btnAddToFavorite.setImageResource(R.drawable.rating_important);
+				btnAddToFavorite.setContentDescription(getResources()
+						.getString(R.string.remove_favorite));
+			} else {
+				btnAddToFavorite
+						.setImageResource(R.drawable.rating_not_important);
+				btnAddToFavorite.setContentDescription(getResources()
+						.getString(R.string.add_favorite));
+			}
+			if (alreadyDownloaded) {
+				ImageButton btnDownload = (ImageButton) view
+						.findViewById(R.id.btnDownload);
+				btnDownload.setImageResource(R.drawable.content_discard);
+				btnDownload.setContentDescription(getResources().getString(
+						R.string.delete));
+			} else {
+				ImageButton btnDownload = (ImageButton) view
+						.findViewById(R.id.btnDownload);
+				btnDownload.setImageResource(R.drawable.av_download);
+				btnDownload.setContentDescription(getResources().getString(
+						R.string.download));
+			}
+		}
+	}
+	
+	/**
+	 * Shows the progress UI and hides the login form.
+	 */
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+	public void showProgress(final boolean show) {
+		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+		// for very easy animations. If available, use these APIs to fade-in
+		// the progress spinner.
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+			int shortAnimTime = getResources().getInteger(
+					android.R.integer.config_shortAnimTime);
+
+			mStatusView.setVisibility(View.VISIBLE);
+			mStatusView.animate().setDuration(shortAnimTime)
+					.alpha(show ? 1 : 0)
+					.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							mStatusView.setVisibility(show ? View.VISIBLE
+									: View.GONE);
+						}
+					});
+
+			mFormView.setVisibility(View.VISIBLE);
+			mFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1)
+					.setListener(new AnimatorListenerAdapter() {
+						@Override
+						public void onAnimationEnd(Animator animation) {
+							mFormView.setVisibility(show ? View.GONE
+									: View.VISIBLE);
+						}
+					});
+		} else {
+			// The ViewPropertyAnimator APIs are not available, so simply show
+			// and hide the relevant UI components.
+			mStatusView.setVisibility(show ? View.VISIBLE : View.GONE);
+			mFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+		}
+	}
+	
+	class FavoriteDoujin extends AsyncTask<Boolean, Float, Boolean> {
+
+		protected void onPreExecute() {
+			showProgress(true);
+		}
+
+		protected Boolean doInBackground(Boolean... bool) {
+			boolean isConnected = false;
+			if (app.getSettingBean().isChecked())
+				try {
+					isConnected = FakkuConnection.connect(app.getSettingBean()
+							.getUser(), app.getSettingBean().getPassword());
+				} catch (ClientProtocolException e) {
+					Helper.logError(this, e.getMessage(), e);
+				} catch (IOException e) {
+					Helper.logError(this, e.getMessage(), e);
+				}
+
+			if (!isConnected) {
+				UserBean s = app.getSettingBean();
+				s.setChecked(false);
+				new DataBaseHandler(getActivity()).updateSetting(s);
+				app.setSettingBean(null);
+			} else {
+				Boolean b = bool[0];
+				try {
+					if (b)
+						FakkuConnection.transaction(currentBean
+								.urlFavorite(Constants.SITEADDFAVORITE));
+					else
+						FakkuConnection.transaction(currentBean
+								.urlFavorite(Constants.SITEREMOVEFAVORITE));
+				} catch (ExceptionNotLoggedIn e) {
+					Helper.logError(this, e.getMessage(), e);
+				} catch (IOException e) {
+					Helper.logError(this, e.getMessage(), e);
+				}
+				currentBean.setAddedInFavorite(b);
+			}
+			return isConnected;
+		}
+
+		protected void onPostExecute(Boolean bytes) {
+			showProgress(false);
+			if (bytes) {
+				setComponents();
+				String text = null;
+
+				if (currentBean.isAddedInFavorite())
+					text = getResources().getString(R.string.added_favorite);
+				else
+					text = getResources().getString(R.string.removed_favorite);
+				Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT)
+						.show();
+			} else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivity());
+				builder.setMessage(R.string.login_please)
+						.setPositiveButton(R.string.login,
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										Intent it = new Intent(
+												getActivity(),
+												LoginActivity.class);
+										getActivity().startActivity(it);
+									}
+								})
+						.setNegativeButton(android.R.string.cancel,
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										return;
+									}
+								}).create().show();
+			}
+		}
+	}
+	
+	class CompleteDoujin extends AsyncTask<DoujinBean, Float, DoujinBean> {
+
+		protected void onPreExecute() {
+			showProgress(true);
+		}
+
+		protected DoujinBean doInBackground(DoujinBean... beans) {
+
+			if (app.getSettingBean().isChecked())
+				try {
+					FakkuConnection.connect(app.getSettingBean().getUser(), app
+							.getSettingBean().getPassword());
+				} catch (ClientProtocolException e) {
+					Helper.logError(this, e.getMessage(), e);
+				} catch (IOException e) {
+					Helper.logError(this, e.getMessage(), e);
+				}
+			DoujinBean bean = beans[0];
+
+			try {
+				FakkuConnection.parseHTMLDoujin(bean);
+				File dir = Helper.getCacheDir(getActivity());
+
+				File myFile = new File(dir, bean.getFileImageTitle());
+				Helper.saveInStorage(myFile, bean.getUrlImageTitle());
+
+				myFile = new File(dir, bean.getFileImagePage());
+				Helper.saveInStorage(myFile, bean.getUrlImagePage());
+			} catch (Exception e) {
+				bean=null;
+				Helper.logError(this, e.getMessage(), e);
+			}
+
+			return bean;
+		}
+
+		protected void onPostExecute(DoujinBean bean) {
+			try {
+				if (bean!=null&&bean.getTitle() != null) {
+					setComponents();
+					showProgress(false);
+				} else {
+					Toast.makeText(getActivity(),
+							getResources().getString(R.string.no_data),
+							Toast.LENGTH_SHORT).show();
+					getActivity().finish();
+				}
+			} catch (Exception e) {
+				Helper.logError(this, e.getMessage(), e);
+			}
+		}
+	}
+
+	class UpdateStatus extends AsyncTask<Boolean, Integer, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(Boolean... arg0) {
+			try {
+				Thread.sleep(1000);
+				while (DownloadManagerService.DoujinMap.exists(currentBean)) {
+					if (getActivity().isFinishing()) {
+						break;
+					}
+					if (DownloadManagerService.currentBean != null
+							&& DownloadManagerService.currentBean.getId()
+									.hashCode() == currentBean.getId()
+									.hashCode())
+						publishProgress(DownloadManagerService.percent);
+					Thread.sleep(1000);
+				}
+			} catch (InterruptedException e) {
+			}
+			return null;
+		}
+
+		@Override
+		protected void onProgressUpdate(Integer... progress) {
+			progressBar.setProgress(DownloadManagerService.percent);
+		}
+
+		protected void onPostExecute(Boolean bytes) {
+			if (getActivity().isFinishing()) {
+				return;
+			}
+			progressBar.setProgress(100);
+			ImageButton btnDownload = (ImageButton)view.findViewById(R.id.btnDownload);
+			btnDownload.setImageResource(R.drawable.content_discard);
+			btnDownload.setContentDescription(getResources().getString(
+					R.string.delete));
+			alreadyDownloaded = true;
+		}
+
+	}
+	
+	class URLListener implements OnClickListener {
+
+		URLBean urlBean;
+		int rID;
+
+		public URLListener(URLBean urlBean, int rID) {
+			this.urlBean = urlBean;
+			this.rID = rID;
+		}
+
+		@Override
+		public void onClick(View v) {
+
+//			Intent it = new Intent();
+//			it.putExtra(MainActivity.INTENT_VAR_TITLE, urlBean.getDescription());
+//			it.putExtra(MainActivity.INTENT_VAR_URL, urlBean.getUrl());
+//			doujinActivity.goToList(it);
+
+		}
+	}
+	
+	public boolean verifyAlreadyDownloaded() {
+		try {
+			DataBaseHandler db = new DataBaseHandler(this.getActivity());
+			return db.getDoujinBean(currentBean.getId()) != null;
+		} catch (Exception e) {
+			Helper.logError(this, "Error verifing if exists doujin in the db.", e);
+		}
+
+		return false;
+	}
+}

@@ -96,7 +96,8 @@
         android:id="@+id/view_status"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
         android:orientation="vertical" >
 
         <ProgressBar

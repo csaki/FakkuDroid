@@ -22,6 +22,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -29,6 +30,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.widget.SearchView;
 import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.core.FakkuConnection;
+import com.fakkudroid.fragment.DoujinFragment;
 import com.fakkudroid.fragment.DoujinListFragment;
 import com.fakkudroid.fragment.DownloadListFragment;
 import com.fakkudroid.fragment.DownloadQueueListFragment;
@@ -52,12 +54,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private DoujinListFragment frmDoujinList;
 	private DownloadListFragment frmDownloadListFragment;
 	private DownloadQueueListFragment frmDownloadQueueListFragment;
+	private DoujinFragment frmDoujinFragment;
 	public static final int DOUJIN_LIST = 1;
 	public static final int DOWNLOADS = 2;
 	public static final int FAVORITES = 3;
 	public static final int DOWNLOADS_QUEUE = 4;
+	public static final int DOUJIN = 5;
 	private static int currentContent = DOUJIN_LIST;
-
+	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,8 +86,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 			currentContent = tempCurrentContent;
 		
 		if (currentContent == DOUJIN_LIST) {
-			if (frmDoujinList == null)
+			if (frmDoujinList == null){
 				frmDoujinList = new DoujinListFragment();
+				frmDoujinList.setMainActivity(this);
+			}
 			frmCurrent = frmDoujinList;
 		} else if (currentContent == DOWNLOADS) {
 			if (frmDownloadListFragment == null)
@@ -239,8 +245,18 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void viewInBrowser(View view) {
 		if (currentContent == DOUJIN_LIST)
 			frmDoujinList.viewInBrowser(view);
+		else if(currentContent == DOUJIN)
+			frmDoujinFragment.viewInBrowser(view);
 		else
 			frmFavorite.viewInBrowser(view);
+	}
+	
+	public void read(View view) {
+		frmDoujinFragment.read(view);
+	}
+	
+	public void addOrRemoveFavorite(View view) {
+		frmDoujinFragment.addOrRemoveFavorite(view);
 	}
 
 	public void refresh(View view) {
@@ -279,14 +295,24 @@ public class MainActivity extends SherlockFragmentActivity implements
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
 	}
+	
+	public void goToDoujin() {
+		currentContent = DOUJIN;
+		mDrawerLayout.closeDrawers();
+		if (frmDoujinFragment == null)
+			frmDoujinFragment = new DoujinFragment();
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.content_frame, frmDoujinFragment).commit();
+	}
 
 	public void loadPageDoujinList(String title, String url) {
 		mDrawerLayout.closeDrawers();
 		this.setTitle(title);
 
-		if (frmDoujinList == null)
+		if (frmDoujinList == null){
 			frmDoujinList = new DoujinListFragment();
-
+			frmDoujinList.setMainActivity(this);
+		}
 		frmDoujinList.setUrl(url);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.content_frame, frmDoujinList).commit();
@@ -298,8 +324,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private void relatedContent() {
 		setTitle(R.string.related_content);
-		if (frmDoujinList == null)
+		if (frmDoujinList == null){
 			frmDoujinList = new DoujinListFragment();
+			frmDoujinList.setMainActivity(this);
+		}
 		frmDoujinList.setRelated(true);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.content_frame, frmDoujinList).commit();
@@ -371,6 +399,22 @@ public class MainActivity extends SherlockFragmentActivity implements
 		} else if (resultCode == 3) {
 			goToFavorites(data.getStringExtra(INTENT_VAR_USER));
 		}
+	}
+	
+	public void relatedContent(View view) {
+		Toast.makeText(this,
+				getResources().getString(R.string.soon), Toast.LENGTH_SHORT)
+				.show();
+	}
+	
+	public void comments(View view) {
+		Toast.makeText(this,
+				getResources().getString(R.string.soon), Toast.LENGTH_SHORT)
+				.show();
+	}
+	
+	public void download(View view) {
+		frmDoujinFragment.download(view);
 	}
 
 	private android.view.MenuItem getMenuItem(final MenuItem item) {

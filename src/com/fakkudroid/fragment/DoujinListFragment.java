@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.fakkudroid.DoujinActivity;
+import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.adapter.DoujinListAdapter;
 import com.fakkudroid.bean.DoujinBean;
@@ -45,6 +45,11 @@ public class DoujinListFragment extends SherlockListFragment {
 	private View mStatusView;
 	private View view;
 	static boolean related = false;
+	private MainActivity mainActivity;
+	
+	public void setMainActivity(MainActivity mainActivity) {
+		this.mainActivity = mainActivity;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -144,8 +149,7 @@ public class DoujinListFragment extends SherlockListFragment {
 		super.onListItemClick(l, v, position, id);
 		DoujinBean data = llDoujin.get(position);
 		app.setCurrent(data);
-		Intent it = new Intent(this.getActivity(), DoujinActivity.class);
-		this.startActivityForResult(it, 1);
+		mainActivity.goToDoujin();
 	}
 
 	/**
