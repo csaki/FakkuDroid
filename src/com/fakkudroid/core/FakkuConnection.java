@@ -552,6 +552,7 @@ public class FakkuConnection {
 		bean.setImageServer(s);
 		
 		//Get download link
+        /*
 		html = Helper.getHTML(bean.getUrl() + "/download");
 		token = "<div class=\"download-row\"><span>fu</span> ";
 		idxStart = html.indexOf(token, idxStart) + token.length();
@@ -564,7 +565,9 @@ public class FakkuConnection {
 			s = html.substring(idxStart, idxEnd-1);
 			
 			bean.setUrlDownload(s);
-		}
+		}*/
+
+        bean.setCompleted(true);
 	}
 
 	public static LinkedList<URLBean> parseHTMLTagsList(String url)

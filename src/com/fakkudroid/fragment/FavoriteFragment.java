@@ -45,7 +45,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	public final static String INTENT_VAR_USER = "intentVarUser";
 
 	FakkuDroidApplication app;
-	LinkedList<DoujinBean> llDoujin;
+	static LinkedList<DoujinBean> llDoujin;
 	FavoriteListAdapter da;
 	GridView gvFavorites;
 	static String user;
@@ -71,7 +71,12 @@ public class FavoriteFragment extends SherlockFragment implements
 	@Override
 	public void onStart(){
 		super.onStart();
-		loadPage();
+        if(llDoujin==null)
+            loadPage();
+        else{
+            showProgress(false);
+            setData();
+        }
 	}
 	
 	private View findViewById(int resource){

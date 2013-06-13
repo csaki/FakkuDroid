@@ -85,18 +85,19 @@ public class DownloadManagerService extends Service {
 				resultIntent= new Intent(DownloadManagerService.this,
 						MainActivity.class);				
 				resultIntent.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOWNLOADS_QUEUE);
-			}else if(resource==R.string.completed_download){
+			}else if(resource==R.string.download_completed){
 				resultIntent= new Intent(DownloadManagerService.this,
 						MainActivity.class);				
 				resultIntent.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOWNLOADS);
 			}else if(resource==R.string.download_cancelled||resource==R.string.download_error){
 				resultIntent= new Intent(DownloadManagerService.this,
-						DoujinActivity.class);				
+						DoujinActivity.class);
 				resultIntent.putExtra(DoujinActivity.INTENT_VAR_URL, bean.getUrl());
 			}
 			
 			// Adds the Intent to the top of the stack
 			// Gets a PendingIntent containing the entire back stack
+            Object temp = DownloadManagerService.this;
 			PendingIntent resultPendingIntent = PendingIntent.getActivity(DownloadManagerService.this,
 					0, resultIntent,PendingIntent.FLAG_ONE_SHOT);
 			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(

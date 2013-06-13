@@ -37,7 +37,7 @@ import com.fakkudroid.util.Helper;
 public class DoujinListFragment extends SherlockListFragment {
 
 	FakkuDroidApplication app;
-	LinkedList<DoujinBean> llDoujin;
+	static LinkedList<DoujinBean> llDoujin;
 	DoujinListAdapter da;
 	static String url = Constants.SITEROOT;;
 	static int numPage = 1;
@@ -45,13 +45,14 @@ public class DoujinListFragment extends SherlockListFragment {
 	private View mStatusView;
 	private View view;
 	static boolean related = false;
-	private MainActivity mainActivity;
-	
-	public void setMainActivity(MainActivity mainActivity) {
-		this.mainActivity = mainActivity;
-	}
+	private MainActivity mMainActivity;
+    private boolean refresh;
 
-	@Override
+    public void setMainActivity(MainActivity mainActivity) {
+        mMainActivity = mainActivity;
+    }
+
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (FakkuDroidApplication) getActivity().getApplication();
@@ -65,7 +66,12 @@ public class DoujinListFragment extends SherlockListFragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		loadPage();
+        if(llDoujin==null||refresh)
+		    loadPage();
+        else{
+            showProgress(false);
+            setData();
+        }
 	}
 
 	@Override
@@ -134,6 +140,7 @@ public class DoujinListFragment extends SherlockListFragment {
 	}
 
 	public void setUrl(String url) {
+        refresh = true;
 		related = false;
 		DoujinListFragment.numPage = 1;
 		DoujinListFragment.url = url;
@@ -143,13 +150,13 @@ public class DoujinListFragment extends SherlockListFragment {
 		da = new DoujinListAdapter(this.getActivity(), R.layout.row_doujin, 0,
 				llDoujin, related);
 		this.setListAdapter(da);
+        refresh = false;
 	}
 
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		DoujinBean data = llDoujin.get(position);
-		app.setCurrent(data);
-		mainActivity.goToDoujin();
+        mMainActivity.loadDoujin(data.getUrl());
 	}
 
 	/**

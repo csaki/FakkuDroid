@@ -245,9 +245,9 @@ public class MenuListFragment extends SherlockListFragment {
 						getResources().getString(R.string.app_name),
 						com.fakkudroid.util.Constants.SITEROOT);
 			} else if (bean.getDescription().equals("Downloads")) {
-				mainActivity.goToDownloads();
+				mainActivity.loadDownloads();
 			} else if (bean.getDescription().equals("My favorites")) {
-				mainActivity.goToFavorites(app.getSettingBean().getUser());
+				mainActivity.loadFavorites(app.getSettingBean().getUser());
 			} else if (bean.getDescription().startsWith("Sign")) {
 				Intent itLogin = new Intent(this.getActivity(),
 						LoginActivity.class);
@@ -299,11 +299,7 @@ public class MenuListFragment extends SherlockListFragment {
 				Helper.executeAsyncTask(new DownloadList(), typeView);
 			} else {
 				if (position == lstURL.size() - 1) {
-					Intent it = new Intent(mainActivity, DoujinActivity.class);
-					DoujinBean dBean = new DoujinBean();
-					dBean.setUrl(bean.getUrl());
-					app.setCurrent(dBean);
-					mainActivity.startActivity(it);
+                    mainActivity.loadDoujin(bean.getUrl());
 				} else {
 					mainActivity.loadPageDoujinList(bean.getDescription(),
 							bean.getUrl());

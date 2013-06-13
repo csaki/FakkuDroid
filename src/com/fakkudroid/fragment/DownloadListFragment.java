@@ -21,8 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.GallerySwipeActivity;
+import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.adapter.DownloadListAdapter;
 import com.fakkudroid.bean.DoujinBean;
@@ -31,13 +31,19 @@ import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Helper;
 
 public class DownloadListFragment extends SherlockListFragment{
+
+    private MainActivity mMainActivity;
 	private FakkuDroidApplication app;
 	DownloadListAdapter da;
 	static int numPage = 1;
 	private String query = "";
 	private View view;
 
-	@Override
+    public void setMainActivity(MainActivity mainActivity) {
+        mMainActivity = mainActivity;
+    }
+
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (FakkuDroidApplication) getActivity().getApplication();
@@ -137,9 +143,7 @@ public class DownloadListFragment extends SherlockListFragment{
 	}
 
 	public void showDetails(DoujinBean bean) {
-		app.setCurrent(bean);
-		Intent it = new Intent(this.getActivity(), DoujinActivity.class);
-		this.startActivityForResult(it, 1);
+		mMainActivity.loadDoujin(bean.getUrl());
 	}
 
 	public void read(DoujinBean bean) {

@@ -26,7 +26,7 @@ public class DoujinBean {
 	private URLBean uploader;
 	private String fecha;
 	private List<URLBean> lstTags;
-	private boolean addedInFavorite;
+	private boolean addedInFavorite, completed;
 	private String timeAgo;
 	private transient Bitmap titleBitmap, pageBitmap;
 	private String imageServer;
@@ -310,5 +310,12 @@ public class DoujinBean {
 	public void setUrlDownload(String urlDownload) {
 		this.urlDownload = urlDownload;
 	}
-	
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 }

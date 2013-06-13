@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.fakkudroid.DoujinActivity;
+import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.adapter.DownloadQueueListAdapter;
 import com.fakkudroid.bean.DoujinBean;
@@ -24,22 +24,27 @@ import com.fakkudroid.service.DownloadManagerService;
 import com.fakkudroid.util.Helper;
 
 public class DownloadQueueListFragment extends SherlockListFragment{
-	private FakkuDroidApplication app;
+
+    private MainActivity mMainActivity;
 	DownloadQueueListAdapter da;
 	private View view;
 	NotificationManager mNotificationManager;
 
-	@Override
+    public void setMainActivity(MainActivity mainActivity) {
+        mMainActivity = mainActivity;
+    }
+
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		app = (FakkuDroidApplication) getActivity().getApplication();
 		mNotificationManager = (NotificationManager)getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 	
 	private void showNotification(DoujinBean bean) {
 		Intent resultIntent = new Intent(getActivity(),
-				DoujinActivity.class);
-		resultIntent.putExtra(DoujinActivity.INTENT_VAR_URL, bean.getUrl());
+                MainActivity.class);
+        resultIntent.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN);
+        resultIntent.putExtra(MainActivity.INTENT_VAR_URL, bean.getUrl());
 
 		// Gets a PendingIntent containing the entire back stack
 		PendingIntent resultPendingIntent = PendingIntent.getActivity(getActivity(),
@@ -95,9 +100,7 @@ public class DownloadQueueListFragment extends SherlockListFragment{
 	}
 
 	public void showDetails(DoujinBean bean) {
-		app.setCurrent(bean);
-		Intent it = new Intent(this.getActivity(), DoujinActivity.class);
-		this.startActivityForResult(it, 1);
+        mMainActivity.loadDoujin(bean.getUrl());
 	}
 	
 	class UpdateStatus extends AsyncTask<Boolean, Integer, Boolean> {
