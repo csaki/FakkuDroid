@@ -36,7 +36,6 @@ public class WebViewImageLayout extends RelativeLayout{
 		bar.setMax(100);
 		
 		wb = new NoZoomControlWebView(getContext());
-		wb.getSettings().setJavaScriptEnabled(true);
 		
 		this.bar.setProgress(0);
 

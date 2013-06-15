@@ -3,6 +3,7 @@ package com.fakkudroid.component;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -17,17 +18,26 @@ public class NoZoomControlWebView extends WebView {
 
     public NoZoomControlWebView(Context context) {
         super(context);
-        disableControls();
+        init(context);
     }
 
     public NoZoomControlWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        disableControls();
+        init(context);
     }
 
     public NoZoomControlWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(context);
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private void init(Context context) {
         disableControls();
+        getSettings().setJavaScriptEnabled(true);
+        getSettings().setLoadWithOverviewMode(true);
+        setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+        setScrollbarFadingEnabled(false);
     }
 
     /**
