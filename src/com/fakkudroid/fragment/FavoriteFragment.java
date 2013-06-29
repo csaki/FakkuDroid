@@ -26,12 +26,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.fakkudroid.MainActivity;
 import com.fakkudroid.adapter.FavoriteListAdapter;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Helper;
-import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.R;
 
 public class FavoriteFragment extends SherlockFragment implements
@@ -54,6 +54,12 @@ public class FavoriteFragment extends SherlockFragment implements
 	private View mFormView;
 	private View mStatusView;
 	private View view;
+    private MainActivity mMainActivity;
+    private boolean refresh;
+
+    public void setMainActivity(MainActivity mainActivity) {
+        mMainActivity = mainActivity;
+    }
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +77,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	@Override
 	public void onStart(){
 		super.onStart();
-        if(llDoujin==null)
+        if(llDoujin==null||refresh)
             loadPage();
         else{
             showProgress(false);
@@ -84,6 +90,8 @@ public class FavoriteFragment extends SherlockFragment implements
 	}
 	
 	public void setUser(String user){
+        refresh = true;
+        nroPage = 1;
 		FavoriteFragment.user = user;
 	}
 	
@@ -156,6 +164,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	private void setData() {
 		da = new FavoriteListAdapter(this.getActivity(), R.layout.row_doujin, 0, llDoujin);
 		gvFavorites.setAdapter(da);
+        refresh = false;
 	}
 
 	/**
@@ -248,8 +257,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		DoujinBean data = llDoujin.get(arg2);
 		app.setCurrent(data);
-		Intent it = new Intent(getActivity(), DoujinActivity.class);
-		this.startActivityForResult(it, 1);
+        mMainActivity.loadDoujin(data.getUrl());
 	}
 
 }

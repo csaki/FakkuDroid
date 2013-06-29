@@ -25,6 +25,11 @@
             android:key="perfect_viewer_checkbox"
             android:summary="@string/pref_description_perfect_viewer"
             android:title="@string/pref_title_perfect_viewer" />
+
+        <Preference android:key="folder_directory"
+                    android:summary="@string/pref_description_download_folder"
+                    android:title="@string/pref_title_download_folder"/>
+
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_header_gallery" >
         <ListPreference
@@ -54,6 +59,11 @@
             android:negativeButtonText="@null"
             android:positiveButtonText="@null"
             android:title="@string/pref_title_reading_mode" />
+
+        <Preference android:key="background_color"
+                    android:summary="@string/pref_description_background_color"
+                    android:title="@string/pref_title_background_color"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

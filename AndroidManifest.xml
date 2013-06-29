@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fakkudroid"
-    android:versionCode="25"
-    android:versionName="2.2.5" >
+    android:versionCode="26"
+    android:versionName="2.3.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -23,15 +23,6 @@
             android:configChanges="orientation|keyboardHidden"
             android:launchMode="singleInstance"
             >
-        </activity>
-        <activity
-            android:name="com.fakkudroid.DoujinActivity"
-            android:label="@string/title_activity_doujin" >
-        </activity>
-        <activity
-            android:name="com.fakkudroid.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
             android:name="com.fakkudroid.GallerySwipeActivity"

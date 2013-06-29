@@ -21,9 +21,9 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import android.widget.Toast;
 
-import com.fakkudroid.DoujinActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
@@ -91,16 +91,16 @@ public class DownloadManagerService extends Service {
 				resultIntent.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOWNLOADS);
 			}else if(resource==R.string.download_cancelled||resource==R.string.download_error){
 				resultIntent= new Intent(DownloadManagerService.this,
-						DoujinActivity.class);
-				resultIntent.putExtra(DoujinActivity.INTENT_VAR_URL, bean.getUrl());
+						MainActivity.class);
+                resultIntent.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN);
+				resultIntent.putExtra(MainActivity.INTENT_VAR_URL, bean.getUrl());
 			}
 			
 			// Adds the Intent to the top of the stack
 			// Gets a PendingIntent containing the entire back stack
-            Object temp = DownloadManagerService.this;
 			PendingIntent resultPendingIntent = PendingIntent.getActivity(DownloadManagerService.this,
 					0, resultIntent,PendingIntent.FLAG_ONE_SHOT);
-			NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 					DownloadManagerService.this).setSmallIcon(
 					R.drawable.ic_launcher).setContentTitle(bean.getTitle());
 

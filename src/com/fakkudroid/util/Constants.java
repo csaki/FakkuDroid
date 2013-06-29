@@ -12,7 +12,7 @@ public class Constants {
 	public static String SITEIMAGEROOT = "http://www.fakku.net"; 
 	public static String SITEIMAGE = "http://c.fakku.net";
 	public static String SITECOMMENTS = "http://www.fakku.net/comments/@id/@page";
-	public static String SITEFAVORITE = "http://www.fakku.net/users/usr/favorites?mode=viewfavorites&u=2&start=";
+	public static String SITEFAVORITE = "http://www.fakku.net/users/@user/favorites/page/@numpage";
 	public static String PAGE = "/page/";
 	public static String UPDATE_SERVICE = "http://fakkudroid.herokuapp.com/versions/max.json";
 

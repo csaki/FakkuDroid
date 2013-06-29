@@ -25,13 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListFragment;
-import com.fakkudroid.DoujinActivity;
-import com.fakkudroid.LoginActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.PreferencesActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.adapter.MenuListAdapter;
-import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.component.ActionImageButton;
@@ -249,9 +246,7 @@ public class MenuListFragment extends SherlockListFragment {
 			} else if (bean.getDescription().equals("My favorites")) {
 				mainActivity.loadFavorites(app.getSettingBean().getUser());
 			} else if (bean.getDescription().startsWith("Sign")) {
-				Intent itLogin = new Intent(this.getActivity(),
-						LoginActivity.class);
-				this.startActivityForResult(itLogin, 2);
+                mainActivity.loadLogin();
 			} else if (bean.getDescription().equals("Preferences")) {
 				Intent itPreference = new Intent(this.getActivity(),
 						PreferencesActivity.class);

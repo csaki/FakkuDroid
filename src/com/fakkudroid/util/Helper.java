@@ -232,6 +232,10 @@ public class Helper {
 		HttpClient client = new DefaultHttpClient();
 		HttpGet request = new HttpGet(url);
 		HttpResponse response = client.execute(request);
+        int code = response.getStatusLine().getStatusCode();
+
+        if(code!=200)
+            System.out.print(code);
 
 		String html = "";
 		InputStream in = response.getEntity().getContent();
@@ -257,9 +261,13 @@ public class Helper {
 
 		
 		HttpGet get = new HttpGet(url);
-		get.addHeader("Origin", "http://www.fakku.net:80");
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpResponse response = httpClient.execute(get, localContext);
+        int code = response.getStatusLine().getStatusCode();
+
+        if(code!=200)
+            System.out.print(code);
+
 		HttpEntity ent = response.getEntity();
 		InputStream is = ent.getContent();
 

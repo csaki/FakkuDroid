@@ -38,7 +38,6 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.fakkudroid.GallerySwipeActivity;
-import com.fakkudroid.LoginActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
@@ -125,9 +124,7 @@ public class DoujinFragment extends SherlockFragment {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
                                                     int id) {
-                                    Intent it = new Intent(getActivity(),
-                                            LoginActivity.class);
-                                    getActivity().startActivity(it);
+                                    mMainActivity.loadLogin();
                                 }
                             })
                     .setNegativeButton(android.R.string.cancel,
@@ -303,6 +300,7 @@ public class DoujinFragment extends SherlockFragment {
         tvTranslator.setOnClickListener(new URLListener(currentBean
                 .getTranslator(), R.string.tile_translator));
 
+        llTags.removeAllViews();
         for (URLBean urlBean : currentBean.getLstTags()) {
             TextView tv = (TextView) getActivity().getLayoutInflater().inflate(
                     R.layout.textview_custom, null);
@@ -447,10 +445,7 @@ public class DoujinFragment extends SherlockFragment {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,
                                                         int id) {
-                                        Intent it = new Intent(
-                                                getActivity(),
-                                                LoginActivity.class);
-                                        getActivity().startActivity(it);
+                                        mMainActivity.loadLogin();
                                     }
                                 })
                         .setNegativeButton(android.R.string.cancel,

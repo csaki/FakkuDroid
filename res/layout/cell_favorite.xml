@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-	android:layout_height="match_parent"
-    android:background="@drawable/stroke"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:padding="10dp"
-    android:scaleType="fitXY" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="2dp">
 
-    <TextView
-        android:id="@+id/tvDoujin"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="@string/fail_load_title_doujin"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/main_color" 
-        android:gravity="center_horizontal"/>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/stroke"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:scaleType="fitXY">
 
-    <ImageView
-        android:id="@+id/ivTitle"
-        android:layout_width="100dp"
-        android:layout_height="140dp"
-        android:scaleType="fitXY" />
+        <TextView
+                android:id="@+id/tvDoujin"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="@string/fail_load_title_doujin"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/main_color"
+                android:gravity="center_horizontal"/>
 
-</LinearLayout>
+        <ImageView
+                android:id="@+id/ivTitle"
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:scaleType="fitXY"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

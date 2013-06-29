@@ -37,6 +37,7 @@ import com.fakkudroid.fragment.DoujinListFragment;
 import com.fakkudroid.fragment.DownloadListFragment;
 import com.fakkudroid.fragment.DownloadQueueListFragment;
 import com.fakkudroid.fragment.FavoriteFragment;
+import com.fakkudroid.fragment.LoginFragment;
 import com.fakkudroid.fragment.MenuListFragment;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
@@ -60,11 +61,13 @@ public class MainActivity extends SherlockFragmentActivity implements
     private DownloadListFragment frmDownloadListFragment;
     private DownloadQueueListFragment frmDownloadQueueListFragment;
     private DoujinFragment frmDoujinFragment;
+    private LoginFragment frmLoginFragment;
     public static final int DOUJIN_LIST = 1;
     public static final int DOWNLOADS = 2;
     public static final int FAVORITES = 3;
     public static final int DOWNLOADS_QUEUE = 4;
     public static final int DOUJIN = 5;
+    public static final int LOGIN = 6;
     private static int currentContent = DOUJIN_LIST;
     private static HistoryArray mHistoryArray = new HistoryArray();
     FakkuDroidApplication app;
@@ -103,6 +106,8 @@ public class MainActivity extends SherlockFragmentActivity implements
             goToDownloadsQueue();
         } else if (currentContent == DOUJIN) {
             loadDoujin(getIntent().getStringExtra(INTENT_VAR_URL));
+        } else if (currentContent == LOGIN) {
+            goToLogin();
         }
 
         frmMenu = new MenuListFragment();
@@ -257,23 +262,56 @@ public class MainActivity extends SherlockFragmentActivity implements
 
     //<editor-fold desc="GO_TO">
     public void loadFavorites(String user) {
-        currentContent = FAVORITES;
         mDrawerLayout.closeDrawers();
-        if (frmFavorite == null)
+        if (frmFavorite == null){
             frmFavorite = new FavoriteFragment();
+            frmFavorite.setMainActivity(this);
+        }
         frmFavorite.setUser(user);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, frmFavorite).commit();
+        if(currentContent==FAVORITES)
+            frmFavorite.refresh(null);
+
+        currentContent = FAVORITES;
+
         mHistoryArray.addHistory(currentContent, user);
     }
 
     private void goToFavorites() {
         currentContent = FAVORITES;
         mDrawerLayout.closeDrawers();
-        if (frmFavorite == null)
+        if (frmFavorite == null){
             frmFavorite = new FavoriteFragment();
+            frmFavorite.setMainActivity(this);
+        }
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_frame, frmFavorite).commit();
+    }
+
+    private void goToLogin() {
+        currentContent = LOGIN;
+        mDrawerLayout.closeDrawers();
+        setTitle(R.string.title_activity_login);
+        if (frmLoginFragment == null) {
+            frmLoginFragment = new LoginFragment();
+            frmLoginFragment.setMainActivity(this);
+        }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, frmLoginFragment).commit();
+    }
+
+    public void loadLogin() {
+        currentContent = LOGIN;
+        mDrawerLayout.closeDrawers();
+        setTitle(R.string.title_activity_login);
+        if (frmLoginFragment == null) {
+            frmLoginFragment = new LoginFragment();
+            frmLoginFragment.setMainActivity(this);
+        }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_frame, frmLoginFragment).commit();
+        mHistoryArray.addHistory(currentContent);
     }
 
     private void goToDownloads() {
@@ -455,18 +493,8 @@ public class MainActivity extends SherlockFragmentActivity implements
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void createMainMenu(){
         frmMenu.createMainMenu();
-        if (resultCode == 1) {
-            relatedContent();
-        } else if (resultCode == 2) {
-            loadPageDoujinList(data.getStringExtra(INTENT_VAR_TITLE),
-                    data.getStringExtra(INTENT_VAR_URL));
-        } else if (resultCode == 3) {
-            loadFavorites(data.getStringExtra(INTENT_VAR_USER));
-        }
     }
 
     //<editor-fold desc="DoujinFragment">
@@ -782,6 +810,9 @@ public class MainActivity extends SherlockFragmentActivity implements
                         mHistoryArray.removeLastAction();
                     } else
                         goToFavorites();
+                    break;
+                case LOGIN:
+                    onBackPressed();
                     break;
             }
             mHistoryArray.removeLastAction();
