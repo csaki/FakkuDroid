@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fakkudroid"
-    android:versionCode="26"
-    android:versionName="2.3.0" >
+    android:versionCode="27"
+    android:versionName="2.4.0" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -28,6 +28,16 @@
             android:name="com.fakkudroid.GallerySwipeActivity"
             android:label="@string/title_activity_gallery_swipe"
             android:theme="@style/Theme.Sherlock" >
+        </activity>
+        <activity
+                android:name="com.androidexplorer.AndroidExplorerActivity"
+                android:label="@string/title_activity_android_explorer"
+                android:theme="@style/Theme.Sherlock" >
+        </activity>
+        <activity
+                android:name="com.larswerkman.colorpicker.ColorPickerActivity"
+                android:label="@string/title_activity_color_picker"
+                android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
             android:name="com.fakkudroid.PreferencesActivity"

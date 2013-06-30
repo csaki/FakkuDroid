@@ -1,9 +1,12 @@
 package com.fakkudroid;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.androidexplorer.AndroidExplorerActivity;
+import com.larswerkman.colorpicker.ColorPickerActivity;
 
 public class PreferencesActivity extends SherlockPreferenceActivity {
 
@@ -16,7 +19,9 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         Preference folderDialogPreference = (Preference) getPreferenceScreen().findPreference("folder_directory");
         folderDialogPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                // dialog code here
+                Intent itExplorer = new Intent(PreferencesActivity.this,
+                        AndroidExplorerActivity.class);
+                startActivity(itExplorer);
                 return true;
             }
         });
@@ -24,7 +29,9 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         Preference colorDialogPreference = (Preference) getPreferenceScreen().findPreference("background_color");
         colorDialogPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                // dialog code here
+                Intent it = new Intent(PreferencesActivity.this,
+                        ColorPickerActivity.class);
+                startActivity(it);
                 return true;
             }
         });

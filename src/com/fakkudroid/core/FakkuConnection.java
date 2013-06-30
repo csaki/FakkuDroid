@@ -24,6 +24,7 @@ import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.VersionBean;
+import com.fakkudroid.exception.ExceptionNotLoggedIn;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
 import com.google.gson.Gson;

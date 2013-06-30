@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
@@ -12,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -134,7 +136,12 @@ public class MainActivity extends SherlockFragmentActivity implements
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        Helper.executeAsyncTask(new CheckerVersion());
+
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(MainActivity.this);
+        boolean checkUpdates = prefs.getBoolean("check_updates_checkbox", true);
+        if(checkUpdates)
+            Helper.executeAsyncTask(new CheckerVersion());
     }
 
     @Override
@@ -483,7 +490,15 @@ public class MainActivity extends SherlockFragmentActivity implements
                                                         .startActivity(itVersion);
                                             }
                                         })
-                                .setNegativeButton(R.string.remind_later, null)
+                                .setNegativeButton(R.string.remind_never, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        SharedPreferences prefs = PreferenceManager
+                                                .getDefaultSharedPreferences(MainActivity.this);
+                                        prefs.edit().putBoolean("check_updates_checkbox", false);
+                                    }
+                                })
+                                .setNeutralButton(R.string.remind_later, null)
                                 .show();
                     }
                 } catch (NameNotFoundException e) {

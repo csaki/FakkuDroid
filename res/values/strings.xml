@@ -63,6 +63,7 @@
     <string name="favorite">Favorites of usr</string>
     <string name="reading_left_right">Reading: Left to Right</string>
     <string name="reading_right_left">Reading: Right to Left</string>
+    <string name="refresh">Refresh</string>
     <string name="next_page">Next Page</string>
     <string name="previous_page">Previous Page</string>
     <string name="page_1">Page 1</string>

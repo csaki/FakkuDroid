@@ -71,7 +71,7 @@ public class PasswordActivity extends Activity {
 
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
-		
+
 		if (prefs.getBoolean(Constants.SHOW_MESSAGE_HELP, true)) {
 			it = new Intent(this, MessageHelpActivity.class);
 			this.startActivity(it);

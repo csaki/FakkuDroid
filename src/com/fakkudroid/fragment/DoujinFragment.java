@@ -44,7 +44,7 @@ import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
-import com.fakkudroid.core.ExceptionNotLoggedIn;
+import com.fakkudroid.exception.ExceptionNotLoggedIn;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.service.DownloadManagerService;

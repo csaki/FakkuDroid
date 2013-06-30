@@ -26,6 +26,12 @@
             android:summary="@string/pref_description_perfect_viewer"
             android:title="@string/pref_title_perfect_viewer" />
 
+        <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="check_updates_checkbox"
+                android:summary="@string/pref_description_check_updates"
+                android:title="@string/pref_title_check_updates" />
+
         <Preference android:key="folder_directory"
                     android:summary="@string/pref_description_download_folder"
                     android:title="@string/pref_title_download_folder"/>

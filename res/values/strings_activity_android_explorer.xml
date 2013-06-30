@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_android_explorer">Android Explorer</string>
+    <string name="location_android_explorer">[@location] folder can\'t be read!</string>
+    <string name="use_default_folder">Use default folder</string>
+    <string name="use_this_folder">Use this folder</string>
+</resources>

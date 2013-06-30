@@ -14,7 +14,9 @@
 	<string name="pref_title_perfect_viewer">Use Perfect Viewer</string>
 	<string name="pref_description_perfect_viewer">If enabled, Fakkudroid will open downloaded doujinshi with Perfect Viewer. (only works with downloaded files!)</string>
     <string name="pref_title_background_color">Select Viewer Background Color</string>
-    <string name="pref_description_background_color">Change background color.</string>
+    <string name="pref_description_background_color">Change Viewer background color.</string>
+    <string name="pref_title_check_updates">Check updates</string>
+    <string name="pref_description_check_updates">Check if there are new versions of FakkuDroid.</string>
 	
 	<string-array name="pref_reading_mode_list">
         <item>Right to Left</item>

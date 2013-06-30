@@ -55,9 +55,11 @@ public class Constants {
 	public static final int SCREEN_ORIENTATION_PORTRAIT = 1;
 	public static final int SCREEN_ORIENTATION_LANDSCAPE = 2;
 	
-	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.1";
+	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.3.1";
 
 	public static final int WIDTH_STANDARD = 119;
 	public static final int HEIGHT_STANDARD = 163;
+
+    public static final String DEFAULT_COLOR = "000000";
 	
 }

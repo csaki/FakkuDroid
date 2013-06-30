@@ -16,6 +16,7 @@ import com.fakkudroid.component.NoZoomControlWebView;
 public class WebViewImageLayout extends RelativeLayout{
 
 	String imageFile;
+    String backgroundColor;
 	ProgressBar bar;
 	NoZoomControlWebView wb;
 	
@@ -23,9 +24,10 @@ public class WebViewImageLayout extends RelativeLayout{
 		super(context);
 	}
 	
-	public WebViewImageLayout(String imageFile, Context context){
+	public WebViewImageLayout(String imageFile, String backgroundColor, Context context){
 		super(context);
 		this.imageFile = imageFile;
+        this.backgroundColor = backgroundColor;
 		init();
 	}
 
@@ -71,9 +73,13 @@ public class WebViewImageLayout extends RelativeLayout{
 	public void startLoader(int width, int height, boolean japaneseMode){
 		height-= getBarHeight();
 		wb.loadDataWithBaseURL(null,
-				Helper.createHTMLImage(imageFile, width/wb.getScale(), height/wb.getScale(), japaneseMode, this.getResources()),
+				Helper.createHTMLImage(imageFile, width/wb.getScale(), height/wb.getScale(), japaneseMode, this.getResources(), backgroundColor),
 				"text/html", "utf-8", null);
 	}
+
+    public void reload(){
+        wb.reload();
+    }
 	
 	@SuppressWarnings("deprecation")
 	public void resizeImage(int width, int height){

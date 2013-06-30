@@ -47,5 +47,10 @@
 		    </item>
         </menu>
     </item>
+    <item
+        android:id="@+id/menu_refresh"
+        android:orderInCategory="200"
+        android:title="@string/refresh">
+    </item>
 
 </menu>

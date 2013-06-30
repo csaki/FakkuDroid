@@ -37,8 +37,7 @@ import com.fakkudroid.util.Helper;
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
- * 
- * @see SystemUiHider
+ *
  */
 public class GallerySwipeActivity extends SherlockActivity {
 
@@ -48,6 +47,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 	GalleryPagerAdapter adapter;
 	boolean showPageNumber, zoomButtons;
 	int readingMode;
+    String backgroundColor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +91,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 			public void onPageScrollStateChanged(int arg0) {
 			}
 		});
+
 	}
 
 	public void openOptionsMenu(View view) {
@@ -113,6 +114,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 		zoomButtons = prefs.getBoolean("zoom_button_checkbox", false);
 		readingMode = Integer.parseInt(prefs
 				.getString("reading_mode_list", "0"));
+        backgroundColor = prefs.getString("default_color", Constants.DEFAULT_COLOR);
 	}
 
 	private void setReadingMode(int readingMode) {
@@ -218,6 +220,9 @@ public class GallerySwipeActivity extends SherlockActivity {
 			prefs.edit().putString("screen_orientation_list", "2").commit();
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 			return true;
+        case R.id.menu_refresh:
+            adapter.getCurrent().reload();
+            return true;
 		default:
 			return true;
 		}
@@ -283,11 +288,11 @@ public class GallerySwipeActivity extends SherlockActivity {
 					File myFile = new File(dir, lstFiles.get(i));
 					WebViewImageLayout wv = null;
 					if (!myFile.exists())
-						wv = new WebViewImageLayout(strImageFile,
+						wv = new WebViewImageLayout(strImageFile,backgroundColor,
 								GallerySwipeActivity.this);
 					else
 						wv = new WebViewImageLayout("file://"
-								+ myFile.getAbsolutePath(),
+								+ myFile.getAbsolutePath(),backgroundColor,
 								GallerySwipeActivity.this);
 					views.add(wv);
 				}
@@ -297,11 +302,11 @@ public class GallerySwipeActivity extends SherlockActivity {
 					File myFile = new File(dir, lstFiles.get(i));
 					WebViewImageLayout wv = null;
 					if (!myFile.exists())
-						wv = new WebViewImageLayout(strImageFile,
+						wv = new WebViewImageLayout(strImageFile,backgroundColor,
 								GallerySwipeActivity.this);
 					else
 						wv = new WebViewImageLayout("file://"
-								+ myFile.getAbsolutePath(),
+								+ myFile.getAbsolutePath(),backgroundColor,
 								GallerySwipeActivity.this);
 					views.add(wv);
 				}

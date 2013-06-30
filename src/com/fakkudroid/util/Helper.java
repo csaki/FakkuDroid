@@ -284,13 +284,14 @@ public class Helper {
 	}
 
 	public static String createHTMLImage(String url, float width, float height,
-			boolean japaneseMode, Resources res) {
+			boolean japaneseMode, Resources res, String backgroundColor) {
 		url = Helper.escapeURL(url);
 		String html = res.getString(R.string.image_html);
 		html = html.replace("@width", width + "");
 		html = html.replace("@height", height + "");
 		html = html.replace("@japaneseMode", japaneseMode + "");
 		html = html.replace("@url", url);
+        html = html.replace("@color", backgroundColor);
 
 		return html;
 	}

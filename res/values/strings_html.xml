@@ -5,11 +5,10 @@
 	    		<head>
 	    			<script src=\"file:///android_asset/js/jquery.min.js\"></script>
 	    		</head>
-	    		<body style=\"margin: 0 0 0 0;\">
+	    		<body style=\"margin: 0 0 0 0;\" bgcolor=\'#@color\'>
 	    			<script type=\"text/javascript\">
 	    				$(window).load(function() {resizeAll(@width,@height);});
 	    				$(window).bind(\'resize\', resizeWindow);
-	    				
 	    				function resizeWindow(e) {
 	    					if(first){
 	    						if(japaneseMode)
@@ -48,7 +47,7 @@
 	    							
 	    				}	
 	    			</script>
-	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\"/>
+	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\" onerror=\"this.src=\'file:///android_asset/images/no_image_available.png\'\"/>
 	    		</body>
 	    	</html>
 	    ]]>	    
