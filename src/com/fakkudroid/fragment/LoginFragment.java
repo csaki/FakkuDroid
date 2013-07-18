@@ -239,8 +239,7 @@ public class LoginFragment extends SherlockFragment {
             showProgress(false);
 
             if (success) {
-                mMainActivity.createMainMenu();
-                mMainActivity.onBackPressed();
+                mMainActivity.finish();
                 Toast.makeText(getActivity(), getResources().getString(R.string.logged), Toast.LENGTH_SHORT).show();
             } else {
                 mPasswordView

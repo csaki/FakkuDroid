@@ -238,15 +238,22 @@ public class MenuListFragment extends SherlockListFragment {
 			} else if (bean.getDescription().equals("Doujinshi")) {
 				createBrowseDoujin();
 			} else if (position == 0) {
-				mainActivity.loadPageDoujinList(
-						getResources().getString(R.string.app_name),
-						com.fakkudroid.util.Constants.SITEROOT);
+                Intent itMain = new Intent(getActivity(), MainActivity.class);
+                itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN_LIST);
+                getActivity().startActivityForResult(itMain, 1);
 			} else if (bean.getDescription().equals("Downloads")) {
-				mainActivity.loadDownloads();
+                Intent itMain = new Intent(getActivity(), MainActivity.class);
+                itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOWNLOADS);
+                getActivity().startActivityForResult(itMain, 1);
 			} else if (bean.getDescription().equals("My favorites")) {
-				mainActivity.loadFavorites(app.getSettingBean().getUser());
+                Intent itMain = new Intent(getActivity(), MainActivity.class);
+                itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.FAVORITES);
+                itMain.putExtra(MainActivity.INTENT_VAR_USER, app.getSettingBean().getUser());
+                getActivity().startActivityForResult(itMain, 1);
 			} else if (bean.getDescription().startsWith("Sign")) {
-                mainActivity.loadLogin();
+                Intent itMain = new Intent(getActivity(), MainActivity.class);
+                itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.LOGIN);
+                getActivity().startActivityForResult(itMain, 1);
 			} else if (bean.getDescription().equals("Preferences")) {
 				Intent itPreference = new Intent(this.getActivity(),
 						PreferencesActivity.class);
@@ -294,10 +301,16 @@ public class MenuListFragment extends SherlockListFragment {
 				Helper.executeAsyncTask(new DownloadList(), typeView);
 			} else {
 				if (position == lstURL.size() - 1) {
-                    mainActivity.loadDoujin(bean.getUrl());
+                    Intent itMain = new Intent(getActivity(), MainActivity.class);
+                    itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN);
+                    itMain.putExtra(MainActivity.INTENT_VAR_URL, bean.getUrl());
+                    getActivity().startActivityForResult(itMain, 1);
 				} else {
-					mainActivity.loadPageDoujinList(bean.getDescription(),
-							bean.getUrl());
+                    Intent itMain = new Intent(getActivity(), MainActivity.class);
+                    itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN_LIST);
+                    itMain.putExtra(MainActivity.INTENT_VAR_TITLE, bean.getDescription());
+                    itMain.putExtra(MainActivity.INTENT_VAR_URL, bean.getUrl());
+                    getActivity().startActivityForResult(itMain, 1);
 				}
 			}
 		} else if (level == 3) {
@@ -308,8 +321,11 @@ public class MenuListFragment extends SherlockListFragment {
 					createBrowseManga();
 				}
 			} else {
-				mainActivity.loadPageDoujinList(bean.getDescription(),
-						bean.getUrl());
+                Intent itMain = new Intent(getActivity(), MainActivity.class);
+                itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN_LIST);
+                itMain.putExtra(MainActivity.INTENT_VAR_TITLE, bean.getDescription());
+                itMain.putExtra(MainActivity.INTENT_VAR_URL, bean.getUrl());
+                getActivity().startActivityForResult(itMain, 1);
 			}
 		}
 	}

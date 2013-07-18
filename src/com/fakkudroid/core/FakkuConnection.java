@@ -25,6 +25,7 @@ import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.exception.ExceptionNotLoggedIn;
+import com.fakkudroid.json.FakkuContent;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
 import com.google.gson.Gson;
@@ -382,6 +383,30 @@ public class FakkuConnection {
 
 		return result;
 	}
+
+    public static DoujinBean parseJsonDoujin(String url) throws IOException {
+        DoujinBean result = null;
+        FakkuContent fakkuContent = null;
+        String html = Helper.getHTML(url);
+        try{
+            Gson gson = new Gson();
+            fakkuContent = gson.fromJson(html, FakkuContent.class);
+        }catch (Exception e){}
+
+        if(fakkuContent!=null){
+            result = new DoujinBean();
+            result.setUrl(url);
+            result.setQtyPages(fakkuContent.getPages());
+            result.setQtyFavorites(fakkuContent.getFavorites());
+            result.setUrlImageTitle(Constants.SITEROOT + fakkuContent.getCover());
+            result.setUrlImagePage(Constants.SITEROOT + fakkuContent.getSample());
+            result.setTitle(fakkuContent.getName());
+            //Falta add to favorites
+
+        }
+
+        return result;
+    }
 
 	public static void parseHTMLDoujin(DoujinBean bean)
 			throws ClientProtocolException, IOException {

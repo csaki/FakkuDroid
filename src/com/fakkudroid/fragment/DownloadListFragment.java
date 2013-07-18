@@ -143,7 +143,11 @@ public class DownloadListFragment extends SherlockListFragment{
 	}
 
 	public void showDetails(DoujinBean bean) {
-		mMainActivity.loadDoujin(bean.getUrl());
+        Intent itMain = new Intent(mMainActivity, MainActivity.class);
+        itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN);
+        itMain.putExtra(MainActivity.INTENT_VAR_URL, bean.getUrl());
+        itMain.putExtra(MainActivity.INTENT_VAR_TITLE, bean.getTitle());
+        getActivity().startActivityForResult(itMain, 1);
 	}
 
 	public void read(DoujinBean bean) {

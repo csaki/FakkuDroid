@@ -124,7 +124,9 @@ public class DoujinFragment extends SherlockFragment {
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
                                                     int id) {
-                                    mMainActivity.loadLogin();
+                                    Intent itMain = new Intent(mMainActivity, MainActivity.class);
+                                    itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.LOGIN);
+                                    getActivity().startActivityForResult(itMain, 1);
                                 }
                             })
                     .setNegativeButton(android.R.string.cancel,
@@ -213,8 +215,6 @@ public class DoujinFragment extends SherlockFragment {
     }
 
     public void setComponents() {
-        getActivity().setTitle(currentBean.getTitle());
-
         RelativeLayout rl = (RelativeLayout) view.findViewById(
                 R.id.doujinDetail);
         rl.setVisibility(View.VISIBLE);
@@ -288,7 +288,10 @@ public class DoujinFragment extends SherlockFragment {
 
             @Override
             public void onClick(View v) {
-                mMainActivity.loadFavorites(currentBean.getUploader().getDescription());
+                Intent itMain = new Intent(mMainActivity, MainActivity.class);
+                itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.FAVORITES);
+                itMain.putExtra(MainActivity.INTENT_VAR_USER,currentBean.getUploader().getDescription());
+                getActivity().startActivityForResult(itMain, 1);
             }
         });
         tvArtist.setOnClickListener(new URLListener(currentBean
@@ -445,7 +448,9 @@ public class DoujinFragment extends SherlockFragment {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,
                                                         int id) {
-                                        mMainActivity.loadLogin();
+                                        Intent itMain = new Intent(mMainActivity, MainActivity.class);
+                                        itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.LOGIN);
+                                        getActivity().startActivityForResult(itMain, 1);
                                     }
                                 })
                         .setNegativeButton(android.R.string.cancel,
@@ -567,7 +572,11 @@ public class DoujinFragment extends SherlockFragment {
 
         @Override
         public void onClick(View v) {
-            mMainActivity.loadPageDoujinList(urlBean.getDescription(),urlBean.getUrl());
+            Intent itMain = new Intent(mMainActivity, MainActivity.class);
+            itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN_LIST);
+            itMain.putExtra(MainActivity.INTENT_VAR_URL, urlBean.getUrl());
+            itMain.putExtra(MainActivity.INTENT_VAR_TITLE, urlBean.getDescription());
+            getActivity().startActivityForResult(itMain, 1);
         }
     }
 

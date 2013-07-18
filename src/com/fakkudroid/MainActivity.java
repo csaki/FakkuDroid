@@ -55,6 +55,13 @@ public class MainActivity extends SherlockFragmentActivity implements
     public final static String INTENT_VAR_USER = "intentVarUser";
     public final static String INTENT_VAR_CURRENT_CONTENT = "intentVarCurrentContent";
 
+    public static final int DOUJIN_LIST = 1;
+    public static final int DOWNLOADS = 2;
+    public static final int FAVORITES = 3;
+    public static final int DOWNLOADS_QUEUE = 4;
+    public static final int DOUJIN = 5;
+    public static final int LOGIN = 6;
+
     private DrawerLayout mDrawerLayout;
     private MenuListFragment frmMenu;
     private FavoriteFragment frmFavorite;
@@ -64,14 +71,8 @@ public class MainActivity extends SherlockFragmentActivity implements
     private DownloadQueueListFragment frmDownloadQueueListFragment;
     private DoujinFragment frmDoujinFragment;
     private LoginFragment frmLoginFragment;
-    public static final int DOUJIN_LIST = 1;
-    public static final int DOWNLOADS = 2;
-    public static final int FAVORITES = 3;
-    public static final int DOWNLOADS_QUEUE = 4;
-    public static final int DOUJIN = 5;
-    public static final int LOGIN = 6;
-    private static int currentContent = DOUJIN_LIST;
-    private static HistoryArray mHistoryArray = new HistoryArray();
+
+    private int currentContent = DOUJIN_LIST;
     FakkuDroidApplication app;
 
     @SuppressLint("NewApi")
@@ -92,6 +93,13 @@ public class MainActivity extends SherlockFragmentActivity implements
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        frmMenu = new MenuListFragment();
+        frmMenu.setMainActivity(this);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.menu_frame, frmMenu)
+                .commit();
+
         Fragment frmCurrent = null;
 
         int tempCurrentContent = getIntent().getIntExtra(INTENT_VAR_CURRENT_CONTENT, -1);
@@ -99,25 +107,62 @@ public class MainActivity extends SherlockFragmentActivity implements
             currentContent = tempCurrentContent;
 
         if (currentContent == DOUJIN_LIST) {
-            goToDoujinList();
+                frmDoujinList = new DoujinListFragment();
+                frmDoujinList.setMainActivity(this);
+                frmDoujinList.setRelated(false);
+                String url = getIntent().getStringExtra(INTENT_VAR_URL);
+                url = url==null?Constants.SITEROOT:url;
+                frmDoujinList.setUrl(url);
+
+            String title = getIntent().getStringExtra(INTENT_VAR_TITLE);
+            title = title==null?getResources().getString(R.string.app_name):title;
+
+            setTitle(title);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, frmDoujinList).commit();
         } else if (currentContent == DOWNLOADS) {
-            goToDownloads();
+            setTitle(R.string.download);
+                frmDownloadListFragment = new DownloadListFragment();
+                frmDownloadListFragment.setMainActivity(this);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, frmDownloadListFragment).commit();
         } else if (currentContent == FAVORITES) {
-            goToFavorites();
+            String user = getIntent().getStringExtra(INTENT_VAR_USER);
+                frmFavorite = new FavoriteFragment();
+                frmFavorite.setMainActivity(this);
+                frmFavorite.setUser(user);
+            String title = getResources().getString(R.string.favorite);
+            title = title.replace("usr", user);
+            setTitle(title);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, frmFavorite).commit();
         } else if (currentContent == DOWNLOADS_QUEUE) {
-            goToDownloadsQueue();
+            setTitle(R.string.download);
+                frmDownloadQueueListFragment = new DownloadQueueListFragment();
+                frmDownloadQueueListFragment.setMainActivity(this);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
         } else if (currentContent == DOUJIN) {
-            loadDoujin(getIntent().getStringExtra(INTENT_VAR_URL));
+            String url = getIntent().getStringExtra(INTENT_VAR_URL);
+            url = url==null?Constants.SITEROOT:url;
+            DoujinBean bean = new DoujinBean();
+            bean.setUrl(url);
+            app.setCurrent(bean);
+                frmDoujinFragment = new DoujinFragment();
+                frmDoujinFragment.setMainActivity(this);
+            String title = getIntent().getStringExtra(INTENT_VAR_TITLE);
+            title = title==null?getResources().getString(R.string.random):title;
+
+            setTitle(title);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, frmDoujinFragment).commit();
         } else if (currentContent == LOGIN) {
-            goToLogin();
+            setTitle(R.string.title_activity_login);
+                frmLoginFragment = new LoginFragment();
+                frmLoginFragment.setMainActivity(this);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, frmLoginFragment).commit();
         }
-
-        frmMenu = new MenuListFragment();
-        frmMenu.setMainActivity(this);
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.menu_frame, frmMenu)
-                .commit();
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
@@ -181,9 +226,19 @@ public class MainActivity extends SherlockFragmentActivity implements
             return true;
         } else if (item.getItemId() == R.string.go_other_list) {
             if (currentContent == DOWNLOADS_QUEUE) {
-                goToDownloads();
+                if (frmDownloadListFragment == null) {
+                    frmDownloadListFragment = new DownloadListFragment();
+                    frmDownloadListFragment.setMainActivity(this);
+                }
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_frame, frmDownloadListFragment).commit();
             } else if (currentContent == DOWNLOADS) {
-                goToDownloadsQueue();
+                if (frmDownloadQueueListFragment == null) {
+                    frmDownloadQueueListFragment = new DownloadQueueListFragment();
+                    frmDownloadQueueListFragment.setMainActivity(this);
+                }
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
             }
             supportInvalidateOptionsMenu();
         }
@@ -226,7 +281,11 @@ public class MainActivity extends SherlockFragmentActivity implements
                 title = getResources().getString(R.string.app_name);
                 url = Constants.SITEROOT;
             }
-            loadPageDoujinList(title, url);
+            Intent itMain = new Intent(this, MainActivity.class);
+            itMain.putExtra(INTENT_VAR_CURRENT_CONTENT, DOUJIN_LIST);
+            itMain.putExtra(INTENT_VAR_TITLE,title);
+            itMain.putExtra(INTENT_VAR_URL, url);
+            startActivityForResult(itMain, 1);
         }
         InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         im.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
@@ -263,177 +322,11 @@ public class MainActivity extends SherlockFragmentActivity implements
     public void refresh(View view) {
         if (currentContent == DOUJIN_LIST)
             frmDoujinList.refresh(view);
-        else
+        else if (currentContent == FAVORITES)
             frmFavorite.refresh(view);
-    }
-
-    //<editor-fold desc="GO_TO">
-    public void loadFavorites(String user) {
-        mDrawerLayout.closeDrawers();
-        if (frmFavorite == null){
-            frmFavorite = new FavoriteFragment();
-            frmFavorite.setMainActivity(this);
-        }
-        frmFavorite.setUser(user);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmFavorite).commit();
-        if(currentContent==FAVORITES)
-            frmFavorite.refresh(null);
-
-        currentContent = FAVORITES;
-
-        mHistoryArray.addHistory(currentContent, user);
-    }
-
-    private void goToFavorites() {
-        currentContent = FAVORITES;
-        mDrawerLayout.closeDrawers();
-        if (frmFavorite == null){
-            frmFavorite = new FavoriteFragment();
-            frmFavorite.setMainActivity(this);
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmFavorite).commit();
-    }
-
-    private void goToLogin() {
-        currentContent = LOGIN;
-        mDrawerLayout.closeDrawers();
-        setTitle(R.string.title_activity_login);
-        if (frmLoginFragment == null) {
-            frmLoginFragment = new LoginFragment();
-            frmLoginFragment.setMainActivity(this);
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmLoginFragment).commit();
-    }
-
-    public void loadLogin() {
-        currentContent = LOGIN;
-        mDrawerLayout.closeDrawers();
-        setTitle(R.string.title_activity_login);
-        if (frmLoginFragment == null) {
-            frmLoginFragment = new LoginFragment();
-            frmLoginFragment.setMainActivity(this);
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmLoginFragment).commit();
-        mHistoryArray.addHistory(currentContent);
-    }
-
-    private void goToDownloads() {
-        currentContent = DOWNLOADS;
-        mDrawerLayout.closeDrawers();
-        setTitle(R.string.download);
-        if (frmDownloadListFragment == null) {
-            frmDownloadListFragment = new DownloadListFragment();
-            frmDownloadListFragment.setMainActivity(this);
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDownloadListFragment).commit();
-    }
-
-    public void loadDownloads() {
-        currentContent = DOWNLOADS;
-        mDrawerLayout.closeDrawers();
-        setTitle(R.string.download);
-        if (frmDownloadListFragment == null) {
-            frmDownloadListFragment = new DownloadListFragment();
-            frmDownloadListFragment.setMainActivity(this);
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDownloadListFragment).commit();
-        mHistoryArray.addHistory(currentContent);
-    }
-
-    private void goToDownloadsQueue() {
-        currentContent = DOWNLOADS_QUEUE;
-        mDrawerLayout.closeDrawers();
-        setTitle(R.string.download);
-        if (frmDownloadQueueListFragment == null) {
-            frmDownloadQueueListFragment = new DownloadQueueListFragment();
-            frmDownloadQueueListFragment.setMainActivity(this);
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
-    }
-
-    public void loadDownloadsQueue() {
-        currentContent = DOWNLOADS_QUEUE;
-        mDrawerLayout.closeDrawers();
-        setTitle(R.string.download);
-        if (frmDownloadQueueListFragment == null) {
-            frmDownloadQueueListFragment = new DownloadQueueListFragment();
-            frmDownloadQueueListFragment.setMainActivity(this);
-        }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
-        mHistoryArray.addHistory(currentContent);
-    }
-
-    private void goToDoujin() {
-        currentContent = DOUJIN;
-        mDrawerLayout.closeDrawers();
-        if (frmDoujinFragment == null) {
-            frmDoujinFragment = new DoujinFragment();
-            frmDoujinFragment.setMainActivity(this);
-        }
-        getIntent().putExtra(INTENT_VAR_URL, app.getCurrent().getUrl());
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDoujinFragment).commit();
-    }
-
-    public void loadDoujin(String url) {
-
-        DoujinBean bean = new DoujinBean();
-        bean.setUrl(url);
-        app.setCurrent(bean);
-        mDrawerLayout.closeDrawers();
-        if (frmDoujinFragment == null) {
-            frmDoujinFragment = new DoujinFragment();
-            frmDoujinFragment.setMainActivity(this);
-        }
-        getIntent().putExtra(INTENT_VAR_URL, app.getCurrent().getUrl());
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDoujinFragment).commit();
-        if(currentContent==DOUJIN)
+        else if (currentContent == DOUJIN)
             frmDoujinFragment.refresh();
-
-        currentContent = DOUJIN;
-        mHistoryArray.addHistory(currentContent, app.getCurrent().getUrl());
     }
-
-    private void goToDoujinList() {
-        mDrawerLayout.closeDrawers();
-        if (frmDoujinList == null) {
-            frmDoujinList = new DoujinListFragment();
-            frmDoujinList.setMainActivity(this);
-        }
-
-        getIntent().putExtra(INTENT_VAR_URL, app.getCurrent() != null ? app.getCurrent().getUrl() : null);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDoujinList).commit();
-        currentContent = DOUJIN_LIST;
-    }
-
-    public void loadPageDoujinList(String title, String url) {
-        mDrawerLayout.closeDrawers();
-        this.setTitle(title);
-
-        if (frmDoujinList == null) {
-            frmDoujinList = new DoujinListFragment();
-            frmDoujinList.setMainActivity(this);
-        }
-        frmDoujinList.setUrl(url);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_frame, frmDoujinList).commit();
-        if (currentContent == DOUJIN_LIST) {
-            frmDoujinList.loadPage();
-        }
-        currentContent = DOUJIN_LIST;
-        mHistoryArray.addHistory(currentContent, title, url);
-    }
-    //</editor-fold>
 
     private void relatedContent() {
         setTitle(R.string.related_content);
@@ -792,101 +685,10 @@ public class MainActivity extends SherlockFragmentActivity implements
     //</editor-fold>
 
     @Override
-    public void onBackPressed() {
-        HistoryArray.HistoryBean historyBean = mHistoryArray.lastAction();
-        if (historyBean == null)
-            super.onBackPressed();
-        else {
-            switch (historyBean.getCurrentContent()) {
-                case DOUJIN:
-                    if (currentContent == DOUJIN) {
-                        loadDoujin(historyBean.getParams()[0].toString());
-                        mHistoryArray.removeLastAction();
-                    } else
-                        goToDoujin();
-                    break;
-                case DOUJIN_LIST:
-                    if (currentContent == DOUJIN_LIST) {
-                        loadPageDoujinList(historyBean.getParams()[0].toString(), historyBean.getParams()[1].toString());
-                        mHistoryArray.removeLastAction();
-                    } else {
-                        goToDoujinList();
-                    }
-                    break;
-                case DOWNLOADS:
-                    goToDownloads();
-                    break;
-                case DOWNLOADS_QUEUE:
-                    goToDownloadsQueue();
-                    break;
-                case FAVORITES:
-                    if (currentContent != FAVORITES) {
-                        loadFavorites(historyBean.getParams()[0].toString());
-                        mHistoryArray.removeLastAction();
-                    } else
-                        goToFavorites();
-                    break;
-                case LOGIN:
-                    onBackPressed();
-                    break;
-            }
-            mHistoryArray.removeLastAction();
-        }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        frmMenu.createMainMenu();
     }
 
-    static class HistoryArray {
 
-        private List<HistoryBean> list = new ArrayList<HistoryBean>();
-        private final int MAX_HISTORY = 10;
-
-        public HistoryArray() {
-            addHistory(DOUJIN_LIST, "FakkuDroid", Constants.SITEROOT);
-        }
-
-        public HistoryBean lastAction() {
-            HistoryBean result = null;
-
-            if (list != null && list.size() > 1)
-                result = list.get(list.size() - 2);
-
-            return result;
-        }
-
-        public void addHistory(int currentContent, Object... params) {
-            if (list.size() >= MAX_HISTORY)
-                list.remove(0);
-            list.add(new HistoryBean(currentContent, params));
-        }
-
-        public void removeLastAction() {
-            if (list.size() > 0)
-                list.remove(list.size() - 1);
-        }
-
-        class HistoryBean {
-            private int currentContent;
-            private Object[] params;
-
-            HistoryBean(int currentContent, Object... params) {
-                this.currentContent = currentContent;
-                this.params = params;
-            }
-
-            int getCurrentContent() {
-                return currentContent;
-            }
-
-            void setCurrentContent(int currentContent) {
-                this.currentContent = currentContent;
-            }
-
-            Object[] getParams() {
-                return params;
-            }
-
-            void setParams(Object[] params) {
-                this.params = params;
-            }
-        }
-    }
 }

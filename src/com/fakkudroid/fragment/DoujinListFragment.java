@@ -37,14 +37,14 @@ import com.fakkudroid.util.Helper;
 public class DoujinListFragment extends SherlockListFragment {
 
 	FakkuDroidApplication app;
-	static LinkedList<DoujinBean> llDoujin;
+	LinkedList<DoujinBean> llDoujin;
 	DoujinListAdapter da;
-	static String url = Constants.SITEROOT;;
-	static int numPage = 1;
+	String url = Constants.SITEROOT;;
+	int numPage = 1;
 	private View mFormView;
 	private View mStatusView;
 	private View view;
-	static boolean related = false;
+	boolean related = false;
 	private MainActivity mMainActivity;
     private boolean refresh;
 
@@ -125,7 +125,7 @@ public class DoujinListFragment extends SherlockListFragment {
 
 	public void setRelated(boolean related) {
 		numPage = 1;
-		DoujinListFragment.related = related;
+		this.related = related;
 	}
 
 	@SuppressLint("NewApi")
@@ -142,8 +142,8 @@ public class DoujinListFragment extends SherlockListFragment {
 	public void setUrl(String url) {
         refresh = true;
 		related = false;
-		DoujinListFragment.numPage = 1;
-		DoujinListFragment.url = url;
+		numPage = 1;
+		this.url = url;
 	}
 
 	private void setData() {
@@ -156,7 +156,11 @@ public class DoujinListFragment extends SherlockListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		DoujinBean data = llDoujin.get(position);
-        mMainActivity.loadDoujin(data.getUrl());
+        Intent itMain = new Intent(mMainActivity, MainActivity.class);
+        itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN);
+        itMain.putExtra(MainActivity.INTENT_VAR_URL, data.getUrl());
+        itMain.putExtra(MainActivity.INTENT_VAR_TITLE, data.getTitle());
+        getActivity().startActivityForResult(itMain, 1);
 	}
 
 	/**

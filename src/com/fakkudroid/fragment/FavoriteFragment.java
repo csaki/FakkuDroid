@@ -45,12 +45,12 @@ public class FavoriteFragment extends SherlockFragment implements
 	public final static String INTENT_VAR_USER = "intentVarUser";
 
 	FakkuDroidApplication app;
-	static LinkedList<DoujinBean> llDoujin;
+    private LinkedList<DoujinBean> llDoujin;
 	FavoriteListAdapter da;
 	GridView gvFavorites;
-	static String user;
-	static String title;
-	static int nroPage = 1;
+    private String user;
+    private String title;
+    private int nroPage = 1;
 	private View mFormView;
 	private View mStatusView;
 	private View view;
@@ -92,7 +92,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	public void setUser(String user){
         refresh = true;
         nroPage = 1;
-		FavoriteFragment.user = user;
+		this.user = user;
 	}
 	
 	@Override
@@ -112,8 +112,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	private void loadPage() {
 		title = getResources().getString(R.string.favorite);
 		title = title.replace("usr", user);
-		
-		getActivity().setTitle(app.getTitle(nroPage, title));
+
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
 		tvPage.setText("Page " + nroPage);
 		Helper.executeAsyncTask(new DownloadCatalog(),app.getUrlFavorite(nroPage, user));
@@ -257,7 +256,11 @@ public class FavoriteFragment extends SherlockFragment implements
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 		DoujinBean data = llDoujin.get(arg2);
 		app.setCurrent(data);
-        mMainActivity.loadDoujin(data.getUrl());
+        Intent itMain = new Intent(mMainActivity, MainActivity.class);
+        itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN);
+        itMain.putExtra(MainActivity.INTENT_VAR_URL, data.getUrl());
+        itMain.putExtra(MainActivity.INTENT_VAR_TITLE, data.getTitle());
+        getActivity().startActivityForResult(itMain, 1);
 	}
 
 }
