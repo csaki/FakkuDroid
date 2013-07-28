@@ -1,5 +1,9 @@
 package com.fakkudroid.json;
 
+import com.fakkudroid.bean.URLBean;
+import com.fakkudroid.util.Constants;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,12 +36,69 @@ public class FakkuContent {
     private ArrayLink tags;
     private ArrayLink translators;
 
-    class ArrayLink{
+    public class ArrayLink{
 
         private List<String> names;
         private List<String> links;
         private List<String> ids;
 
+        public List<String> getNames() {
+            return names;
+        }
+
+        public void setNames(List<String> names) {
+            this.names = names;
+        }
+
+        public List<String> getLinks() {
+            return links;
+        }
+
+        public void setLinks(List<String> links) {
+            this.links = links;
+        }
+
+        public List<String> getIds() {
+            return ids;
+        }
+
+        public void setIds(List<String> ids) {
+            this.ids = ids;
+        }
+
+        public List<URLBean> parseListURLBean(){
+            List<URLBean> result = new ArrayList<URLBean>();
+            if(ids!=null&&!ids.isEmpty()){
+                for (int i = 0; i<ids.size(); i++){
+                    URLBean urlBean = new URLBean();
+                    urlBean.setDescription(names.get(i));
+                    urlBean.setUrl(Constants.SITEROOT + extractUrl(links.get(i)));
+                    result.add(urlBean);
+                }
+            }
+            return result;
+        }
+
+        public URLBean parseURLBean(){
+            URLBean urlBean = new URLBean();
+            if(ids!=null&&!ids.isEmpty()){
+                urlBean.setDescription(names.get(0));
+                urlBean.setUrl(Constants.SITEROOT + extractUrl(links.get(0)));
+            }
+            return urlBean;
+        }
+
+        private String extractUrl(String link){
+            String result = null;
+            if(link!=null){
+                int idx = link.indexOf("\"") + 1;
+                int idxEnd = link.indexOf("\"", idx);
+                result = link.substring(idx, idxEnd);
+            }else{
+                result = "";
+            }
+            return  result;
+        }
     }
 
     public long getContent_id() {
@@ -230,5 +291,26 @@ public class FakkuContent {
 
     public void setTranslators(ArrayLink translators) {
         this.translators = translators;
+    }
+
+    public URLBean parseLanguage(){
+        URLBean result = new URLBean();
+        result.setDescription(getLanguage());
+        if(getUrl().startsWith(Constants.SITEMANGA))
+            result.setUrl(Constants.SITEMANGA + "/" + getLanguage());
+        else
+            result.setUrl(Constants.SITEDOUJINSHI + "/" +getLanguage());
+
+        return result;
+    }
+
+    public URLBean parseUploader(){
+        URLBean result = new URLBean();
+        result.setDescription(getUser_displayname());
+        return result;
+    }
+
+    public String imageServer(){
+        return Constants.IMAGESERVER + getDirectory() + "images/";
     }
 }

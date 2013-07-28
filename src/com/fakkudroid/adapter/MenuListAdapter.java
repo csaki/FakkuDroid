@@ -43,7 +43,9 @@ public class MenuListAdapter extends ArrayAdapter<URLBean> {
 		if(s.getIcon()==-1){
 			holder.iv.setVisibility(View.GONE);
 		}
-		holder.iv.setImageResource(s.getIcon());
+        if(s.getIcon()!=-2&&s.getIcon()!=-1){
+            holder.iv.setImageResource(s.getIcon());
+        }
 		if(main){
 			if(s.getIcon()==-1){
 				holder.tvMenu.setTextAppearance(getContext(), android.R.style.TextAppearance_Small);

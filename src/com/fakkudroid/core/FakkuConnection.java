@@ -3,6 +3,7 @@ package com.fakkudroid.core;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -384,9 +385,9 @@ public class FakkuConnection {
 		return result;
 	}
 
-    public static DoujinBean parseJsonDoujin(String url) throws IOException {
-        DoujinBean result = null;
+    public static DoujinBean parseJsonDoujin(DoujinBean result) throws IOException {
         FakkuContent fakkuContent = null;
+        String url = result.getUrl();
         String html = Helper.getHTML(url);
         try{
             Gson gson = new Gson();
@@ -394,15 +395,25 @@ public class FakkuConnection {
         }catch (Exception e){}
 
         if(fakkuContent!=null){
-            result = new DoujinBean();
             result.setUrl(url);
             result.setQtyPages(fakkuContent.getPages());
             result.setQtyFavorites(fakkuContent.getFavorites());
             result.setUrlImageTitle(Constants.SITEROOT + fakkuContent.getCover());
             result.setUrlImagePage(Constants.SITEROOT + fakkuContent.getSample());
             result.setTitle(fakkuContent.getName());
-            //Falta add to favorites
-
+            result.setDescription(fakkuContent.getDescription());
+            if(cookiesStore!=null){
+                String htmlComplete = Helper.getHTML(url, cookiesStore);
+                result.setAddedInFavorite(!html.contains("Add To Favorites"));
+            }
+            result.setDate(Helper.formatterDate(new Date(fakkuContent.getDate())));
+            result.setSerie(fakkuContent.getSeries().parseURLBean());
+            result.setArtist(fakkuContent.getArtists().parseURLBean());
+            result.setTranslator(fakkuContent.getTranslators().parseURLBean());
+            result.setLstTags(fakkuContent.getTags().parseListURLBean());
+            result.setUploader(fakkuContent.parseUploader());
+            result.setLanguage(fakkuContent.parseLanguage());
+            result.setImageServer(fakkuContent.imageServer());
         }
 
         return result;
@@ -416,7 +427,6 @@ public class FakkuConnection {
 
 		bean.setAddedInFavorite(!html.contains("Add To Favorites"));
 
-		html = Helper.getHTML(url);
 		// Qty Pages
 		String token = "</b> pages";
 		int idxStart = html.indexOf(token);
@@ -538,13 +548,13 @@ public class FakkuConnection {
 		s = html.substring(idxStart, idxEnd);
 		bean.setUploader(parseURLBean(s.trim()));
 
-		// fecha
+		// date
 		token = "<b>";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		token = "</b>";
 		idxEnd = html.indexOf(token, idxStart);
 		s = html.substring(idxStart, idxEnd);
-		bean.setFecha(s);
+		bean.setDate(s);
 
 		// tags
 		token = "Tags:";

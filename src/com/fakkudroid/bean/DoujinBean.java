@@ -24,7 +24,7 @@ public class DoujinBean {
 	private URLBean language;
 	private URLBean translator;
 	private URLBean uploader;
-	private String fecha;
+	private String date;
 	private List<URLBean> lstTags;
 	private boolean addedInFavorite, completed;
 	private String timeAgo;
@@ -215,12 +215,12 @@ public class DoujinBean {
 		this.uploader = uploader;
 	}
 
-	public String getFecha() {
-		return fecha;
+	public String getDate() {
+		return date;
 	}
 
-	public void setFecha(String fecha) {
-		this.fecha = fecha;
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 	public List<URLBean> getLstTags() {
@@ -291,7 +291,7 @@ public class DoujinBean {
 				+ urlImagePage + ", urlImageTitle=" + urlImageTitle + ", url="
 				+ url + ", qtyPages=" + qtyPages + ", qtyFavorites="
 				+ qtyFavorites + ", language=" + language + ", translator="
-				+ translator + ", uploader=" + uploader + ", fecha=" + fecha
+				+ translator + ", uploader=" + uploader + ", date=" + date
 				+ ", lstTags=" + lstTags + "]";
 	}
 

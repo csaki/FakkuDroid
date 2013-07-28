@@ -247,7 +247,7 @@ public class DoujinFragment extends SherlockFragment {
         s = getResources().getString(R.string.content_uploader);
 
         s = s.replace("rpc1", currentBean.getUploader().getDescription());
-        s = s.replace("rpc2", currentBean.getFecha());
+        s = s.replace("rpc2", currentBean.getDate());
 
         SpannableString content = new SpannableString(s);
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
@@ -484,7 +484,12 @@ public class DoujinFragment extends SherlockFragment {
             DoujinBean bean = beans[0];
 
             try {
-                FakkuConnection.parseHTMLDoujin(bean);
+                if(bean.getUrl().toLowerCase().endsWith("random"))
+                    FakkuConnection.parseHTMLDoujin(bean);
+                else{
+                    bean.setUrl(bean.getUrl().replace(Constants.SITEROOT, Constants.SITEAPI));
+                    FakkuConnection.parseJsonDoujin(bean);
+                }
                 File dir = Helper.getCacheDir(getActivity());
 
                 File myFile = new File(dir, bean.getFileImageTitle());

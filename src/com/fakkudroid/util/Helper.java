@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -439,4 +441,9 @@ public class Helper {
 					Toast.LENGTH_SHORT).show();
 		}
 	}
+
+    public static String formatterDate(Date date){
+        SimpleDateFormat formatter = new SimpleDateFormat("MMMMM dd, yyyy");
+        return formatter.format(date);
+    }
 }

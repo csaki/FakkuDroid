@@ -6,13 +6,13 @@ public class Constants {
 	public static String SITEREMOVEFAVORITE = "http://www.fakku.net/favorite/@id/remove/";
 	public static String SITERELATED = "http://www.fakku.net/get/related/";
 	public static String SITELOGIN = "http://www.fakku.net/login/submit";
-	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html"; 
-	public static String SITEABOUT = "http://fakkudroid.blogspot.com/2013/01/about-fakkudroid.html"; 
-	public static String SITEROOT = "http://www.fakku.net"; 
-	public static String SITEIMAGEROOT = "http://www.fakku.net"; 
-	public static String SITEIMAGE = "http://c.fakku.net";
-	public static String SITECOMMENTS = "http://www.fakku.net/comments/@id/@page";
+	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html";
+	public static String SITEROOT = "http://www.fakku.net";
+    public static String SITEAPI = "http://www.fakku.net/api";
+
+    public static String SITECOMMENTS = "http://www.fakku.net/comments/@id/@page";
 	public static String SITEFAVORITE = "http://www.fakku.net/users/@user/favorites/page/@numpage";
+    public static String IMAGESERVER = "http://cdn.fakku.net/8041E1/c/manga";
 	public static String PAGE = "/page/";
 	public static String UPDATE_SERVICE = "http://fakkudroid.herokuapp.com/versions/max.json";
 
