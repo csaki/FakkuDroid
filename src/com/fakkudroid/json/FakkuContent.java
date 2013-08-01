@@ -16,7 +16,7 @@ public class FakkuContent {
     private String name;
     private String clean_name;
     private String description;
-    private long filesize;
+    private double filesize;
     private int pages;
     private long date;
     private int favorites;
@@ -84,6 +84,9 @@ public class FakkuContent {
             if(ids!=null&&!ids.isEmpty()){
                 urlBean.setDescription(names.get(0));
                 urlBean.setUrl(Constants.SITEROOT + extractUrl(links.get(0)));
+            }else{
+                urlBean.setDescription("");
+                urlBean.setUrl("");
             }
             return urlBean;
         }
@@ -141,11 +144,11 @@ public class FakkuContent {
         this.description = description;
     }
 
-    public long getFilesize() {
+    public double getFilesize() {
         return filesize;
     }
 
-    public void setFilesize(long filesize) {
+    public void setFilesize(double filesize) {
         this.filesize = filesize;
     }
 
@@ -262,6 +265,8 @@ public class FakkuContent {
     }
 
     public ArrayLink getArtists() {
+        if(artists==null)
+            artists = new ArrayLink();
         return artists;
     }
 
@@ -270,6 +275,8 @@ public class FakkuContent {
     }
 
     public ArrayLink getSeries() {
+        if(series==null)
+            series = new ArrayLink();
         return series;
     }
 
@@ -278,6 +285,8 @@ public class FakkuContent {
     }
 
     public ArrayLink getTags() {
+        if(tags==null)
+            tags = new ArrayLink();
         return tags;
     }
 
@@ -286,6 +295,8 @@ public class FakkuContent {
     }
 
     public ArrayLink getTranslators() {
+        if(translators==null)
+            translators = new ArrayLink();
         return translators;
     }
 

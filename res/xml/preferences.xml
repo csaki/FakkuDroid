@@ -36,6 +36,10 @@
                     android:summary="@string/pref_description_download_folder"
                     android:title="@string/pref_title_download_folder"/>
 
+        <Preference android:key="delete_covers"
+                    android:summary="@string/pref_description_delete_covers"
+                    android:title="@string/pref_title_delete_covers"/>
+
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_header_gallery" >
         <ListPreference

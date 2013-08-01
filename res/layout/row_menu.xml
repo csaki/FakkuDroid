@@ -8,8 +8,7 @@
         android:id="@+id/iv"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/av_play"/>
+        android:layout_alignParentTop="true"/>
     
     <TextView
         android:id="@+id/tvMenu"
@@ -17,9 +16,10 @@
         android:layout_height="match_parent"
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@android:color/white"
         android:layout_toRightOf="@id/iv"
         android:paddingLeft="10dp"
-        android:gravity="center_vertical"/>
+        android:gravity="center_vertical"
+        style="bold"/>
 	
 </RelativeLayout>

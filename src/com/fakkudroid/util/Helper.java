@@ -70,12 +70,22 @@ public class Helper {
 					file = null;
 			}
 		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.CACHE_DIRECTORY);
+        if (file == null)
+            try {
+                file = new File(Environment.getRootDirectory()
+                        + Constants.CACHE_DIRECTORY);
+            }catch (Exception e){
+                file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
+                file = new File(file, Constants.CACHE_DIRECTORY);
+            }
 
 		if (!file.exists()) {
-			file.mkdirs();
+			if(!file.mkdirs()){
+                file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
+                file = new File(file, Constants.CACHE_DIRECTORY);
+                if (!file.exists())
+                    file.mkdirs();
+            }
 		}
 		return file;
 	}
@@ -99,13 +109,24 @@ public class Helper {
 					file = null;
 			}
 		}
-		if (file == null)
-			file = new File(Environment.getRootDirectory()
-					+ Constants.LOCAL_DIRECTORY + "/" + dir);
+        if (file == null)
+            try {
+                file = new File(Environment.getRootDirectory()
+                        + Constants.LOCAL_DIRECTORY + "/" + dir);
+            }catch (Exception e){
+                file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
+                file = new File(file, Constants.LOCAL_DIRECTORY);
+            }
 
-		if (!file.exists()) {
-			file.mkdirs();
-		}
+        if (!file.exists()) {
+            if(!file.mkdirs()){
+                file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
+                file = new File(file, Constants.LOCAL_DIRECTORY);
+                if (!file.exists()) {
+                    file.mkdirs();
+                }
+            }
+        }
 		return file;
 	}
 

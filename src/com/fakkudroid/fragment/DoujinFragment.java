@@ -58,7 +58,7 @@ public class DoujinFragment extends SherlockFragment {
     private View mFormView;
     private View mStatusView;
     private View view;
-    private static DoujinBean currentBean;
+    private DoujinBean currentBean;
     boolean alreadyDownloaded = false;
     private ProgressBar progressBar;
 
@@ -70,7 +70,10 @@ public class DoujinFragment extends SherlockFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = (FakkuDroidApplication) getActivity().getApplication();
-        currentBean = app.getCurrent();
+        if(currentBean==null){
+            currentBean = new DoujinBean();
+            currentBean.setUrl(getActivity().getIntent().getStringExtra(MainActivity.INTENT_VAR_URL));
+        }
     }
 
     @Override
@@ -155,11 +158,13 @@ public class DoujinFragment extends SherlockFragment {
             Helper.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
         } else {
             Intent it = new Intent(getActivity(), GallerySwipeActivity.class);
+            app.setCurrent(currentBean);
             this.startActivity(it);
         }
     }
 
     public void download(View view) {
+        app.setCurrent(currentBean);
         if (!alreadyDownloaded) {
             if (DownloadManagerService.started) {
                 if (!DownloadManagerService.DoujinMap.exists(app.getCurrent())) {
@@ -487,7 +492,8 @@ public class DoujinFragment extends SherlockFragment {
                 if(bean.getUrl().toLowerCase().endsWith("random"))
                     FakkuConnection.parseHTMLDoujin(bean);
                 else{
-                    bean.setUrl(bean.getUrl().replace(Constants.SITEROOT, Constants.SITEAPI));
+                    if(!bean.getUrl().contains(Constants.SITEAPI))
+                        bean.setUrl(bean.getUrl().replace(Constants.SITEROOT, Constants.SITEAPI));
                     FakkuConnection.parseJsonDoujin(bean);
                 }
                 File dir = Helper.getCacheDir(getActivity());

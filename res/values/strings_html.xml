@@ -65,7 +65,7 @@
         <![CDATA[
 	    	<html>
 	    		<body style=\"margin: 0 0 0 0;\">
-	    			<img src =\"file:///android_asset/images/load_animation.gif\" style=\"padding:0px;display: block;   margin-left: auto;   margin-right: auto;\"/>
+	    			<img src =\"file:///android_asset/images/loading.gif\" style=\"padding:0px;display: block;   margin-left: auto;   margin-right: auto;\"/>
 	    		</body>
 	    	</html>
 	    ]]>
@@ -76,12 +76,13 @@
 			<HTML>
 			<BODY>
 					<h2 style=\"text-align: center; color: #9D0A0A;\">Support FakkuDroid!</h2>
-					<div style=\"text-align: center; margin-top: 20px;\">You will only see this message once. Please take some time to read it.</div>
 					<div style=\"text-align: center; margin-top: 20px;\">Taking any of the following steps will help the development of Fakkudroid!</div>
 					<ol>
-					    <li>You can support the app by <strong>donating $1 or more</strong>. You can find the donation link over at <a href=\"http://fakkudroid.blogspot.com/\">the blog</a>.</li>
 					    <li>Please <strong>click the ads</strong> over at <a href=\"http://fakkudroid.blogspot.com/\">the project\'s blog</a> to support the author, so he can continue improving the app!
-					    <br /><strong>May, 2013: 166 ad clicks, 2536 downloads.</strong> Please, click some more ads!</li>
+					    <br /><strong>Jul, 2013: 166 ad clicks, FakkuDroid v2.4: 3394 downloads.</strong>
+					    <br /><strong>1 Click = $0.13.</strong>
+					    <br /><img src=\"file:///android_asset/images/ads.png\" style=\"width:100%\"/></li>
+					    <li>You can support the app by <strong>donating $1 or more</strong>. You can find the donation link over at <a href=\"http://fakkudroid.blogspot.com/\">the blog</a>.</li>
 					    <li>If you\'re experiencing problems, have found a bug, wish to give feedback or just want to say thanks, you\'re welcome to post a comment at <a href=\"http://fakkudroid.blogspot.com/\">the blog</a>.</li>
 					</ol>
 					<div style=\"text-align: center; margin-top: 20px;\">Thanks for supporting Fakkudroid!</div>

@@ -51,7 +51,6 @@ public class LoginFragment extends SherlockFragment {
     private View mLoginFormView;
     private View mLoginStatusView;
     private View view;
-    private TextView mLoginStatusMessageView;
     private MainActivity mMainActivity;
 
     public void setMainActivity(MainActivity mainActivity) {
@@ -96,7 +95,6 @@ public class LoginFragment extends SherlockFragment {
                         return false;
                     }
                 });
-        mLoginStatusMessageView = (TextView) view.findViewById(R.id.login_status_message);
 
         view.findViewById(R.id.sign_in_button).setOnClickListener(
                 new View.OnClickListener() {
@@ -155,7 +153,6 @@ public class LoginFragment extends SherlockFragment {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            mLoginStatusMessageView.setText(R.string.login_progress_signing_in);
             showProgress(true);
             Helper.executeAsyncTask(new UserLoginTask(), (Void)null);
         }

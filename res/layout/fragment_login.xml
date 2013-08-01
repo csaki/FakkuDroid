@@ -3,6 +3,22 @@
                 android:layout_height="match_parent" >
 
     <!-- Login progress -->
+    <RelativeLayout
+            android:id="@+id/login_status"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone"
+            android:background="@android:color/white">
+
+        <view
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                class="com.fakkudroid.component.GifWebView"
+                android:gravity="center"
+                />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/login_status"

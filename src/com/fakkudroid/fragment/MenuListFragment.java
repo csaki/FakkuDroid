@@ -9,6 +9,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -17,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -79,7 +81,13 @@ public class MenuListFragment extends SherlockListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		view = inflater.inflate(R.layout.fragment_menu, container, false);
+        // create ContextThemeWrapper from the original Activity Context with the custom theme
+        final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), com.actionbarsherlock.R.style.Sherlock___Theme);
+
+        // clone the inflater using the ContextThemeWrapper
+        LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
+
+		view = localInflater.inflate(R.layout.fragment_menu, container, false);
 		mFormView = findViewById(R.id.view_form);
 		mStatusView = findViewById(R.id.view_status);
 		ll = findViewById(R.id.ll);
@@ -148,10 +156,10 @@ public class MenuListFragment extends SherlockListFragment {
 		String[] lstMainMenu = getActivity().getResources().getStringArray(
 				R.array.main_menu);
 		int[] lstIcons = new int[] { R.drawable.home,
-				R.drawable.navigation_forward, R.drawable.rating_important,
-				R.drawable.navigation_back, -1, -2, -2,
-				R.drawable.device_access_sd_storage, R.drawable.av_upload,
-				R.drawable.action_settings };
+				R.drawable.navigation_forward_inverse, R.drawable.rating_important_inverse,
+				R.drawable.navigation_back_inverse, -1, -2, -2,
+				R.drawable.device_access_sd_storage_inverse, R.drawable.av_upload_inverse,
+				R.drawable.action_settings_inverse };
 		lstURL = new LinkedList<URLBean>();
 
 		for (int i = 0; i < lstMainMenu.length; i++) {
@@ -183,7 +191,7 @@ public class MenuListFragment extends SherlockListFragment {
 			URLBean bean = new URLBean(lstURLBrowseManga[i], lstBrowseManga[i]);
 			lstURL.add(bean);
 		}
-		lstURL.get(0).setIcon(R.drawable.content_undo);
+		lstURL.get(0).setIcon(R.drawable.content_undo_inverse);
 		this.setListAdapter(new MenuListAdapter(this.getActivity(),
 				R.layout.row_menu, 0, lstURL, false));
 	}
@@ -203,7 +211,7 @@ public class MenuListFragment extends SherlockListFragment {
 					lstBrowseDoujin[i]);
 			lstURL.add(bean);
 		}
-		lstURL.get(0).setIcon(R.drawable.content_undo);
+		lstURL.get(0).setIcon(R.drawable.content_undo_inverse);
 		this.setListAdapter(new MenuListAdapter(this.getActivity(),
 				R.layout.row_menu, 0, lstURL, false));
 	}
@@ -375,7 +383,7 @@ public class MenuListFragment extends SherlockListFragment {
 		URLBean bean = new URLBean();
 		bean.setDescription(getResources().getString(R.string.back));
 		bean.setUrl(null);
-		bean.setIcon(R.drawable.content_undo);
+		bean.setIcon(R.drawable.content_undo_inverse);
 		lstURL.add(0, bean);
 		this.setListAdapter(new MenuListAdapter(getActivity(),
 				R.layout.row_menu, 0, lstURL, false));

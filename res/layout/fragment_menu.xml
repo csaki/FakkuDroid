@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white" >    
+    android:background="@android:color/background_dark">
     
     <RelativeLayout
         android:id="@+id/view_form"
@@ -27,7 +27,7 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/previous_page"
                 android:scaleType="fitXY"
-                android:src="@drawable/navigation_previous_item" />
+                android:src="@drawable/navigation_previous_item_inverse" />
 
             <TextView
                 android:id="@+id/tvPage"
@@ -47,7 +47,7 @@
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/next_page"
                 android:scaleType="fitXY"
-                android:src="@drawable/navigation_next_item" />
+                android:src="@drawable/navigation_next_item_inverse" />
         </LinearLayout>
 
         <ListView

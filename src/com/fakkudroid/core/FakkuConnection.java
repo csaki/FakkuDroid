@@ -272,7 +272,8 @@ public class FakkuConnection {
 			bean.setUrlImageTitle(s);
 
 			// Look for the next image tag
-			idxStart = section.indexOf("<img", idxStart) + token.length();
+            token = "<img class=\"sample\"";
+			idxStart = section.indexOf(token, idxStart) + token.length();
 			token = "src=\"";
 			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
@@ -389,10 +390,9 @@ public class FakkuConnection {
         FakkuContent fakkuContent = null;
         String url = result.getUrl();
         String html = Helper.getHTML(url);
-        try{
-            Gson gson = new Gson();
-            fakkuContent = gson.fromJson(html, FakkuContent.class);
-        }catch (Exception e){}
+
+        Gson gson = new Gson();
+        fakkuContent = gson.fromJson(html, FakkuContent.class);
 
         if(fakkuContent!=null){
             result.setUrl(url);

@@ -50,12 +50,18 @@ public class PasswordActivity extends Activity {
 					file = null;
 			}
 		}
-		if(file == null)
-			file = new File(Environment.getRootDirectory() + Constants.DIRECTORY);
-		
-		if(!file.exists()){
-			file.mkdirs();
-		}
+        if(file == null)
+            file = new File(Environment.getRootDirectory() + Constants.DIRECTORY);
+
+        if(!file.exists()){
+            if(!file.mkdirs()){
+                file = getDir("", MODE_WORLD_WRITEABLE);
+                file = new File(file, Constants.DIRECTORY);
+                if(!file.exists()){
+                    file.mkdirs();
+                }
+            }
+        }
 		
 		File nomedia = new File(file, ".nomedia");
 		try {

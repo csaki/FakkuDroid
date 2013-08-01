@@ -143,13 +143,8 @@ public class MainActivity extends SherlockFragmentActivity implements
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
         } else if (currentContent == DOUJIN) {
-            String url = getIntent().getStringExtra(INTENT_VAR_URL);
-            url = url==null?Constants.SITEROOT:url;
-            DoujinBean bean = new DoujinBean();
-            bean.setUrl(url);
-            app.setCurrent(bean);
-                frmDoujinFragment = new DoujinFragment();
-                frmDoujinFragment.setMainActivity(this);
+            frmDoujinFragment = new DoujinFragment();
+            frmDoujinFragment.setMainActivity(this);
             String title = getIntent().getStringExtra(INTENT_VAR_TITLE);
             title = title==null?getResources().getString(R.string.random):title;
 
