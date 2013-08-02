@@ -5,5 +5,6 @@
     <color name="black_overlay">#66000000</color>
     <color name="url_color">#0099cc</color>
     <color name="rank_color">#088A08</color>
-
+    <color name="side_bar_background">#303030</color>
+    <color name="side_bar_lines">#292929</color>
 </resources>

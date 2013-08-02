@@ -203,14 +203,18 @@ public class DoujinListFragment extends SherlockListFragment {
 		}
 	}
 
-	class DownloadCatalog extends AsyncTask<String, Float, Integer> {
+	class DownloadCatalog extends AsyncTask<String, String, Integer> {
+
+        private TextView tvLoadingID;
 
 		protected void onPreExecute() {
+            tvLoadingID = (TextView)view.findViewById(R.id.tvLoadingID);
 			showProgress(true);
 		}
 
 		protected Integer doInBackground(String... urls) {
 
+            publishProgress(getResources().getString(R.string.downloading_data));
 			try {
 				Log.i(DownloadCatalog.class.toString(), "URL Catalog: "
 						+ urls[0]);
@@ -226,8 +230,11 @@ public class DoujinListFragment extends SherlockListFragment {
 				llDoujin = new LinkedList<DoujinBean>();
 			if (related)
 				llDoujin.add(0, app.getCurrent());
-			for (DoujinBean bean : llDoujin) {
-				if(DoujinListFragment.this.getActivity()!=null){
+            publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","0").replace("@t", "" + llDoujin.size()));
+			for (int i = 0; i<llDoujin.size(); i++) {
+                DoujinBean bean = llDoujin.get(i);
+
+                if(DoujinListFragment.this.getActivity()!=null){
 					try {
 						File dir = Helper.getCacheDir(getActivity());
 
@@ -242,9 +249,16 @@ public class DoujinListFragment extends SherlockListFragment {
 						Helper.logError(this, e.getMessage(), e);
 					}
 				}
+                publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + i).replace("@t", "" + llDoujin.size()));
 			}
 			return llDoujin.size();
 		}
+
+        @Override
+        protected void onProgressUpdate(String... progress) {
+            String msg = progress[0];
+            tvLoadingID.setText(msg);
+        }
 
 		protected void onPostExecute(Integer size) {
 			if(DoujinListFragment.this.getActivity()!=null){

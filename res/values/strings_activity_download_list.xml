@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="search_by">Search by Title, Artist and Series</string>
+    <string name="downloading_data">Downloading data list</string>
+    <string name="downloading_image_cover">Downloading Images Cover (@i/@t)</string>
 </resources>

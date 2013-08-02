@@ -40,6 +40,9 @@
                     android:summary="@string/pref_description_delete_covers"
                     android:title="@string/pref_title_delete_covers"/>
 
+        <Preference android:key="scan_folder"
+                    android:title="@string/pref_title_scan_folder"/>
+
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_header_gallery" >
         <ListPreference

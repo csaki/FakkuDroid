@@ -19,6 +19,7 @@
     <string name="pref_description_check_updates">Check if there are new versions of FakkuDroid.</string>
     <string name="pref_title_delete_covers">Delete covers images cache</string>
     <string name="pref_description_delete_covers">Delete covers images cache to download again.</string>
+    <string name="pref_title_scan_folder">Scan Folder</string>
 
     <string name="covers_images_cache_deleted">Covers images cache deleted.</string>
 	

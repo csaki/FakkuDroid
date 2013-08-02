@@ -83,19 +83,30 @@
         </GridView>
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
             android:id="@+id/view_status"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:orientation="vertical"
             android:background="@android:color/white">
 
         <view
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 class="com.fakkudroid.component.GifWebView"
-                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
                 />
 
-    </RelativeLayout>
+        <TextView
+                android:id="@+id/tvLoadingID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/loading"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    </LinearLayout>
 </RelativeLayout>

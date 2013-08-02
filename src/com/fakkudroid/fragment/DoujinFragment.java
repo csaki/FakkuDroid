@@ -489,13 +489,13 @@ public class DoujinFragment extends SherlockFragment {
             DoujinBean bean = beans[0];
 
             try {
-                if(bean.getUrl().toLowerCase().endsWith("random"))
+                //if(bean.getUrl().toLowerCase().endsWith("random"))
                     FakkuConnection.parseHTMLDoujin(bean);
-                else{
+               /* else{
                     if(!bean.getUrl().contains(Constants.SITEAPI))
                         bean.setUrl(bean.getUrl().replace(Constants.SITEROOT, Constants.SITEAPI));
                     FakkuConnection.parseJsonDoujin(bean);
-                }
+                }*/
                 File dir = Helper.getCacheDir(getActivity());
 
                 File myFile = new File(dir, bean.getFileImageTitle());

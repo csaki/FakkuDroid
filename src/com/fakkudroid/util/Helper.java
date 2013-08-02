@@ -4,7 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -170,6 +172,31 @@ public class Helper {
 			writer.close();
 		}
 	}
+
+    public static DoujinBean readJsonDoujin(File f) throws IOException {
+        BufferedReader br = null;
+        DoujinBean doujinBean = null;
+        String json = "";
+        try {
+
+            String sCurrentLine;
+            br = new BufferedReader(new FileReader(f));
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                json+=sCurrentLine;
+            }
+
+        } finally {
+            try {
+                if (br != null)br.close();
+            } catch (IOException ex) {}
+        }
+
+        Gson gson = new Gson();
+        doujinBean = gson.fromJson(json, DoujinBean.class);
+
+        return doujinBean;
+    }
 
 	public static int calculateInSampleSize(BitmapFactory.Options options,
 			int reqWidth, int reqHeight) {

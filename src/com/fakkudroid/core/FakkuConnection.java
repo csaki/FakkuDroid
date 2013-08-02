@@ -481,7 +481,7 @@ public class FakkuConnection {
 
 		bean.setUrlImageTitle(Constants.SITEROOT + s);
 
-		token = "<img ";
+		token = "<img class=\"sample\"";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		token = "src=\"";
 		idxStart = html.indexOf(token, idxStart) + token.length();

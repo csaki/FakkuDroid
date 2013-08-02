@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_dark">
+    android:background="@color/side_bar_background">
     
     <RelativeLayout
         android:id="@+id/view_form"
@@ -56,7 +56,10 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/ll"
             android:layout_margin="5dp"
-            android:scrollbars="horizontal" >
+            android:scrollbars="horizontal"
+            android:divider="@color/side_bar_lines"
+            android:dividerHeight="1dp"
+            android:background="@color/side_bar_background">
         </ListView>
 
         <TextView
