@@ -36,7 +36,8 @@ public class PasswordActivity extends Activity {
 		File file = null;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String settingDir = prefs.getString("dir_download", "0");
-		
+		boolean writeLogFile = prefs.getBoolean("log_file_checkbox", false);
+
 		if(settingDir.equals(Constants.EXTERNAL_STORAGE + "")){
 			String state = Environment.getExternalStorageState();
 			if(Environment.MEDIA_MOUNTED.equals(state)){
@@ -64,6 +65,8 @@ public class PasswordActivity extends Activity {
         }
 		
 		File nomedia = new File(file, ".nomedia");
+        Helper.logFile = new File(file, Helper.LOG_FILE);
+        Helper.writeLogFile = writeLogFile;
 		try {
 			nomedia.createNewFile();
 		} catch (IOException e) {

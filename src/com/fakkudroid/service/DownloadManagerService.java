@@ -141,14 +141,14 @@ public class DownloadManagerService extends Service {
 			try {
 				if (!titleBitmapCP.exists())
 					FileUtils.copyFile(titleBitmap, titleBitmapCP);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				Helper.logError(this, e.getMessage(), e);
 			}
 
 			// Save data.json
 			try {
 				Helper.saveJsonDoujin(bean, dir);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				Helper.logError(this, e.getMessage(), e);
 			}
 

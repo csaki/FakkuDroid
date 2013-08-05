@@ -41,7 +41,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_ARTIST = "artist";
 	private static final String KEY_TAGS = "tags";
 	private static final String KEY_SERIE = "serie";
-	private static final String KEY_QTY_PAGES = "qty_pages";
+    private static final String KEY_QTY_PAGES = "qty_pages";
 
 	// Settings Table Columns names
 	private static final String KEY_USER = "user";
@@ -202,17 +202,28 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		return result;
 	}
 
-	public LinkedList<DoujinBean> getDoujinList(int numPage, String query) {
+	public LinkedList<DoujinBean> getDoujinList(int numPage, String query, boolean alphabeticalOrder) {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
 		int pageSize = 20;
 		// Select All Query
-		String selectQuery = "SELECT " + KEY_ID + "," + KEY_TITLE + ","
-				+ KEY_DESCRIPTION + "," + KEY_ARTIST + "," + KEY_TAGS + ","
-				+ KEY_SERIE + "," + KEY_QTY_PAGES + "," + KEY_URL + " FROM " + TABLE_DOUJIN +
-				" WHERE " + KEY_TITLE + " LIKE '%" + query + "%' OR " 
-						  + KEY_SERIE + " LIKE '%" + query + "%' OR "
-						  + KEY_ARTIST + " LIKE '%" + query + "%'" +
-				" ORDER BY " + KEY_TITLE + " LIMIT "+((numPage-1)*pageSize)+"," + pageSize;
+        String selectQuery = "";
+        if(alphabeticalOrder){
+            selectQuery = "SELECT " + KEY_ID + "," + KEY_TITLE + ","
+                    + KEY_DESCRIPTION + "," + KEY_ARTIST + "," + KEY_TAGS + ","
+                    + KEY_SERIE + "," + KEY_QTY_PAGES + "," + KEY_URL + " FROM " + TABLE_DOUJIN +
+                    " WHERE " + KEY_TITLE + " LIKE '%" + query + "%' OR "
+                    + KEY_SERIE + " LIKE '%" + query + "%' OR "
+                    + KEY_ARTIST + " LIKE '%" + query + "%'" +
+                    " ORDER BY " + KEY_TITLE + " LIMIT "+((numPage-1)*pageSize)+"," + pageSize;
+        }else{
+            selectQuery = "SELECT " + KEY_ID + "," + KEY_TITLE + ","
+                    + KEY_DESCRIPTION + "," + KEY_ARTIST + "," + KEY_TAGS + ","
+                    + KEY_SERIE + "," + KEY_QTY_PAGES + "," + KEY_URL + " FROM " + TABLE_DOUJIN +
+                    " WHERE " + KEY_TITLE + " LIKE '%" + query + "%' OR "
+                    + KEY_SERIE + " LIKE '%" + query + "%' OR "
+                    + KEY_ARTIST + " LIKE '%" + query + "%'" +
+                    " ORDER BY rowid DESC LIMIT "+((numPage-1)*pageSize)+"," + pageSize;
+        }
 
 		Log.i(this.getClass().toString(), selectQuery);
 

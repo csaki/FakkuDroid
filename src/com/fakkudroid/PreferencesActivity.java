@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.widget.Toast;
 
@@ -71,7 +72,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         Preference scanFolderDialogPreference = (Preference) getPreferenceScreen().findPreference("scan_folder");
         scanFolderDialogPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                dialog = ProgressDialog.show(PreferencesActivity.this, getResources().getString(R.string.loading), getResources().getString(R.string.pref_title_scan_folder), false, true);
+                dialog = ProgressDialog.show(PreferencesActivity.this, getResources().getString(R.string.pref_title_scan_folder), getResources().getString(R.string.loading), false, true);
                 dialog.setIcon(R.drawable.ic_launcher);
                 dialog.setCancelable(false);
                 new Thread() {
@@ -98,6 +99,14 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
                 return true;
             }
         });
+
+        CheckBoxPreference logFilePreference = (CheckBoxPreference)getPreferenceScreen().findPreference("log_file_checkbox");
+        logFilePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o) {
+                Helper.writeLogFile = (Boolean)o;
+                return true;
+            }
+        });
     }
-	
 }

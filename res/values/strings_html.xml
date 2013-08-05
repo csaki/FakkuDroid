@@ -75,17 +75,12 @@
 			<!DOCTYPE html>
 			<HTML>
 			<BODY>
-					<h2 style=\"text-align: center; color: #9D0A0A;\">Support FakkuDroid!</h2>
-					<div style=\"text-align: center; margin-top: 20px;\">Taking any of the following steps will help the development of Fakkudroid!</div>
-					<ol>
-					    <li>Please <strong>click the ads</strong> over at <a href=\"http://fakkudroid.blogspot.com/\">the project\'s blog</a> to support the author, so he can continue improving the app!
-					    <br /><strong>Jul, 2013: 166 ad clicks, FakkuDroid v2.4: 3394 downloads.</strong>
-					    <br /><strong>1 Click = $0.13.</strong>
-					    <br /><img src=\"file:///android_asset/images/ads.png\" style=\"width:100%\"/></li>
-					    <li>You can support the app by <strong>donating $1 or more</strong>. You can find the donation link over at <a href=\"http://fakkudroid.blogspot.com/\">the blog</a>.</li>
-					    <li>If you\'re experiencing problems, have found a bug, wish to give feedback or just want to say thanks, you\'re welcome to post a comment at <a href=\"http://fakkudroid.blogspot.com/\">the blog</a>.</li>
-					</ol>
-					<div style=\"text-align: center; margin-top: 20px;\">Thanks for supporting Fakkudroid!</div>
+			        <h2 style=\"text-align: center; color: #9D0A0A;\">Support FakkuDroid!</h2>
+                    <div style=\"text-align: center; margin-top: 20px;\">Every time you visit <a href=\"http://fakkudroid.blogspot.com/\">the project\'s blog</a>, click the advertisements to support FakkuDroid!
+                    <br /><br /><strong>Statistics</strong><br />
+                    <br /> - Ago, 2013: 50 ad clicks
+                    <br /> - FakkuDroid v2.4.2: 1372 downloads</div><br /><br />
+					<div style=\"text-align: center; margin-top: 20px;\"> A click helps a lot! Thanks for supporting Fakkudroid!</div>
 			</BODY>
 			</HTML>
 		]]>

@@ -2,6 +2,7 @@ package com.fakkudroid.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
@@ -52,6 +55,11 @@ import com.fakkudroid.bean.URLBean;
 import com.google.gson.Gson;
 
 public class Helper {
+
+
+    public static String LOG_FILE = "logFile.txt";
+    public  static File logFile;
+    public static boolean writeLogFile;
 
 	public static File getCacheDir(Context context) {
 		File file = null;
@@ -123,7 +131,7 @@ public class Helper {
         if (!file.exists()) {
             if(!file.mkdirs()){
                 file = context.getDir("", Context.MODE_WORLD_WRITEABLE);
-                file = new File(file, Constants.LOCAL_DIRECTORY);
+                file = new File(file, Constants.LOCAL_DIRECTORY + "/" + dir);
                 if (!file.exists()) {
                     file.mkdirs();
                 }
@@ -146,7 +154,30 @@ public class Helper {
 	
 	public static void logError(String errorClass, String msg, Exception e) {
 		Log.e(errorClass, msg, e);
+
+        if(writeLogFile&&logFile!=null){
+            String completeError = errorClass + " // " + msg + " // " + e.getMessage() + "\n";
+            StringWriter errors = new StringWriter();
+            e.printStackTrace(new PrintWriter(errors));
+            completeError += errors.toString() + "\n";
+
+            writeLog(completeError);
+        }
 	}
+
+    public static void writeLog(String msg){
+        try {
+            // if file doesnt exists, then create it
+            if (!logFile.exists()) {
+                logFile.createNewFile();
+            }
+
+            FileWriter fw = new FileWriter(logFile.getAbsoluteFile(),true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(msg);
+            bw.close();
+        } catch (Exception e) {}
+    }
 
 	@SuppressLint("NewApi")
 	public static <T> void executeAsyncTask(AsyncTask<T, ?, ?> task,

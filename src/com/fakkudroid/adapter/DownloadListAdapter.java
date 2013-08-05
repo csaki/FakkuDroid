@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
@@ -49,7 +50,7 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 			holder.tvSerie = (TextView) convertView.findViewById(R.id.tvSerie);
 			holder.tvDescription = (TextView) convertView
 					.findViewById(R.id.tvDescription);
-			holder.wvTitle = (WebView) convertView.findViewById(R.id.wvTitle);
+			holder.ivTitle = (ImageView) convertView.findViewById(R.id.ivTitle);
 			holder.btnDelete = (ActionImageButton2) convertView
 					.findViewById(R.id.btnDelete);
 			holder.btnDetails = (ActionImageButton2) convertView
@@ -114,12 +115,9 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 			}
 		}
 
-		holder.wvTitle.loadDataWithBaseURL(
-				null,
-				Helper.createHTMLImagePercentage(
-						"file://" + thumbFile.getAbsolutePath(), 100,
-						parent.getResources()), "text/html", "utf-8", null);
-		;
+            holder.image = Helper.decodeSampledBitmapFromFile(thumbFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
+                    Constants.HEIGHT_STANDARD);
+        holder.ivTitle.setImageBitmap(holder.image);
 		return convertView;
 	}
 
@@ -132,6 +130,7 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 		ActionImageButton2 btnRead;
 		ActionImageButton2 btnDetails;
 
-		WebView wvTitle;
+		ImageView ivTitle;
+        Bitmap image;
 	}
 }

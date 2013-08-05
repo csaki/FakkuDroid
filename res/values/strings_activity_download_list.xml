@@ -3,4 +3,8 @@
     <string name="search_by">Search by Title, Artist and Series</string>
     <string name="downloading_data">Downloading data list</string>
     <string name="downloading_image_cover">Downloading Images Cover (@i/@t)</string>
+    <string name="download_title">Downloads</string>
+    <string name="download_queue_title">Downloading Queue</string>
+    <string name="order_a_to_z">A to Z</string>
+    <string name="order_date">Date</string>
 </resources>

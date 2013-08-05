@@ -7,16 +7,19 @@ import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.component.ActionImageButton2;
 import com.fakkudroid.fragment.DownloadQueueListFragment;
 import com.fakkudroid.service.DownloadManagerService;
+import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
 import com.fakkudroid.R;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -48,7 +51,7 @@ public class DownloadQueueListAdapter extends ArrayAdapter<DoujinBean> {
 			holder.tvSerie = (TextView) convertView.findViewById(R.id.tvSerie);
 			holder.tvDescription = (TextView) convertView
 					.findViewById(R.id.tvDescription);
-			holder.wvTitle = (WebView) convertView.findViewById(R.id.wvTitle);
+			holder.ivTitle = (ImageView) convertView.findViewById(R.id.ivTitle);
 			holder.btnCancel = (ActionImageButton2) convertView
 					.findViewById(R.id.btnCancel);
 			holder.btnDetails = (ActionImageButton2) convertView
@@ -82,15 +85,10 @@ public class DownloadQueueListAdapter extends ArrayAdapter<DoujinBean> {
 
 		File dir = Helper.getCacheDir(getContext());
 		File thumbFile = new File(dir, s.getFileImageTitle());
-		
-		if(!holder.alreadyImageLoaded){
-			holder.wvTitle.loadDataWithBaseURL(
-					null,
-					Helper.createHTMLImagePercentage(
-							"file://" + thumbFile.getAbsolutePath(), 100,
-							parent.getResources()), "text/html", "utf-8", null);
-			holder.alreadyImageLoaded = true;
-		}
+
+            holder.image = Helper.decodeSampledBitmapFromFile(thumbFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
+                    Constants.HEIGHT_STANDARD);
+        holder.ivTitle.setImageBitmap(holder.image);
 		if(s==DownloadManagerService.DoujinMap.next()){
 			holder.progressBar.setIndeterminate(false);
 			holder.progressBar.setProgress(DownloadManagerService.percent);
@@ -108,8 +106,8 @@ public class DownloadQueueListAdapter extends ArrayAdapter<DoujinBean> {
 		ActionImageButton2 btnCancel;
 		ActionImageButton2 btnDetails;
 		ProgressBar progressBar;
-		
-		WebView wvTitle;
-		boolean alreadyImageLoaded;
+
+        ImageView ivTitle;
+        Bitmap image;
 	}
 }

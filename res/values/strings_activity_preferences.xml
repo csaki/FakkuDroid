@@ -20,6 +20,8 @@
     <string name="pref_title_delete_covers">Delete covers images cache</string>
     <string name="pref_description_delete_covers">Delete covers images cache to download again.</string>
     <string name="pref_title_scan_folder">Scan Folder</string>
+    <string name="pref_title_save_log_file">Save Log File</string>
+    <string name="pref_description_save_log_file">The Log File don\'t have max size. If you want you can delete the file. The file is in the FakkuDroid folder.</string>
 
     <string name="covers_images_cache_deleted">Covers images cache deleted.</string>
 	

@@ -43,6 +43,12 @@
         <Preference android:key="scan_folder"
                     android:title="@string/pref_title_scan_folder"/>
 
+        <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="log_file_checkbox"
+                android:summary="@string/pref_description_save_log_file"
+                android:title="@string/pref_title_save_log_file" />
+
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_header_gallery" >
         <ListPreference

@@ -121,12 +121,18 @@ public class MainActivity extends SherlockFragmentActivity implements
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_frame, frmDoujinList).commit();
         } else if (currentContent == DOWNLOADS) {
-            setTitle(R.string.download);
+            setTitle(R.string.download_title);
                 frmDownloadListFragment = new DownloadListFragment();
                 frmDownloadListFragment.setMainActivity(this);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_frame, frmDownloadListFragment).commit();
-        } else if (currentContent == FAVORITES) {
+        } else if (currentContent == DOWNLOADS_QUEUE) {
+            setTitle(R.string.download_queue_title);
+            frmDownloadQueueListFragment = new DownloadQueueListFragment();
+            frmDownloadQueueListFragment.setMainActivity(this);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
+        }  else if (currentContent == FAVORITES) {
             String user = getIntent().getStringExtra(INTENT_VAR_USER);
                 frmFavorite = new FavoriteFragment();
                 frmFavorite.setMainActivity(this);
@@ -136,13 +142,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             setTitle(title);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_frame, frmFavorite).commit();
-        } else if (currentContent == DOWNLOADS_QUEUE) {
-            setTitle(R.string.download);
-                frmDownloadQueueListFragment = new DownloadQueueListFragment();
-                frmDownloadQueueListFragment.setMainActivity(this);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
-        } else if (currentContent == DOUJIN) {
+        }else if (currentContent == DOUJIN) {
             frmDoujinFragment = new DoujinFragment();
             frmDoujinFragment.setMainActivity(this);
             String title = getIntent().getStringExtra(INTENT_VAR_TITLE);
@@ -205,8 +205,17 @@ public class MainActivity extends SherlockFragmentActivity implements
                                     | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 
         }
+        if(currentContent==DOWNLOADS&&frmDownloadListFragment!=null){
+            if(frmDownloadListFragment.isOrderDate()){
+                menu.add(Menu.NONE, R.string.order_date, 2, R.string.order_date)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }else {
+                menu.add(Menu.NONE, R.string.order_a_to_z, 2, R.string.order_a_to_z)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
+        }
         if (currentContent == DOWNLOADS_QUEUE || currentContent == DOWNLOADS) {
-            menu.add(Menu.NONE, R.string.go_other_list, Menu.NONE, R.string.go_other_list)
+            menu.add(Menu.NONE, R.string.go_other_list, 3, R.string.go_other_list)
                     .setIcon(R.drawable.content_import_export)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
         }
@@ -221,20 +230,27 @@ public class MainActivity extends SherlockFragmentActivity implements
             return true;
         } else if (item.getItemId() == R.string.go_other_list) {
             if (currentContent == DOWNLOADS_QUEUE) {
+                setTitle(R.string.download_title);
                 if (frmDownloadListFragment == null) {
                     frmDownloadListFragment = new DownloadListFragment();
                     frmDownloadListFragment.setMainActivity(this);
                 }
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, frmDownloadListFragment).commit();
+                currentContent = DOWNLOADS;
             } else if (currentContent == DOWNLOADS) {
+                setTitle(R.string.download_queue_title);
                 if (frmDownloadQueueListFragment == null) {
                     frmDownloadQueueListFragment = new DownloadQueueListFragment();
                     frmDownloadQueueListFragment.setMainActivity(this);
                 }
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
+                currentContent = DOWNLOADS_QUEUE;
             }
+            supportInvalidateOptionsMenu();
+        } else if (item.getItemId() == R.string.order_a_to_z||item.getItemId() == R.string.order_date) {
+            frmDownloadListFragment.changeOrder();
             supportInvalidateOptionsMenu();
         }
         return true;

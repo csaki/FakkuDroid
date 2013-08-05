@@ -36,6 +36,7 @@ import com.fakkudroid.util.Helper;
 
 public class DoujinListFragment extends SherlockListFragment {
 
+    int index = -1;
 	FakkuDroidApplication app;
 	LinkedList<DoujinBean> llDoujin;
 	DoujinListAdapter da;
@@ -68,11 +69,23 @@ public class DoujinListFragment extends SherlockListFragment {
 		super.onStart();
         if(llDoujin==null||refresh)
 		    loadPage();
-        else{
-            showProgress(false);
-            setData();
-        }
 	}
+
+    @Override
+    public void onPause (){
+        super.onPause();
+        ListView list = (ListView) view.findViewById(android.R.id.list);
+        index = list.getFirstVisiblePosition();
+    }
+
+
+    @Override
+    public void onResume (){
+        super.onResume();
+        ListView list = (ListView) view.findViewById(android.R.id.list);
+        if(index>-1)
+            list.setSelectionFromTop(index, 0);
+    }
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

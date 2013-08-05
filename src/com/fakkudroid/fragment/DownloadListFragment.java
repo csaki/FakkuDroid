@@ -38,6 +38,7 @@ public class DownloadListFragment extends SherlockListFragment{
 	static int numPage = 1;
 	private String query = "";
 	private View view;
+    private boolean orderDate;
 
     public void setMainActivity(MainActivity mainActivity) {
         mMainActivity = mainActivity;
@@ -107,12 +108,17 @@ public class DownloadListFragment extends SherlockListFragment{
 	
 	private void setData() {		
 		DataBaseHandler db = new DataBaseHandler(this.getActivity());
-		LinkedList<DoujinBean> llDoujin = db.getDoujinList(numPage, query);
+		LinkedList<DoujinBean> llDoujin = db.getDoujinList(numPage, query, !orderDate);
 
 		da = new DownloadListAdapter(this.getActivity(), R.layout.row_download, 0, llDoujin,
 				this);
 		this.setListAdapter(da);
 	}
+
+    public void changeOrder(){
+        orderDate = !orderDate;
+        setData();
+    }
 
 	public void delete(final DoujinBean bean) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
@@ -164,4 +170,8 @@ public class DownloadListFragment extends SherlockListFragment{
 			this.startActivity(it);
 		}
 	}
+
+    public boolean isOrderDate() {
+        return orderDate;
+    }
 }
