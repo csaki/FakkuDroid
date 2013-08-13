@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -153,7 +154,7 @@ public class DoujinFragment extends SherlockFragment {
         SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (preferenceManager.getBoolean("perfect_viewer_checkbox", false) && alreadyDownloaded) {
             List<String> lstFiles = app.getCurrent().getImagesFiles();
-            File dir = Helper.getDir(app.getCurrent().getId(), Context.MODE_PRIVATE, getActivity());
+            File dir = Helper.getDir(app.getCurrent().getId(), getActivity());
             File myFile = new File(dir, lstFiles.get(0));
             Helper.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
         } else {
@@ -189,8 +190,7 @@ public class DoujinFragment extends SherlockFragment {
                                 public void onClick(DialogInterface dialog,
                                                     int id) {
                                     String folder = currentBean.getId();
-                                    File dir = Helper.getDir(folder,
-                                            Context.MODE_PRIVATE, getActivity());
+                                    File dir = Helper.getDir(folder, getActivity());
                                     try {
                                         FileUtils.deleteDirectory(dir);
                                     } catch (IOException e) {
@@ -286,8 +286,14 @@ public class DoujinFragment extends SherlockFragment {
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         tvTranslator.setText(content);
 
-        ivTitle.setImageBitmap(currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity())));
-        ivPage.setImageBitmap(currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity())));
+        Bitmap bmpTitle = currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity()));
+        Bitmap bmpPage = currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity()));
+
+        if(bmpTitle!=null)
+            ivTitle.setImageBitmap(bmpTitle);
+
+        if(bmpPage!=null)
+            ivPage.setImageBitmap(bmpPage);
 
         tvUploader.setOnClickListener(new OnClickListener() {
 
@@ -496,15 +502,22 @@ public class DoujinFragment extends SherlockFragment {
                         bean.setUrl(bean.getUrl().replace(Constants.SITEROOT, Constants.SITEAPI));
                     FakkuConnection.parseJsonDoujin(bean);
                 }*/
-                File dir = Helper.getCacheDir(getActivity());
-
-                File myFile = new File(dir, bean.getFileImageTitle());
-                Helper.saveInStorage(myFile, bean.getUrlImageTitle());
-
-                myFile = new File(dir, bean.getFileImagePage());
-                Helper.saveInStorage(myFile, bean.getUrlImagePage());
             } catch (Exception e) {
                 bean = null;
+                Helper.logError(this, e.getMessage(), e);
+            }
+
+            try{
+                if(bean!=null){
+                    File dir = Helper.getCacheDir(getActivity());
+
+                    File myFile = new File(dir, bean.getFileImageTitle());
+                    Helper.saveInStorage(myFile, bean.getUrlImageTitle());
+
+                    myFile = new File(dir, bean.getFileImagePage());
+                    Helper.saveInStorage(myFile, bean.getUrlImagePage());
+                }
+            }catch (Exception e){
                 Helper.logError(this, e.getMessage(), e);
             }
 

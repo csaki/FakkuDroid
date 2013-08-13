@@ -78,7 +78,7 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
                 new Thread() {
                     public void run() {
                         try {
-                            File downloadDir = Helper.getDir("", Context.MODE_PRIVATE, PreferencesActivity.this);
+                            File downloadDir = Helper.getDir("", PreferencesActivity.this);
                             File[] lst = downloadDir.listFiles();
                             for(File f:lst){
                                 try{

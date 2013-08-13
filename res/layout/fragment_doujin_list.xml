@@ -47,6 +47,8 @@
                 android:gravity="center"
                 android:text="@string/page_1"
                 android:textAppearance="?android:attr/textAppearanceLarge"
+                android:onClick="changePage"
+                android:clickable="true"
                 android:textColor="@color/main_color" />
 
             <view

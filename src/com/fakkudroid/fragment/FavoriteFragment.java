@@ -50,7 +50,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	GridView gvFavorites;
     private String user;
     private String title;
-    private int nroPage = 1;
+    private int numPage = 1;
 	private View mFormView;
 	private View mStatusView;
 	private View view;
@@ -91,7 +91,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	
 	public void setUser(String user){
         refresh = true;
-        nroPage = 1;
+        numPage = 1;
 		this.user = user;
 	}
 	
@@ -114,14 +114,14 @@ public class FavoriteFragment extends SherlockFragment implements
 		title = title.replace("usr", user);
 
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
-		tvPage.setText("Page " + nroPage);
-		Helper.executeAsyncTask(new DownloadCatalog(),app.getUrlFavorite(nroPage, user));
+		tvPage.setText("Page " + numPage);
+		Helper.executeAsyncTask(new DownloadCatalog(),app.getUrlFavorite(numPage, user));
 	}
 
 	public void nextPage(View view) {
-		nroPage++;
+        numPage++;
 		loadPage();
-		CharSequence text = "Page " + nroPage;
+		CharSequence text = "Page " + numPage;
 		int duration = Toast.LENGTH_SHORT;
 
 		Toast toast = Toast.makeText(getActivity(), text, duration);
@@ -129,16 +129,16 @@ public class FavoriteFragment extends SherlockFragment implements
 	}
 
 	public void previousPage(View view) {
-		if (nroPage - 1 == 0) {
+		if (numPage - 1 == 0) {
 			CharSequence text = "There aren't more pages.";
 			int duration = Toast.LENGTH_SHORT;
 
 			Toast toast = Toast.makeText(getActivity(), text, duration);
 			toast.show();
 		} else {
-			nroPage--;
+            numPage--;
 			loadPage();
-			CharSequence text = "Page " + nroPage;
+			CharSequence text = "Page " + numPage;
 			int duration = Toast.LENGTH_SHORT;
 
 			Toast toast = Toast.makeText(getActivity(), text, duration);
@@ -146,9 +146,19 @@ public class FavoriteFragment extends SherlockFragment implements
 		}
 	}
 
+    public void changePage(int page){
+        numPage = page;
+        loadPage();
+        CharSequence text = "Page " + numPage;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(this.getActivity(), text, duration);
+        toast.show();
+    }
+
 	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
-		viewBrowser.setData(Uri.parse(app.getUrlFavorite(nroPage, user)));
+		viewBrowser.setData(Uri.parse(app.getUrlFavorite(numPage, user)));
 		this.startActivity(viewBrowser);
 	}
 

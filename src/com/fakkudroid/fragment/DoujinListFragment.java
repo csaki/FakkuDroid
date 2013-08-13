@@ -126,6 +126,16 @@ public class DoujinListFragment extends SherlockListFragment {
 		}
 	}
 
+    public void changePage(int page){
+        numPage = page;
+        loadPage();
+        CharSequence text = "Page " + numPage;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(this.getActivity(), text, duration);
+        toast.show();
+    }
+
 	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
 		viewBrowser.setData(Uri.parse(app.getUrl(numPage, url)));

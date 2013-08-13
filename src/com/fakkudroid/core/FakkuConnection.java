@@ -245,6 +245,8 @@ public class FakkuConnection {
 
 		String html = Helper.getHTML(url);
 
+        Helper.logInfo("parseHTMLCatalog : " + url, html);
+
 		String token = "content-row manga|content-row doujinshi";
 		String[] sections = html.split(token);
 		for (int i = 1; i < sections.length; i++) {
@@ -268,7 +270,6 @@ public class FakkuConnection {
 			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);
-			s = Constants.SITEROOT + s;
 			bean.setUrlImageTitle(s);
 
 			// Look for the next image tag
@@ -278,7 +279,6 @@ public class FakkuConnection {
 			idxStart = section.indexOf(token, idxStart) + token.length();
 			idxEnd = section.indexOf("\"", idxStart);
 			s = section.substring(idxStart, idxEnd);
-			s = Constants.SITEROOT + s;
 			bean.setUrlImagePage(s);
 
 			// title
@@ -344,6 +344,8 @@ public class FakkuConnection {
 		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
 
 		String html = Helper.getHTML(url);
+
+        Helper.logInfo("parseHTMLFavorite : " + url, html);
 
 		String token = "<div class=\"favorite ";
 		String[] sections = html.split(token);
@@ -425,6 +427,8 @@ public class FakkuConnection {
 
 		String html = Helper.getHTML(url, cookiesStore);
 
+        Helper.logInfo("parseHTMLDoujin : " + url, html);
+
 		bean.setAddedInFavorite(!html.contains("Add To Favorites"));
 
 		// Qty Pages
@@ -479,7 +483,7 @@ public class FakkuConnection {
 		idxEnd = html.indexOf("\"", idxStart);
 		s = html.substring(idxStart, idxEnd);
 
-		bean.setUrlImageTitle(Constants.SITEROOT + s);
+		bean.setUrlImageTitle(s);
 
 		token = "<img class=\"sample\"";
 		idxStart = html.indexOf(token, idxStart) + token.length();
@@ -487,7 +491,7 @@ public class FakkuConnection {
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		idxEnd = html.indexOf("\"", idxStart);
 		s = html.substring(idxStart, idxEnd);
-		bean.setUrlImagePage(Constants.SITEROOT + s);
+		bean.setUrlImagePage(s);
 
 		// title
 		token = "<h1 itemprop=\"name\">";
@@ -578,6 +582,9 @@ public class FakkuConnection {
 
 		//Get imageServer link
 		html = Helper.getHTML(bean.getUrl() + "/read#page=1");
+
+        Helper.logInfo("parseHTMLDoujin / imageServer : " + bean.getUrl() + "/read#page=1", html);
+
 		token = "function imgpath(x) {";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		token = "return '";

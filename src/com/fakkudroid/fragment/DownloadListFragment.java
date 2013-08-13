@@ -48,6 +48,9 @@ public class DownloadListFragment extends SherlockListFragment{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (FakkuDroidApplication) getActivity().getApplication();
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(getActivity());
+        orderDate = prefs.getBoolean("order_date_download_list", false);
 	}
 	
 	@Override
@@ -97,6 +100,18 @@ public class DownloadListFragment extends SherlockListFragment{
 		}
 	}
 
+    public void changePage(int page){
+        numPage = page;
+        TextView tvPage = (TextView) this.view.findViewById(R.id.tvPage);
+        tvPage.setText("Page " + numPage);
+        setData();
+        CharSequence text = "Page " + numPage;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(this.getActivity(), text, duration);
+        toast.show();
+    }
+
 	public void search(String query){
 		this.query = query;
 
@@ -117,6 +132,9 @@ public class DownloadListFragment extends SherlockListFragment{
 
     public void changeOrder(){
         orderDate = !orderDate;
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(getActivity());
+        prefs.edit().putBoolean("order_date_download_list", orderDate).commit();
         setData();
     }
 
@@ -127,7 +145,7 @@ public class DownloadListFragment extends SherlockListFragment{
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								String folder = bean.getId();
-								File dir = Helper.getDir(folder, Context.MODE_PRIVATE, getActivity());
+								File dir = Helper.getDir(folder, getActivity());
 								try {
 									FileUtils.deleteDirectory(dir);
 								} catch (IOException e) {
@@ -162,7 +180,7 @@ public class DownloadListFragment extends SherlockListFragment{
 				.getDefaultSharedPreferences(getActivity());
 		if(prefs.getBoolean("perfect_viewer_checkbox", false)){
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
-			File dir = Helper.getDir(app.getCurrent().getId(), Context.MODE_PRIVATE, getActivity());
+			File dir = Helper.getDir(app.getCurrent().getId(), getActivity());
 			File myFile = new File(dir, lstFiles.get(0));
 			Helper.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
 		}else{

@@ -126,8 +126,7 @@ public class DownloadManagerService extends Service {
 			List<String> lstUrls = bean.getImages();
 			List<String> lstFiles = bean.getImagesFiles();
 			String folder = bean.getId();
-			File dir = Helper.getDir(folder, Context.MODE_PRIVATE,
-					getApplicationContext());
+			File dir = Helper.getDir(folder, getApplicationContext());
 //			boolean doujinAlreadyExists = dir.listFiles().length>3;
 			File cacheDir = Helper.getCacheDir(getApplicationContext());
 			

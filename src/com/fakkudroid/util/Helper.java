@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
@@ -100,7 +101,7 @@ public class Helper {
 		return file;
 	}
 
-	public static File getDir(String dir, int mode, Context context) {
+	public static File getDir(String dir, Context context) {
 		File file = null;
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
@@ -164,6 +165,15 @@ public class Helper {
             writeLog(completeError);
         }
 	}
+
+    public static void logInfo(String tag, String msg) {
+        Log.i(tag, msg);
+
+        if(writeLogFile&&logFile!=null){
+            String message = tag + "\n" + msg;
+            writeLog(message);
+        }
+    }
 
     public static void writeLog(String msg){
         try {
@@ -289,9 +299,18 @@ public class Helper {
 	}
 
 	public static String escapeURL(String link) {
-		link = link.replaceAll("\\[", "%5B");
-		link = link.replaceAll("\\]", "%5D");
-		link = link.replaceAll("\\s", "%20");
+        try{
+            String path = link;
+            path = java.net.URLEncoder.encode(path, "utf8");
+            path = path.replace("%3A",":");
+            path = path.replace("%2F","/");
+            path = path.replace("+","%20");
+            return path;
+        }catch(Exception e){
+            link = link.replaceAll("\\[", "%5B");
+            link = link.replaceAll("\\]", "%5D");
+            link = link.replaceAll("\\s", "%20");
+        }
 		return link;
 	}
 
@@ -390,13 +409,6 @@ public class Helper {
 			throws Exception {
 
 		imageUrl = Helper.escapeURL(imageUrl);
-		String fakkuExtentionFile = file.getAbsolutePath();
-		fakkuExtentionFile = fakkuExtentionFile
-				.replaceAll("\\.jpg", "\\.fakku");
-		File fakkuFile = new File(fakkuExtentionFile);
-		if (fakkuFile.exists()) {
-			fakkuFile.renameTo(file);
-		}
 
 		OutputStream output = null;
 		InputStream input = null;

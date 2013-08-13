@@ -62,7 +62,7 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 		holder.tvSerie.setText(s.getSerie().getDescription());
 		holder.tvDescription.setText(Html.fromHtml(s.getDescription().replace(
 				"<br>", "<br/>")));
-		;
+
 		holder.tvTags.setText(s.getTags());
 		
 		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));

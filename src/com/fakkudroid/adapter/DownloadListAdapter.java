@@ -90,7 +90,7 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 			}
 		});
 
-		File dir = Helper.getDir(s.getId(), Context.MODE_PRIVATE, getContext());
+		File dir = Helper.getDir(s.getId(), getContext());
 		File oldTitleFile = new File(dir, "001.fakku");
 		File titleFile = new File(dir, "001.jpg");
 		// Save data.json

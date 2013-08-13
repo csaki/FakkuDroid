@@ -155,7 +155,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 			input.setInputType(InputType.TYPE_CLASS_NUMBER);
 			alert.setView(input);
 
-			alert.setPositiveButton("Ok",
+			alert.setPositiveButton(android.R.string.ok,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
 								int whichButton) {
@@ -181,13 +181,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 						}
 					});
 
-			alert.setNegativeButton("Cancel",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int whichButton) {
-							// Canceled.
-						}
-					});
+			alert.setNegativeButton(android.R.string.cancel, null);
 
 			alert.show();
 
@@ -198,7 +192,6 @@ public class GallerySwipeActivity extends SherlockActivity {
 			} else {
 				mViewPager.setCurrentItem(0);
 			}
-			;
 			return true;
 		case R.id.go_to_last:
 			if (readingMode == Constants.LEFT_RIGHT_MODE) {
@@ -206,7 +199,6 @@ public class GallerySwipeActivity extends SherlockActivity {
 			} else {
 				mViewPager.setCurrentItem(0);
 			}
-			;
 			return true;
 		case R.id.menu_none_screen_orientation:
 			prefs.edit().putString("screen_orientation_list", "0").commit();
@@ -275,10 +267,9 @@ public class GallerySwipeActivity extends SherlockActivity {
 		public GalleryPagerAdapter(Context context) {
 			views = new ArrayList<WebViewImageLayout>();
 
-			renameAllFiles();
-
 			this.context = context;
-			File dir = Helper.getDir(app.getCurrent().getId(), Context.MODE_PRIVATE, getApplicationContext());
+			File dir = Helper.getDir("", getApplicationContext());
+            dir = new File(dir, app.getCurrent().getId());
 			List<String> lstFiles = app.getCurrent().getImagesFiles();
 			List<String> lstImages = app.getCurrent().getImages();
 
@@ -310,25 +301,6 @@ public class GallerySwipeActivity extends SherlockActivity {
 								GallerySwipeActivity.this);
 					views.add(wv);
 				}
-		}
-
-		private void renameAllFiles() {
-			try {
-				List<String> lstFiles = app.getCurrent().getImagesFiles();
-				List<String> lstOldFiles = app.getCurrent().getOldImagesFiles();
-				File dir = Helper.getDir(app.getCurrent().getId(),
-						Context.MODE_PRIVATE, getApplicationContext());
-
-				for (int i = 0; i < lstFiles.size(); i++) {
-					File oldFile = new File(dir, lstOldFiles.get(i));
-					File newFile = new File(dir, lstFiles.get(i));
-					if (oldFile.exists()) {
-						oldFile.renameTo(newFile);
-					}
-				}
-			} catch (Exception e) {
-				Helper.logError(this, "Error renaming files.", e);
-			}
 		}
 
 		@Override

@@ -12,6 +12,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -19,11 +20,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.InputType;
 import android.view.ActionProvider;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -187,23 +190,28 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (currentContent == DOUJIN_LIST || currentContent == DOWNLOADS) {
-            // Create the search view
-            SearchView searchView = new SearchView(getSupportActionBar()
-                    .getThemedContext());
-            searchView.setQueryHint(getResources().getText(R.string.search));
-            searchView.setOnQueryTextListener(this);
-            String hint = "";
-            if (currentContent == DOUJIN_LIST)
-                getResources().getText(R.string.search);
-            else
-                getResources().getText(R.string.search_by);
-            menu.add(hint)
-                    .setIcon(R.drawable.action_search)
-                    .setActionView(searchView)
-                    .setShowAsAction(
-                            MenuItem.SHOW_AS_ACTION_IF_ROOM
-                                    | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO){
+                // Create the search view
+                SearchView searchView = new SearchView(getSupportActionBar()
+                        .getThemedContext());
+                searchView.setQueryHint(getResources().getText(R.string.search));
+                searchView.setOnQueryTextListener(this);
+                String hint = "";
+                if (currentContent == DOUJIN_LIST)
+                    getResources().getText(R.string.search);
+                else
+                    getResources().getText(R.string.search_by);
+                menu.add(hint)
+                        .setIcon(R.drawable.action_search)
+                        .setActionView(searchView)
+                        .setShowAsAction(
+                                MenuItem.SHOW_AS_ACTION_IF_ROOM
+                                        | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+            }else{
+                menu.add(Menu.NONE, R.string.search, 1, R.string.search)
+                        .setIcon(R.drawable.action_search)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
         }
         if(currentContent==DOWNLOADS&&frmDownloadListFragment!=null){
             if(frmDownloadListFragment.isOrderDate()){
@@ -252,6 +260,47 @@ public class MainActivity extends SherlockFragmentActivity implements
         } else if (item.getItemId() == R.string.order_a_to_z||item.getItemId() == R.string.order_date) {
             frmDownloadListFragment.changeOrder();
             supportInvalidateOptionsMenu();
+        } else if (item.getItemId() == R.string.search){
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+            alert.setTitle(R.string.abs__searchview_description_query);
+            alert.setMessage(R.string.search);
+
+            // Set an EditText view to get user input
+            final EditText input = new EditText(this);
+            alert.setView(input);
+            alert.setNegativeButton(android.R.string.cancel, null);
+            if (currentContent == DOWNLOADS) {
+                alert.setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int whichButton) {
+                                String query = input.getText().toString().trim();
+                                frmDownloadListFragment.search(query);
+                            }});
+            }else if (currentContent == DOUJIN_LIST) {
+                alert.setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                                int whichButton) {
+                                String query = input.getText().toString();
+                                String url, title;
+                                if (!query.equals("")) {
+                                    String strSearch = getResources().getString(R.string.search);
+                                    url = Constants.SITESEARCH + Helper.escapeURL(query.trim());
+                                    title = strSearch + ": " + query.trim();
+                                } else {
+                                    title = getResources().getString(R.string.app_name);
+                                    url = Constants.SITEROOT;
+                                }
+                                Intent itMain = new Intent(MainActivity.this, MainActivity.class);
+                                itMain.putExtra(INTENT_VAR_CURRENT_CONTENT, DOUJIN_LIST);
+                                itMain.putExtra(INTENT_VAR_TITLE,title);
+                                itMain.putExtra(INTENT_VAR_URL, url);
+                                startActivityForResult(itMain, 1);
+                            }});
+            }
+            alert.show();
         }
         return true;
     }
@@ -427,6 +476,44 @@ public class MainActivity extends SherlockFragmentActivity implements
         Toast.makeText(this,
                 getResources().getString(R.string.soon), Toast.LENGTH_SHORT)
                 .show();
+    }
+
+    public void changePage(View view) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("Go to...");
+        alert.setMessage("Page");
+
+        // Set an EditText view to get user input
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        alert.setView(input);
+
+        alert.setPositiveButton(android.R.string.ok,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,
+                                        int whichButton) {
+                        String value = input.getText().toString();
+                        if (!value.equals("")) {
+                            int page = Integer.parseInt(value);
+                            if(page<=0){
+                                Toast.makeText(MainActivity.this,R.string.error_page_out,Toast.LENGTH_SHORT).show();
+                            }else{
+                                if (currentContent == DOUJIN_LIST){
+                                    frmDoujinList.changePage(page);
+                                }else if(currentContent == FAVORITES){
+                                    frmFavorite.changePage(page);
+                                }else if(currentContent == DOWNLOADS){
+                                    frmDownloadListFragment.changePage(page);
+                                }
+                            }
+                        }
+                    }
+                });
+
+        alert.setNegativeButton(android.R.string.cancel, null);
+
+        alert.show();
     }
 
     public void download(View view) {
