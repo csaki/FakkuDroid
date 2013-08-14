@@ -305,6 +305,8 @@ public class Helper {
             path = path.replace("%3A",":");
             path = path.replace("%2F","/");
             path = path.replace("+","%20");
+            path = path.replace("%23","#");
+            path = path.replace("%3D","=");
             return path;
         }catch(Exception e){
             link = link.replaceAll("\\[", "%5B");
