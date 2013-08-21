@@ -2,8 +2,8 @@ package com.fakkudroid.util;
 
 public class Constants {
 
-	public static String SITEADDFAVORITE = "http://www.fakku.net/favorite/@id/add/";
-	public static String SITEREMOVEFAVORITE = "http://www.fakku.net/favorite/@id/remove/";
+	public static String SITEADDFAVORITE = "http://www.fakku.net/favorites/@id/add/";
+	public static String SITEREMOVEFAVORITE = "http://www.fakku.net/favorites/@id/remove/";
 	public static String SITERELATED = "http://www.fakku.net/get/related/";
 	public static String SITELOGIN = "http://www.fakku.net/login/submit";
 	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html";
@@ -54,6 +54,10 @@ public class Constants {
 	public static final int SCREEN_ORIENTATION_NONE = 0;
 	public static final int SCREEN_ORIENTATION_PORTRAIT = 1;
 	public static final int SCREEN_ORIENTATION_LANDSCAPE = 2;
+
+    public static final int VOLUME_BUTTONS_NONE = 0;
+    public static final int VOLUME_BUTTONS_ZOOM= 1;
+    public static final int VOLUME_BUTTONS_CHANGE_PAGE = 2;
 	
 	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.5";
 

@@ -72,9 +72,13 @@ public class PreferencesActivity extends SherlockPreferenceActivity {
         Preference scanFolderDialogPreference = (Preference) getPreferenceScreen().findPreference("scan_folder");
         scanFolderDialogPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                dialog = ProgressDialog.show(PreferencesActivity.this, getResources().getString(R.string.pref_title_scan_folder), getResources().getString(R.string.loading), false, true);
+                dialog = new ProgressDialog(PreferencesActivity.this);
+                dialog.setTitle(R.string.app_name);
+                dialog.setMessage(getResources().getString(R.string.loading));
                 dialog.setIcon(R.drawable.ic_launcher);
                 dialog.setCancelable(false);
+                dialog.setIndeterminate(true);
+                dialog.show();
                 new Thread() {
                     public void run() {
                         try {

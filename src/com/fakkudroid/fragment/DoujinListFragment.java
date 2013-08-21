@@ -99,6 +99,7 @@ public class DoujinListFragment extends SherlockListFragment {
 	}
 
 	public void nextPage(View view) {
+        index = -1;
 		numPage++;
 		loadPage();
 		CharSequence text = "Page " + numPage;
@@ -109,6 +110,7 @@ public class DoujinListFragment extends SherlockListFragment {
 	}
 
 	public void previousPage(View view) {
+        index = -1;
 		if (numPage - 1 == 0) {
 			CharSequence text = "There aren't more pages.";
 			int duration = Toast.LENGTH_SHORT;
@@ -127,6 +129,7 @@ public class DoujinListFragment extends SherlockListFragment {
 	}
 
     public void changePage(int page){
+        index = -1;
         numPage = page;
         loadPage();
         CharSequence text = "Page " + numPage;
@@ -191,10 +194,7 @@ public class DoujinListFragment extends SherlockListFragment {
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	private void showProgress(final boolean show) {
-		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-		// for very easy animations. If available, use these APIs to fade-in
-		// the progress spinner.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			int shortAnimTime = getResources().getInteger(
 					android.R.integer.config_shortAnimTime);
 
@@ -229,6 +229,7 @@ public class DoujinListFragment extends SherlockListFragment {
 	class DownloadCatalog extends AsyncTask<String, String, Integer> {
 
         private TextView tvLoadingID;
+        private int i = 0;
 
 		protected void onPreExecute() {
             tvLoadingID = (TextView)view.findViewById(R.id.tvLoadingID);
@@ -255,25 +256,29 @@ public class DoujinListFragment extends SherlockListFragment {
 				llDoujin.add(0, app.getCurrent());
             publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","0").replace("@t", "" + llDoujin.size()));
 			for (int i = 0; i<llDoujin.size(); i++) {
-                DoujinBean bean = llDoujin.get(i);
+                final DoujinBean bean = llDoujin.get(i);
+                new Thread(){
+                    public void run () {
+                        if(DoujinListFragment.this.getActivity()!=null){
+                            try {
+                                File dir = Helper.getCacheDir(getActivity());
 
-                if(DoujinListFragment.this.getActivity()!=null){
-					try {
-						File dir = Helper.getCacheDir(getActivity());
+                                File myFile = new File(dir, bean.getFileImageTitle());
+                                Helper.saveInStorage(myFile, bean.getUrlImageTitle());
 
-						File myFile = new File(dir, bean.getFileImageTitle());
-						Helper.saveInStorage(myFile, bean.getUrlImageTitle());
+                                myFile = new File(dir, bean.getFileImagePage());
+                                Helper.saveInStorage(myFile, bean.getUrlImagePage());
 
-						myFile = new File(dir, bean.getFileImagePage());
-						Helper.saveInStorage(myFile, bean.getUrlImagePage());
-						
-						bean.loadImages(dir);
-					} catch (Exception e) {
-						Helper.logError(this, e.getMessage(), e);
-					}
-				}
-                publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + i).replace("@t", "" + llDoujin.size()));
+                                bean.loadImages(dir);
+                            } catch (Exception e) {
+                                Helper.logError(this, e.getMessage(), e);
+                            }
+                        }
+                        publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + DownloadCatalog.this.i++).replace("@t", "" + llDoujin.size()));
+                    }
+                }.start();
 			}
+            while(DownloadCatalog.this.i <= llDoujin.size()-1);
 			return llDoujin.size();
 		}
 

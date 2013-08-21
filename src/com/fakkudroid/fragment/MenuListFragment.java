@@ -9,14 +9,19 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -33,6 +38,7 @@ import com.fakkudroid.R;
 import com.fakkudroid.adapter.MenuListAdapter;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
+import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.component.ActionImageButton;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
@@ -277,9 +283,6 @@ public class MenuListFragment extends SherlockListFragment {
 						Toast.LENGTH_SHORT).show();
 				createMainMenu();
 			} else if (bean.getDescription().startsWith("Check")) {
-				Intent it3 = new Intent(Intent.ACTION_VIEW);
-				it3.setData(Uri.parse(Constants.SITEDOWNLOAD));
-
 				PackageInfo pInfo = null;
 				try {
 					pInfo = getActivity().getPackageManager().getPackageInfo(
@@ -288,13 +291,12 @@ public class MenuListFragment extends SherlockListFragment {
 					Helper.logError(this, "onOptionsItemSelected", e);
 				}
 				String version = pInfo.versionName;
-
-				getActivity().startActivity(it3);
 				CharSequence text = "Your current version is " + version;
 				int duration = Toast.LENGTH_LONG;
 
 				Toast toast = Toast.makeText(getActivity(), text, duration);
 				toast.show();
+                Helper.executeAsyncTask(new CheckerVersion());
 			}
 		} else if (level == 2) {
 			if (bean.getUrl() == null || bean.getUrl().equals("")) {
@@ -343,10 +345,7 @@ public class MenuListFragment extends SherlockListFragment {
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	private void showProgress(final boolean show) {
-		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-		// for very easy animations. If available, use these APIs to fade-in
-		// the progress spinner.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			int shortAnimTime = getResources().getInteger(
 					android.R.integer.config_shortAnimTime);
 
@@ -418,4 +417,70 @@ public class MenuListFragment extends SherlockListFragment {
 			setData();
 		}
 	}
+
+    class CheckerVersion extends AsyncTask<String, Float, VersionBean> {
+
+        private ProgressDialog dialog;
+
+        @Override
+        protected void onPreExecute() {
+            dialog = new ProgressDialog(getActivity());
+            dialog.setTitle(R.string.app_name);
+            dialog.setMessage(getResources().getString(R.string.loading));
+            dialog.setIcon(R.drawable.ic_launcher);
+            dialog.setCancelable(false);
+            dialog.setIndeterminate(true);
+            dialog.show();
+        }
+
+        @Override
+        protected VersionBean doInBackground(String... arg0) {
+            VersionBean versionBean = null;
+            try {
+                versionBean = FakkuConnection.getLastversion();
+            } catch (Exception e) {
+                Helper.logError(this, "error in verifing if exists new version.", e);
+            }
+            return versionBean;
+        }
+
+        protected void onPostExecute(final VersionBean result) {
+            dialog.dismiss();
+            if (result != null) {
+                PackageInfo pInfo = null;
+                try {
+                    pInfo = getActivity().getPackageManager()
+                            .getPackageInfo(getActivity().getPackageName(),
+                                    0);
+                    String currentVersion = pInfo.versionName;
+                    if (currentVersion.compareToIgnoreCase(result
+                            .getVersion_code()) < 0) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(
+                                getActivity());
+                        builder.setMessage(R.string.msg_new_version)
+                                .setPositiveButton(R.string.visit_page,
+                                        new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(
+                                                    DialogInterface arg0,
+                                                    int arg1) {
+                                                Intent itVersion = new Intent(
+                                                        Intent.ACTION_VIEW);
+                                                itVersion.setData(Uri.parse(result
+                                                        .getVersion_url()));
+                                                getActivity()
+                                                        .startActivity(itVersion);
+                                            }
+                                        })
+                                .setNeutralButton(android.R.string.cancel, null)
+                                .show();
+                    }
+                } catch (NameNotFoundException e) {
+                    Helper.logError(this, "error getting current version", e);
+                }
+            }else{
+                Toast.makeText(getActivity(),R.string.you_have_the_last_version,Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }

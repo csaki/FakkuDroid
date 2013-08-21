@@ -157,7 +157,7 @@ public class Helper {
 		Log.e(errorClass, msg, e);
 
         if(writeLogFile&&logFile!=null){
-            String completeError = errorClass + " // " + msg + " // " + e.getMessage() + "\n";
+            String completeError = "\n"+"\n"+errorClass + " // " + msg + " // " + e.getMessage() + "\n";
             StringWriter errors = new StringWriter();
             e.printStackTrace(new PrintWriter(errors));
             completeError += errors.toString() + "\n";

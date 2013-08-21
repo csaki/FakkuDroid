@@ -45,8 +45,8 @@ public class GallerySwipeActivity extends SherlockActivity {
 	ViewPager mViewPager;
 	Toast toast;
 	GalleryPagerAdapter adapter;
-	boolean showPageNumber, zoomButtons;
-	int readingMode;
+	boolean showPageNumber;
+	int readingMode, volumeButtons;
     String backgroundColor;
 
 	@Override
@@ -111,7 +111,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 			break;
 		}
 		showPageNumber = prefs.getBoolean("page_number_checkbox", true);
-		zoomButtons = prefs.getBoolean("zoom_button_checkbox", false);
+        volumeButtons = Integer.parseInt(prefs.getString("volume_button_list", "" + Constants.VOLUME_BUTTONS_NONE));
 		readingMode = Integer.parseInt(prefs
 				.getString("reading_mode_list", "0"));
         backgroundColor = prefs.getString("default_color", Constants.DEFAULT_COLOR);
@@ -412,7 +412,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 	public boolean dispatchKeyEvent(KeyEvent event) {
 		int action = event.getAction();
 		int keyCode = event.getKeyCode();
-		if (zoomButtons)
+		if (volumeButtons==Constants.VOLUME_BUTTONS_ZOOM){
 			if ((action == KeyEvent.ACTION_DOWN)
 					&& (keyCode == KeyEvent.KEYCODE_VOLUME_UP)) {
 				adapter.getCurrent().zoomIn();
@@ -422,6 +422,32 @@ public class GallerySwipeActivity extends SherlockActivity {
 				adapter.getCurrent().zoomOut();
 				return true;
 			}
+        }else if(volumeButtons==Constants.VOLUME_BUTTONS_CHANGE_PAGE)
+                if ((action == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_VOLUME_UP)) {
+                    if (readingMode == Constants.RIGHT_LEFT_MODE){
+                        if(mViewPager.getCurrentItem()!=mViewPager.getChildCount()-1){
+                            mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
+                        }
+                    }else{
+                        if(mViewPager.getCurrentItem()!=0){
+                            mViewPager.setCurrentItem(mViewPager.getCurrentItem()-1);
+                        }
+                    }
+                    return true;
+                } else if ((action == KeyEvent.ACTION_DOWN)
+                        && (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)) {
+                    if (readingMode == Constants.RIGHT_LEFT_MODE){
+                        if(mViewPager.getCurrentItem()!=0){
+                            mViewPager.setCurrentItem(mViewPager.getCurrentItem()-1);
+                        }
+                    }else{
+                        if(mViewPager.getCurrentItem()!=mViewPager.getChildCount()-1){
+                            mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
+                        }
+                    }
+                    return true;
+                }
 		return super.dispatchKeyEvent(event);
 	}
 }

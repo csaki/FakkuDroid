@@ -181,10 +181,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
 	private void showProgress(final boolean show) {
-		// On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-		// for very easy animations. If available, use these APIs to fade-in
-		// the progress spinner.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 			int shortAnimTime = getResources().getInteger(
 					android.R.integer.config_shortAnimTime);
 
@@ -219,6 +216,7 @@ public class FavoriteFragment extends SherlockFragment implements
 	class DownloadCatalog extends AsyncTask<String, String, Integer> {
 
         private TextView tvLoadingID;
+        private int i = 0;
 
 		protected void onPreExecute() {
             tvLoadingID = (TextView)view.findViewById(R.id.tvLoadingID);
@@ -246,20 +244,24 @@ public class FavoriteFragment extends SherlockFragment implements
 
             publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","0").replace("@t", "" + llDoujin.size()));
             for (int i = 0; i<llDoujin.size(); i++) {
-                DoujinBean bean = llDoujin.get(i);
-				try {
-					File dir = Helper.getCacheDir(getActivity());
+                final DoujinBean bean = llDoujin.get(i);
+                new Thread(){
+                    public void run () {
+                        try {
+                            File dir = Helper.getCacheDir(getActivity());
 
-					File myFile = new File(dir, bean.getFileImageTitle());
-					Helper.saveInStorage(myFile, bean.getUrlImageTitle());
-					
-					bean.loadImages(dir);
-				} catch (Exception e) {
-					Helper.logError(this, e.getMessage(), e);
-				}
-                publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + i).replace("@t", "" + llDoujin.size()));
+                            File myFile = new File(dir, bean.getFileImageTitle());
+                            Helper.saveInStorage(myFile, bean.getUrlImageTitle());
+
+                            bean.loadImages(dir);
+                        } catch (Exception e) {
+                            Helper.logError(this, e.getMessage(), e);
+                        }
+                        publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + DownloadCatalog.this.i++).replace("@t", "" + llDoujin.size()));
+                    }
+                }.start();
 			}
-
+            while(DownloadCatalog.this.i <= llDoujin.size()-1);
 			return llDoujin.size();
 		}
 

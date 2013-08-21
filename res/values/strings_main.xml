@@ -7,4 +7,5 @@
     <string name="remind_later">Remind me later</string>
     <string name="remind_never">Don\'t remind me again</string>
     <string name="go_other_list">Go to the other list</string>
+    <string name="you_have_the_last_version">You have the last version ^_^</string>
 </resources>

@@ -47,7 +47,7 @@
 	    							
 	    				}	
 	    			</script>
-	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\" onerror=\"this.src=\'file:///android_asset/images/no_image_available.png\'\"/>
+	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\"/>
 	    		</body>
 	    	</html>
 	    ]]>	    
@@ -76,7 +76,7 @@
 			<HTML>
 			<BODY>
 			        <h2 style=\"text-align: center; color: #9D0A0A;\">Click the ads and support FakkuDroid!</h2>
-                    <div style=\"text-align: center; margin-top: 20px;\">Every time you visit <a href=\"http://fakkudroid.blogspot.com/\">the project\'s blog</a>, click the advertisements to support FakkuDroid!
+                    <div style=\"text-align: center; margin-top: 20px;\">Every time you visit <a href=\"http://fakkudroid.blogspot.com/\">fakkudroid.blogspot.com (the project\'s blog)</a>, click the advertisements to support FakkuDroid!
                     <br /><br /><strong>Statistics</strong><br />
                     <br /> - Ago, 2013: 91 ad clicks
                     <br /> - FakkuDroid v2.4.3: 3559 downloads</div><br /><br />

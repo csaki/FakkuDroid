@@ -7,8 +7,8 @@
     <!-- Example Gallery settings -->
 	<string name="pref_header_gallery">Gallery</string>
 	<string name="pref_title_force_screen_orientation">Force Screen Orientation</string>
-	<string name="pref_title_zoom_button">Use volume buttons</string>
-	<string name="pref_description_zoom_button">Use volume buttons as zoom buttons</string>
+	<string name="pref_title_volume_button">Use volume buttons</string>
+	<string name="pref_description_volume_button">Use volume buttons as zoom buttons or change page buttons</string>
 	<string name="pref_title_page_number">Show page number</string>
 	<string name="pref_title_reading_mode">Reading mode</string>
 	<string name="pref_title_perfect_viewer">Use Perfect Viewer</string>
@@ -42,6 +42,18 @@
     </string-array>
     
     <string-array name="pref_screen_orientation_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="pref_volume_buttons_function_list">
+        <item>None</item>
+        <item>Zoom</item>
+        <item>Change Page</item>
+    </string-array>
+
+    <string-array name="pref_volume_buttons_function_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>
