@@ -26,7 +26,8 @@
                 android:id="@+id/ivTitle"
                 android:layout_width="100dp"
                 android:layout_height="140dp"
-                android:scaleType="fitXY"/>
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_launcher"/>
 
     </LinearLayout>
 

@@ -64,9 +64,17 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
 				"<br>", "<br/>")));
 
 		holder.tvTags.setText(s.getTags());
-		
-		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
-		holder.ivPage.setImageBitmap(s.getBitmapImagePage(Helper.getCacheDir(getContext())));
+
+        if(s.isTitleLoaded()){
+            holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
+        }else{
+            holder.ivTitle.setImageResource(R.drawable.ic_launcher);
+        }
+        if(s.isPageLoaded()){
+            holder.ivPage.setImageBitmap(s.getBitmapImagePage(Helper.getCacheDir(getContext())));
+        }else{
+            holder.ivPage.setImageResource(R.drawable.ic_launcher);
+        }
 		return convertView;
 	}
 

@@ -9,13 +9,20 @@
         android:layout_height="match_parent"
         android:visibility="gone" >
 
+        <ProgressBar
+                android:id="@+id/progressBarImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                style="@style/Widget.Sherlock.Light.ProgressBar.Horizontal"/>
+
         <LinearLayout
             android:id="@+id/ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <view
                 android:id="@+id/btnPreviousPage"
@@ -79,7 +86,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/ll"
-            android:layout_margin="5dp"
+            android:layout_below="@id/progressBarImages"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:background="@android:color/white"
             android:scrollbars="horizontal" >
         </ListView>

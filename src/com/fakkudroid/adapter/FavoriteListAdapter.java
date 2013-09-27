@@ -41,7 +41,11 @@ public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 		}
 		holder.tvDoujin.setText(Helper.limitString(s.getTitle(), 36, "..."));
 
-		holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
+        if(s.isTitleLoaded()){
+            holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
+        }else{
+            holder.ivTitle.setImageResource(R.drawable.ic_launcher);
+        }
 		return convertView;
 	}
 

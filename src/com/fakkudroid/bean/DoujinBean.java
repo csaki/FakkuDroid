@@ -318,4 +318,12 @@ public class DoujinBean {
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
+
+    public boolean isPageLoaded(){
+        return pageBitmap!=null;
+    }
+
+    public boolean isTitleLoaded(){
+        return titleBitmap!=null;
+    }
 }

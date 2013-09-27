@@ -10,6 +10,13 @@
         android:layout_height="match_parent"
         android:visibility="gone" >
 
+        <ProgressBar
+                android:id="@+id/progressBarImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                style="@style/Widget.Sherlock.Light.ProgressBar.Horizontal"/>
+
         <LinearLayout
             android:id="@+id/ll"
             android:layout_width="match_parent"
@@ -77,6 +84,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/ll"
+            android:layout_below="@id/progressBarImages"
             android:layout_margin="5dp"
        		android:numColumns="auto_fit"
         	android:columnWidth="150dp"

@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -227,15 +228,54 @@ public class DoujinListFragment extends SherlockListFragment {
 		}
 	}
 
+    class DownloadImage extends AsyncTask<List<DoujinBean>, String, Boolean> {
 
+        private ProgressBar progressBar;
+
+        protected void onPreExecute() {
+            progressBar = (ProgressBar) DoujinListFragment.this.getActivity().findViewById(R.id.progressBarImages);
+        }
+
+        @Override
+        protected Boolean doInBackground(List<DoujinBean>... params) {
+            boolean success = false;
+            List<DoujinBean> list = params[0];
+            for(DoujinBean bean:list){
+                if(DoujinListFragment.this.getActivity()!=null){
+                    try {
+                        File dir = Helper.getCacheDir(getActivity());
+
+                        File myFile = new File(dir, bean.getFileImageTitle());
+                        Helper.saveInStorage(myFile, bean.getUrlImageTitle());
+
+                        myFile = new File(dir, bean.getFileImagePage());
+                        Helper.saveInStorage(myFile, bean.getUrlImagePage());
+
+                        bean.loadImages(dir);
+                    } catch (Exception e) {
+                        Helper.logError(this, e.getMessage(), e);
+                    }
+                }
+                publishProgress();
+            }
+
+            return success;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... progress) {
+            progressBar.setProgress(progressBar.getProgress() + 1);
+            da.notifyDataSetChanged();
+        }
+    }
 
 	class DownloadCatalog extends AsyncTask<String, String, Integer> {
 
-        private TextView tvLoadingID;
-        private int i = 0;
+        private ProgressBar progressBar;
 
 		protected void onPreExecute() {
-            tvLoadingID = (TextView)view.findViewById(R.id.tvLoadingID);
+            progressBar = (ProgressBar) DoujinListFragment.this.getActivity().findViewById(R.id.progressBarImages);
+            progressBar.setProgress(0);
 			showProgress(true);
 		}
 
@@ -257,45 +297,21 @@ public class DoujinListFragment extends SherlockListFragment {
 				llDoujin = new LinkedList<DoujinBean>();
 			if (related)
 				llDoujin.add(0, app.getCurrent());
-            publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","0").replace("@t", "" + llDoujin.size()));
-            List<List<DoujinBean>> list = Helper.splitArrayList(llDoujin, 3);
-            for(List<DoujinBean> l : list){
-                final List<DoujinBean> l2 = l;
-                new Thread(){
-                    public void run () {
-                        for(DoujinBean bean:l2){
-                            if(DoujinListFragment.this.getActivity()!=null){
-                                try {
-                                    File dir = Helper.getCacheDir(getActivity());
-
-                                    File myFile = new File(dir, bean.getFileImageTitle());
-                                    Helper.saveInStorage(myFile, bean.getUrlImageTitle());
-
-                                    myFile = new File(dir, bean.getFileImagePage());
-                                    Helper.saveInStorage(myFile, bean.getUrlImagePage());
-
-                                    bean.loadImages(dir);
-                                } catch (Exception e) {
-                                    Helper.logError(this, e.getMessage(), e);
-                                }
-                            }
-                            publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + DownloadCatalog.this.i++).replace("@t", "" + llDoujin.size()));
-                        }
-                    }
-                }.start();
-            }
-            while(DownloadCatalog.this.i <= llDoujin.size()-1);
 			return llDoujin.size();
 		}
 
-        @Override
-        protected void onProgressUpdate(String... progress) {
-            String msg = progress[0];
-            tvLoadingID.setText(msg);
-        }
-
 		protected void onPostExecute(Integer size) {
 			if(DoujinListFragment.this.getActivity()!=null){
+                if(llDoujin.size()==0){
+                    progressBar.setMax(100);
+                    progressBar.setProgress(100);
+                }else{
+                    progressBar.setMax(llDoujin.size());
+                    List<List<DoujinBean>> list = Helper.splitArrayList(llDoujin, 3);
+                    for(List<DoujinBean> l : list){
+                        Helper.executeAsyncTask(new DownloadImage(), l);
+                    }
+                }
 				setData();
 				showProgress(false);	
 			}
