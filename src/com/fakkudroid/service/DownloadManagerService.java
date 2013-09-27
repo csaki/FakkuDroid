@@ -67,9 +67,13 @@ public class DownloadManagerService extends Service {
 		NotificationManager mNotificationManager;
 
 		DoujinBean bean;
+        boolean error;
+        int i;
 
 		public DownloadDoujin() {
 			cancel = false;
+            error = false;
+            i = 0;
 			this.bean = DoujinMap.next();
 			mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		}
@@ -126,7 +130,7 @@ public class DownloadManagerService extends Service {
 			List<String> lstUrls = bean.getImages();
 			List<String> lstFiles = bean.getImagesFiles();
 			String folder = bean.getId();
-			File dir = Helper.getDir(folder, getApplicationContext());
+			final File dir = Helper.getDir(folder, getApplicationContext());
 //			boolean doujinAlreadyExists = dir.listFiles().length>3;
 			File cacheDir = Helper.getCacheDir(getApplicationContext());
 			
@@ -152,50 +156,41 @@ public class DownloadManagerService extends Service {
 			}
 
 			try {
-//				try{
-//					if(bean.getUrlDownload()==null){
-//						throw new RuntimeException("Not exists download link.");
-//					}else{
-//						if(!doujinAlreadyExists){
-//							if(tempZip.exists())
-//								tempZip.delete();
-//							URL url = new URL(bean.getUrlDownload());
-//							URLConnection connection = url.openConnection();
-//							connection.connect();
-//
-//							input = new BufferedInputStream(url.openStream());
-//
-//							output = new FileOutputStream(tempZip);
-//
-//							byte data[] = new byte[1024];
-//							int count;
-//							int downloaded = 0;
-//							int total = connection.getContentLength();
-//							while ((count = input.read(data)) != -1) {
-//								if (!cancel) {
-//									output.write(data, 0, count);
-//									downloaded+=count;
-//									publishProgress(downloaded, total);
-//								}else{
-//									return R.string.download_cancelled;
-//								}
-//							}
-//							output.flush();
-//							Helper.zipDecompress(tempZip.getAbsolutePath(), dir.getAbsolutePath());
-//						}
-//					}
-//				}catch(Exception e){
-					for (int i = 0; i < lstUrls.size(); i++) {
-						File myFile = new File(dir, lstFiles.get(i));
-						if (!cancel) {
-							if (!myFile.exists()) {
-								Helper.saveInStorage(myFile, lstUrls.get(i));
-								publishProgress(i + 1, bean.getQtyPages());
-							}
-						} else
-							return R.string.download_cancelled;
-					}
-//				}
+                List<List<String>> listUrls = Helper.splitArrayList(lstUrls, 3);
+                List<List<String>> listFiles = Helper.splitArrayList(lstFiles, 3);
+
+                for(int i =0; i<listUrls.size();i++){
+
+                    final List<String> lUrls = listUrls.get(i);
+                    final List<String> lFiles = listFiles.get(i);
+                    new Thread(){
+                        public void run () {
+                            for(int i =0; i<lUrls.size();i++){
+                                File myFile = new File(dir, lFiles.get(i));
+                                if (!cancel&&!error) {
+                                    try {
+                                        if (!myFile.exists()) {
+                                            Helper.saveInStorage(myFile, lUrls.get(i));
+                                        }
+                                    }catch (Exception e){
+                                        Helper.logError(this, e.getMessage(), e);
+                                        error = true;
+                                    }
+                                    publishProgress(DownloadDoujin.this.i++, bean.getQtyPages());
+                                }else{
+                                    break;
+                                }
+                            }
+                        }
+                    }.start();
+                }
+
+                while(DownloadDoujin.this.i <= lstUrls.size()-1&&!error&&!cancel);
+
+                if(error)
+                    return R.string.download_error;
+                if(cancel)
+                    return R.string.download_cancelled;
 
 				DataBaseHandler db = new DataBaseHandler(
 						DownloadManagerService.this);
@@ -205,21 +200,6 @@ public class DownloadManagerService extends Service {
 			} catch (Exception e) {
 				Helper.logError(this, e.getMessage(), e);
 				return R.string.download_error;
-			} finally{
-				if (output != null) {
-					try {
-						output.close();
-					} catch (IOException e1) {
-					}
-				}
-				if (input != null) {
-					try {
-						input.close();
-					} catch (IOException e1) {
-					}
-				}
-				if(tempZip.exists())
-					tempZip.delete();
 			}
 		}
 

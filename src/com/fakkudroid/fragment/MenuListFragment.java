@@ -474,6 +474,8 @@ public class MenuListFragment extends SherlockListFragment {
                                         })
                                 .setNeutralButton(android.R.string.cancel, null)
                                 .show();
+                    }else{
+                        Toast.makeText(getActivity(),R.string.you_have_the_last_version,Toast.LENGTH_SHORT).show();
                     }
                 } catch (NameNotFoundException e) {
                     Helper.logError(this, "error getting current version", e);

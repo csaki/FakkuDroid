@@ -585,7 +585,7 @@ public class FakkuConnection {
 
         Helper.logInfo("parseHTMLDoujin / imageServer : " + bean.getUrl() + "/read#page=1", html);
 
-		token = "function imgpath(x) {";
+		token = "function imgpath(x)";
 		idxStart = html.indexOf(token, idxStart) + token.length();
 		token = "return '";
 		idxStart = html.indexOf(token, idxStart) + token.length();

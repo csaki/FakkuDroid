@@ -19,8 +19,10 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -538,5 +540,23 @@ public class Helper {
     public static String formatterDate(Date date){
         SimpleDateFormat formatter = new SimpleDateFormat("MMMMM dd, yyyy");
         return formatter.format(date);
+    }
+
+    public static <T> List<List<T>> splitArrayList(List<T> array, int size){
+        List<List<T>> result = new ArrayList<List<T>>();
+
+        for (int i=0;i<size;i++){
+            List<T> list = new ArrayList<T>();
+            result.add(list);
+        }
+        int c = 0;
+
+        for(T t:array){
+           result.get(c++).add(t);
+            if(c>=size)
+                c = 0;
+        }
+
+        return result;
     }
 }

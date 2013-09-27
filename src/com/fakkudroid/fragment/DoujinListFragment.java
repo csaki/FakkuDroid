@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -226,6 +227,8 @@ public class DoujinListFragment extends SherlockListFragment {
 		}
 	}
 
+
+
 	class DownloadCatalog extends AsyncTask<String, String, Integer> {
 
         private TextView tvLoadingID;
@@ -255,29 +258,32 @@ public class DoujinListFragment extends SherlockListFragment {
 			if (related)
 				llDoujin.add(0, app.getCurrent());
             publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","0").replace("@t", "" + llDoujin.size()));
-			for (int i = 0; i<llDoujin.size(); i++) {
-                final DoujinBean bean = llDoujin.get(i);
+            List<List<DoujinBean>> list = Helper.splitArrayList(llDoujin, 3);
+            for(List<DoujinBean> l : list){
+                final List<DoujinBean> l2 = l;
                 new Thread(){
                     public void run () {
-                        if(DoujinListFragment.this.getActivity()!=null){
-                            try {
-                                File dir = Helper.getCacheDir(getActivity());
+                        for(DoujinBean bean:l2){
+                            if(DoujinListFragment.this.getActivity()!=null){
+                                try {
+                                    File dir = Helper.getCacheDir(getActivity());
 
-                                File myFile = new File(dir, bean.getFileImageTitle());
-                                Helper.saveInStorage(myFile, bean.getUrlImageTitle());
+                                    File myFile = new File(dir, bean.getFileImageTitle());
+                                    Helper.saveInStorage(myFile, bean.getUrlImageTitle());
 
-                                myFile = new File(dir, bean.getFileImagePage());
-                                Helper.saveInStorage(myFile, bean.getUrlImagePage());
+                                    myFile = new File(dir, bean.getFileImagePage());
+                                    Helper.saveInStorage(myFile, bean.getUrlImagePage());
 
-                                bean.loadImages(dir);
-                            } catch (Exception e) {
-                                Helper.logError(this, e.getMessage(), e);
+                                    bean.loadImages(dir);
+                                } catch (Exception e) {
+                                    Helper.logError(this, e.getMessage(), e);
+                                }
                             }
+                            publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + DownloadCatalog.this.i++).replace("@t", "" + llDoujin.size()));
                         }
-                        publishProgress(getResources().getString(R.string.downloading_image_cover).replace("@i","" + DownloadCatalog.this.i++).replace("@t", "" + llDoujin.size()));
                     }
                 }.start();
-			}
+            }
             while(DownloadCatalog.this.i <= llDoujin.size()-1);
 			return llDoujin.size();
 		}
