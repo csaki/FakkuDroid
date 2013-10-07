@@ -47,8 +47,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 	private static final String KEY_USER = "user";
 	private static final String KEY_PASSWORD = "password";
 	private static final String KEY_CHECKED = "checked";
-	private static final String KEY_MESSAGE_HELP = "message_help";
-	private static final String KEY_DATE_MESSAGE_HELP = "date_message_help";
 
 	public DataBaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -58,8 +56,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_TABLE_SETTINGS = "CREATE TABLE " + TABLE_SETTINGS + "("
 				+ KEY_ID + " TEXT PRIMARY KEY," + KEY_USER + " TEXT,"
-				+ KEY_MESSAGE_HELP + " INTEGER" + "," + KEY_DATE_MESSAGE_HELP
-				+ " INTEGER" + "," + KEY_PASSWORD + " TEXT" + "," + KEY_CHECKED
+				+ KEY_PASSWORD + " TEXT" + "," + KEY_CHECKED
 				+ " INTEGER" + ")";
 
 		String CREATE_TABLE_DOUJIN = "CREATE TABLE " + TABLE_DOUJIN + "("
@@ -80,7 +77,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 
 		// Create tables again
 		onCreate(db);
-
 	}
 
 	public UserBean addSetting() {
@@ -95,9 +91,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		c.add(Calendar.DATE, random);
 		Date dateMessageHelp = c.getTime();
 
-		bean.setDateShowMessageHelp(dateMessageHelp);
-		bean.setMessageHelp(false);
-
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		ContentValues values = new ContentValues();
@@ -105,9 +98,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_USER, bean.getUser());
 		values.put(KEY_PASSWORD, bean.getPassword());
 		values.put(KEY_CHECKED, bean.isChecked() ? 1 : 0);
-		values.put(KEY_MESSAGE_HELP, bean.isMessageHelp() ? 1 : 0);
-		values.put(KEY_DATE_MESSAGE_HELP, bean.getDateShowMessageHelp()
-				.getTime());
 
 		// Inserting Row
 		db.insert(TABLE_SETTINGS, null, values);
@@ -143,8 +133,7 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		UserBean result = null;
 		// Select All Query
 		String selectQuery = "SELECT " + KEY_ID + "," + KEY_USER + ","
-				+ KEY_PASSWORD + "," + KEY_CHECKED + "," + KEY_MESSAGE_HELP
-				+ "," + KEY_DATE_MESSAGE_HELP + " FROM " + TABLE_SETTINGS;
+				+ KEY_PASSWORD + "," + KEY_CHECKED + " FROM " + TABLE_SETTINGS;
 
 		Log.i(this.getClass().toString(), selectQuery);
 
@@ -157,8 +146,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 			result.setUser(cursor.getString(1));
 			result.setPassword(cursor.getString(2));
 			result.setChecked(cursor.getInt(3) == 1);
-			result.setMessageHelp(cursor.getInt(4) == 1);
-			result.setDateShowMessageHelp(new Date(cursor.getLong(5)));
 		}
 
 		db.close();
@@ -263,9 +250,6 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		values.put(KEY_USER, bean.getUser());
 		values.put(KEY_PASSWORD, bean.getPassword());
 		values.put(KEY_CHECKED, bean.isChecked() ? 1 : 0);
-		values.put(KEY_MESSAGE_HELP, bean.isMessageHelp() ? 1 : 0);
-		values.put(KEY_DATE_MESSAGE_HELP, bean.getDateShowMessageHelp()
-				.getTime());
 
 		// Inserting Row
 		db.update(TABLE_SETTINGS, values, "1=1", new String[] {});

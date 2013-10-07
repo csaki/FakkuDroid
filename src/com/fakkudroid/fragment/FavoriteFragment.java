@@ -39,18 +39,12 @@ import com.fakkudroid.R;
 public class FavoriteFragment extends SherlockFragment implements
 		AdapterView.OnItemClickListener {
 
-	/**
-	 * constante para identificar la llave con la que env�o datos a trav�s de
-	 * intents para comunicar entre las dos actividades: Main y ShowElement
-	 */
-
-	public final static String INTENT_VAR_USER = "intentVarUser";
-
 	FakkuDroidApplication app;
     private LinkedList<DoujinBean> llDoujin;
 	FavoriteListAdapter da;
 	GridView gvFavorites;
     private String user;
+    private String url_user;
     private String title;
     private int numPage = 1;
 	private View mFormView;
@@ -91,10 +85,14 @@ public class FavoriteFragment extends SherlockFragment implements
 		return view.findViewById(resource);
 	}
 	
-	public void setUser(String user){
+	public void setUser(String user, String url_user){
         refresh = true;
         numPage = 1;
 		this.user = user;
+        if(url_user==null)
+            this.url_user = user;
+        else
+            this.url_user = url_user;
 	}
 	
 	@Override
@@ -117,7 +115,7 @@ public class FavoriteFragment extends SherlockFragment implements
 
 		TextView tvPage = (TextView) findViewById(R.id.tvPage);
 		tvPage.setText("Page " + numPage);
-		Helper.executeAsyncTask(new DownloadCatalog(),app.getUrlFavorite(numPage, user));
+		Helper.executeAsyncTask(new DownloadCatalog(),app.getUrlFavorite(numPage, url_user));
 	}
 
 	public void nextPage(View view) {
@@ -160,13 +158,18 @@ public class FavoriteFragment extends SherlockFragment implements
 
 	public void viewInBrowser(View view) {
 		Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
-		viewBrowser.setData(Uri.parse(app.getUrlFavorite(numPage, user)));
+		viewBrowser.setData(Uri.parse(app.getUrlFavorite(numPage, url_user)));
 		this.startActivity(viewBrowser);
 	}
 
 	public void refresh(View view) {
 		loadPage();
 	}
+
+    public void refreshChanginUrlUser(String url_user){
+        this.url_user = url_user;
+        loadPage();
+    }
 
 	/**
 	 * Funci�n auxiliar que recibe una lista de mapas, y utilizando esta data

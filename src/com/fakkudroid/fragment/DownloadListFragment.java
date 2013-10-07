@@ -24,8 +24,10 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.fakkudroid.GallerySwipeActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
+import com.fakkudroid.ViewerMangaActivity;
 import com.fakkudroid.adapter.DownloadListAdapter;
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.component.ImageStore;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Helper;
@@ -185,6 +187,8 @@ public class DownloadListFragment extends SherlockListFragment{
 			Helper.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
 		}else{
 			Intent it = new Intent(this.getActivity(), GallerySwipeActivity.class);
+            //ImageStore.reset();
+            //Intent it = new Intent(this.getActivity(), ViewerMangaActivity.class);
 			this.startActivity(it);
 		}
 	}

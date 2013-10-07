@@ -48,7 +48,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_serie"
+                android:text="@string/label_serie_row"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold" />
 
@@ -63,7 +63,7 @@
                 android:id="@+id/lblArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/label_artist"
+                android:text="@string/label_artist_row"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textStyle="bold" />
 
@@ -79,7 +79,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/label_description"
+        android:text="@string/label_description_row"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textStyle="bold" />
 

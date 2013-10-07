@@ -251,40 +251,37 @@ public class DoujinFragment extends SherlockFragment {
 
         s = getResources().getString(R.string.content_uploader);
 
-        s = s.replace("rpc1", currentBean.getUploader().getDescription());
+        s = s.replace("rpc1", currentBean.getUploader().getUser());
         s = s.replace("rpc2", currentBean.getDate());
 
         SpannableString content = new SpannableString(s);
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         tvUploader.setText(content);
 
-        tvDescription.setText(Html.fromHtml(currentBean.getDescription()
-                .replace("<br>", "<br/>")));
+        s = getResources().getString(R.string.label_description);
+        s = s.replace("?", currentBean.getDescription().replace("<br>", "<br/>"));
+        tvDescription.setText(Html.fromHtml(s));
         tvDescription.setMovementMethod(LinkMovementMethod.getInstance());
 
         content = new SpannableString(currentBean.getTitle());
         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
         tvDoujin.setText(content);
 
-        content = new SpannableString(currentBean.getArtist()
-                .getDescription());
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        tvArtist.setText(content);
+        s = getResources().getString(R.string.label_artist);
+        s = s.replace("?", currentBean.getArtist().getDescription());
+        tvArtist.setText(Html.fromHtml(s));
 
-        content = new SpannableString(currentBean.getSerie()
-                .getDescription());
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        tvSerie.setText(content);
+        s = getResources().getString(R.string.label_serie);
+        s = s.replace("?", currentBean.getSerie().getDescription());
+        tvSerie.setText(Html.fromHtml(s));
 
-        content = new SpannableString(currentBean.getLanguage()
-                .getDescription());
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        tvLanguage.setText(content);
+        s = getResources().getString(R.string.label_language);
+        s = s.replace("?", currentBean.getLanguage().getDescription());
+        tvLanguage.setText(Html.fromHtml(s));
 
-        content = new SpannableString(currentBean.getTranslator()
-                .getDescription());
-        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-        tvTranslator.setText(content);
+        s = getResources().getString(R.string.label_translator);
+        s = s.replace("?", currentBean.getTranslator().getDescription());
+        tvTranslator.setText(Html.fromHtml(s));
 
         Bitmap bmpTitle = currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity()));
         Bitmap bmpPage = currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity()));
@@ -301,7 +298,8 @@ public class DoujinFragment extends SherlockFragment {
             public void onClick(View v) {
                 Intent itMain = new Intent(mMainActivity, MainActivity.class);
                 itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.FAVORITES);
-                itMain.putExtra(MainActivity.INTENT_VAR_USER,currentBean.getUploader().getDescription());
+                itMain.putExtra(MainActivity.INTENT_VAR_USER,currentBean.getUploader().getUser());
+                itMain.putExtra(MainActivity.INTENT_VAR_URL,currentBean.getUploader().getUrlUser());
                 getActivity().startActivityForResult(itMain, 1);
             }
         });
@@ -593,11 +591,13 @@ public class DoujinFragment extends SherlockFragment {
 
         @Override
         public void onClick(View v) {
-            Intent itMain = new Intent(mMainActivity, MainActivity.class);
-            itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN_LIST);
-            itMain.putExtra(MainActivity.INTENT_VAR_URL, urlBean.getUrl());
-            itMain.putExtra(MainActivity.INTENT_VAR_TITLE, urlBean.getDescription());
-            getActivity().startActivityForResult(itMain, 1);
+            if(urlBean!=null&&urlBean.getDescription()!=null&&!urlBean.getDescription().equals("")){
+                Intent itMain = new Intent(mMainActivity, MainActivity.class);
+                itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN_LIST);
+                itMain.putExtra(MainActivity.INTENT_VAR_URL, urlBean.getUrl());
+                itMain.putExtra(MainActivity.INTENT_VAR_TITLE, urlBean.getDescription());
+                getActivity().startActivityForResult(itMain, 1);
+            }
         }
     }
 

@@ -13,13 +13,20 @@
     <string name="fail_load_uploader_doujin">Failed to load uploader</string>
     <string name="fail_load_page_doujin">Failed to load quantity of pages and favorites</string>
     <string name="fail_load_tags_doujin">Failed to load tags</string>
-    <string name="label_serie">Series:</string>
-    <string name="label_artist">Artist:</string>
-    <string name="label_description">Description:</string>
-    <string name="label_language">Language:</string>
-    <string name="label_translator">Translator:</string>
+
+    <string name="label_serie"><![CDATA[<b>Series:</b> <a href=\"#\">?</a>]]>	</string>
+    <string name="label_artist"><![CDATA[<b>Artist:</b> <a href=\"#\">?</a>]]>	</string>
+    <string name="label_description"><![CDATA[<b>Description:</b> ?]]>	</string>
+    <string name="label_language"><![CDATA[<b>Language:</b> <a href=\"#\">?</a>]]>	</string>
+    <string name="label_translator"><![CDATA[<b>Translator:</b> <a href=\"#\">?</a>]]>	</string>
+
+    <string name="label_serie_row">Series:</string>
+    <string name="label_artist_row">Artist:</string>
+    <string name="label_description_row">Description:</string>
+
     <string name="content_uploader">uploaded by rpc1, rpc2</string>
     <string name="content_pages">rpc1 pages, rpc2 favorites</string>
+
     <string name="label_tags">Tags:</string>
     <string name="button_refresh">Refresh</string>
     <string name="title_activity_doujin">DoujinActivity</string>

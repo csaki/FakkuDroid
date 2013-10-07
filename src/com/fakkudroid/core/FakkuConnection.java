@@ -24,6 +24,7 @@ import android.util.Log;
 import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
+import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.exception.ExceptionNotLoggedIn;
 import com.fakkudroid.json.FakkuContent;
@@ -387,7 +388,7 @@ public class FakkuConnection {
 
 		return result;
 	}
-
+/*
     public static DoujinBean parseJsonDoujin(DoujinBean result) throws IOException {
         FakkuContent fakkuContent = null;
         String url = result.getUrl();
@@ -419,7 +420,7 @@ public class FakkuConnection {
         }
 
         return result;
-    }
+    }*/
 
 	public static void parseHTMLDoujin(DoujinBean bean)
 			throws ClientProtocolException, IOException {
@@ -550,7 +551,7 @@ public class FakkuConnection {
 		token = "</a>";
 		idxEnd = html.indexOf(token, idxStart) + token.length();
 		s = html.substring(idxStart, idxEnd);
-		bean.setUploader(parseURLBean(s.trim()));
+		bean.setUploader(parseUserBean(s.trim()));
 
 		// date
 		token = "<b>";
@@ -587,9 +588,10 @@ public class FakkuConnection {
 
 		token = "function imgpath(x)";
 		idxStart = html.indexOf(token, idxStart) + token.length();
-		token = "return '";
+		token = "return";
 		idxStart = html.indexOf(token, idxStart) + token.length();
-		token = "'";
+        token = "'";
+        idxStart = html.indexOf(token, idxStart) + token.length();
 		idxEnd = html.indexOf(token, idxStart) + token.length();
 		s = html.substring(idxStart, idxEnd-1);
 		bean.setImageServer(s);
@@ -708,4 +710,26 @@ public class FakkuConnection {
 		return b;
 	}
 
+    private static UserBean parseUserBean(String a) {
+        UserBean b = new UserBean();
+        String token = ">";
+        int idxStart = a.indexOf(token) + token.length();
+        token = "<";
+        int idxEnd = a.indexOf(token, idxStart);
+        String s = a.substring(idxStart, idxEnd);
+
+        b.setUser(s.trim());
+
+        token = "href=\"";
+        idxStart = a.indexOf(token) + token.length();
+        token = "/users/";
+        idxStart = a.indexOf(token, idxStart) + token.length();
+        token = "\"";
+        idxEnd = a.indexOf(token, idxStart);
+        s = a.substring(idxStart, idxEnd);
+
+        b.setUrlUser(s.trim());
+
+        return b;
+    }
 }

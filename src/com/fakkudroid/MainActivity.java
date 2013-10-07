@@ -137,9 +137,10 @@ public class MainActivity extends SherlockFragmentActivity implements
                     .replace(R.id.content_frame, frmDownloadQueueListFragment).commit();
         }  else if (currentContent == FAVORITES) {
             String user = getIntent().getStringExtra(INTENT_VAR_USER);
-                frmFavorite = new FavoriteFragment();
-                frmFavorite.setMainActivity(this);
-                frmFavorite.setUser(user);
+            String url_user = getIntent().getStringExtra(INTENT_VAR_URL);
+            frmFavorite = new FavoriteFragment();
+            frmFavorite.setMainActivity(this);
+            frmFavorite.setUser(user, url_user);
             String title = getResources().getString(R.string.favorite);
             title = title.replace("usr", user);
             setTitle(title);
@@ -183,7 +184,7 @@ public class MainActivity extends SherlockFragmentActivity implements
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(MainActivity.this);
         boolean checkUpdates = prefs.getBoolean("check_updates_checkbox", true);
-        if(checkUpdates)
+        if(checkUpdates&&!app.isRemindMeLater())
             Helper.executeAsyncTask(new CheckerVersion());
     }
 
@@ -226,6 +227,14 @@ public class MainActivity extends SherlockFragmentActivity implements
             menu.add(Menu.NONE, R.string.go_other_list, 3, R.string.go_other_list)
                     .setIcon(R.drawable.content_import_export)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        }
+        if (currentContent == FAVORITES){
+            String user = getIntent().getStringExtra(INTENT_VAR_USER).toLowerCase();
+            if(user.equals(app.getSettingBean().getUser().toLowerCase())){
+                menu.add(Menu.NONE, R.string.change_user_url, 1, R.string.change_user_url)
+                        .setIcon(R.drawable.social_cc_bcc)
+                        .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            }
         }
         return true;
     }
@@ -300,6 +309,31 @@ public class MainActivity extends SherlockFragmentActivity implements
                                 startActivityForResult(itMain, 1);
                             }});
             }
+            alert.show();
+        } else if (item.getItemId() == R.string.change_user_url){
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+            alert.setTitle("Change User URL");
+            alert.setMessage("User URL : ");
+
+            // Set an EditText view to get user input
+            final EditText input = new EditText(this);
+            alert.setView(input);
+
+            alert.setPositiveButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,
+                                            int whichButton) {
+                            String value = input.getText().toString();
+                            SharedPreferences prefs = PreferenceManager
+                                    .getDefaultSharedPreferences(MainActivity.this);
+                            prefs.edit().putString("url_user", value).commit();
+                            frmFavorite.refreshChanginUrlUser(value);
+                        }
+                    });
+
+            alert.setNegativeButton(android.R.string.cancel, null);
+
             alert.show();
         }
         return true;
@@ -448,11 +482,18 @@ public class MainActivity extends SherlockFragmentActivity implements
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         SharedPreferences prefs = PreferenceManager
                                                 .getDefaultSharedPreferences(MainActivity.this);
-                                        prefs.edit().putBoolean("check_updates_checkbox", false);
+                                        prefs.edit().putBoolean("check_updates_checkbox", false).commit();
+
                                     }
                                 })
-                                .setNeutralButton(R.string.remind_later, null)
+                                .setNeutralButton(R.string.remind_later, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        app.setRemindMeLater(true);
+                                    }})
                                 .show();
+                    }else{
+                        app.setRemindMeLater(true);
                     }
                 } catch (NameNotFoundException e) {
                     Helper.logError(this, "error getting current version", e);

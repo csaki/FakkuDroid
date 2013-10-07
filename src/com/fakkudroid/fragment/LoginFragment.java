@@ -3,9 +3,11 @@ package com.fakkudroid.fragment;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -213,10 +215,14 @@ public class LoginFragment extends SherlockFragment {
 
                 s.setUser(mUser);
                 s.setPassword(mPassword);
+                s.setUrlUser(null);
                 s.setChecked(result);
 
                 new DataBaseHandler(getActivity()).updateSetting(s);
                 app.setSettingBean(null);
+                SharedPreferences prefs = PreferenceManager
+                        .getDefaultSharedPreferences(getActivity());
+                prefs.edit().putString("url_user", null).commit();
             } catch (ClientProtocolException e) {
                 Helper.logError(this, e.getMessage(), e);
             } catch (IOException e) {

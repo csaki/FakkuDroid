@@ -23,7 +23,7 @@ public class DoujinBean {
 	private int qtyFavorites;
 	private URLBean language;
 	private URLBean translator;
-	private URLBean uploader;
+	private transient UserBean uploader;
 	private String date;
 	private List<URLBean> lstTags;
 	private boolean addedInFavorite, completed;
@@ -207,11 +207,11 @@ public class DoujinBean {
 		this.translator = translator;
 	}
 
-	public URLBean getUploader() {
+	public UserBean getUploader() {
 		return uploader;
 	}
 
-	public void setUploader(URLBean uploader) {
+	public void setUploader(UserBean uploader) {
 		this.uploader = uploader;
 	}
 

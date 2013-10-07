@@ -8,8 +8,7 @@ public class UserBean {
 	private String user;
 	private String password;
 	private boolean checked;
-	private Date dateShowMessageHelp;
-	private boolean messageHelp;
+    private String urlUser;
 	
 	public String getUser() {
 		return user;
@@ -29,21 +28,10 @@ public class UserBean {
 	public void setChecked(boolean checked) {
 		this.checked = checked;
 	}
-	public Date getDateShowMessageHelp() {
-		return dateShowMessageHelp;
-	}
-	public void setDateShowMessageHelp(Date dateShowMessageHelp) {
-		this.dateShowMessageHelp = dateShowMessageHelp;
-	}
-	public boolean isMessageHelp() {
-		return messageHelp;
-	}
-	public void setMessageHelp(boolean messageHelp) {
-		this.messageHelp = messageHelp;
-	}
-	
-	public boolean isShowMessage(){
-		Calendar c = Calendar.getInstance(); 
-		return !messageHelp&&c.getTime().after(dateShowMessageHelp);
-	}
+    public String getUrlUser() {
+        return urlUser;
+    }
+    public void setUrlUser(String urlUser) {
+        this.urlUser = urlUser;
+    }
 }

@@ -172,7 +172,7 @@ public class Helper {
         Log.i(tag, msg);
 
         if(writeLogFile&&logFile!=null){
-            String message = tag + "\n" + msg;
+            String message = "\n\n" + tag + "\n" + msg;
             writeLog(message);
         }
     }

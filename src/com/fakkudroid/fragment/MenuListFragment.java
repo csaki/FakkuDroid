@@ -14,14 +14,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -263,6 +261,7 @@ public class MenuListFragment extends SherlockListFragment {
                 Intent itMain = new Intent(getActivity(), MainActivity.class);
                 itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.FAVORITES);
                 itMain.putExtra(MainActivity.INTENT_VAR_USER, app.getSettingBean().getUser());
+                itMain.putExtra(MainActivity.INTENT_VAR_URL, app.getSettingBean().getUrlUser());
                 getActivity().startActivityForResult(itMain, 1);
 			} else if (bean.getDescription().startsWith("Sign")) {
                 Intent itMain = new Intent(getActivity(), MainActivity.class);

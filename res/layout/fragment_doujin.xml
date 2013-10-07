@@ -193,93 +193,61 @@
                         android:textColor="@android:color/darker_gray" />
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/label_serie"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
-
-                    <TextView
                         android:id="@+id/tvSerie"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/fail_load_serie_doujin"
+                        android:text="@string/label_serie"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_artist"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
+                        android:layout_margin="5dp"/>
 
                     <TextView
                         android:id="@+id/tvArtist"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/fail_load_artist_doujin"
+                        android:text="@string/label_artist"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_description"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
+                        android:layout_margin="5dp"/>
 
                     <TextView
                         android:id="@+id/tvDescription"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/fail_load_description_doujin"
+                        android:text="@string/label_description"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/darker_gray" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_language"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
+                        android:layout_margin="5dp"/>
 
                     <TextView
                         android:id="@+id/tvLanguage"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/fail_load_language_doujin"
+                        android:text="@string/label_language"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/label_translator"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
+                        android:layout_margin="5dp"/>
 
                     <TextView
                         android:id="@+id/tvTranslator"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/fail_load_translator_doujin"
+                        android:text="@string/label_translator"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@color/url_color" />
+                        android:layout_margin="5dp"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/label_tags"
                         android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"/>
 
                     <LinearLayout
                         android:id="@+id/llTags"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" >
+                        android:orientation="vertical"
+                        android:layout_margin="5dp">
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>
