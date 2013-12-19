@@ -9,6 +9,11 @@ Dependecies
  - [ActionBarSherlock][1]
  - [ColorPicker][2]
 
+Developed By
+============
+
+* Cesar Arasaki - <cesar.arasaki.88@gmail.com>
+
 License
 =======
 
