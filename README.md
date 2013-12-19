@@ -3,7 +3,7 @@ FakkuDroid
 
 Unofficial Android App for Fakku
 
-Dependecies
+Dependencies
 =======
 
  - [ActionBarSherlock][1]
