@@ -232,7 +232,7 @@ public class MainActivity extends SherlockFragmentActivity implements
             String user = getIntent().getStringExtra(INTENT_VAR_USER).toLowerCase();
             if(user.equals(app.getSettingBean().getUser().toLowerCase())){
                 menu.add(Menu.NONE, R.string.change_user_url, 1, R.string.change_user_url)
-                        .setIcon(R.drawable.social_cc_bcc)
+                            .setIcon(R.drawable.social_cc_bcc)
                         .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             }
         }

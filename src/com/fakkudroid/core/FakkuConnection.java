@@ -315,23 +315,26 @@ public class FakkuConnection {
 			bean.setDescription(s);
 
 			// tags
-			token = "Tags:";
-			idxStart = section.indexOf(token) + token.length();
-			token = "</div>";
-			idxEnd = section.indexOf(token, idxStart);
-			s = section.substring(idxStart, idxEnd);
-			token = ",";
-
 			List<URLBean> lstTags = new ArrayList<URLBean>();
 
-			for (String str : s.split(",")) {
-				idxStart = str.indexOf("<a");
-				token = "</a>";
-				idxEnd = str.indexOf(token, idxStart) + token.length();
-				String tag = str.substring(idxStart, idxEnd);
+            try {
+                token = "Tags:";
+                idxStart = section.indexOf(token) + token.length();
+                token = "</div>";
+                idxEnd = section.indexOf(token, idxStart);
+                s = section.substring(idxStart, idxEnd);
+                token = ",";
 
-				lstTags.add(parseURLBean(tag));
-			}
+                for (String str : s.split(",")) {
+                    idxStart = str.indexOf("<a");
+                    token = "</a>";
+                    idxEnd = str.indexOf(token, idxStart) + token.length();
+                    String tag = str.substring(idxStart, idxEnd);
+
+                    lstTags.add(parseURLBean(tag));
+                }
+            }catch (Exception e){}
+
 			bean.setLstTags(lstTags);
 
 			result.add(bean);
@@ -562,23 +565,26 @@ public class FakkuConnection {
 		bean.setDate(s);
 
 		// tags
-		token = "Tags:";
-		idxStart = html.indexOf(token) + token.length();
-		token = "</div>";
-		idxEnd = html.indexOf(token, idxStart);
-		s = html.substring(idxStart, idxEnd);
-		token = ",";
+        List<URLBean> lstTags = new ArrayList<URLBean>();
 
-		List<URLBean> lstTags = new ArrayList<URLBean>();
+        try{
+            token = "Tags:";
+            idxStart = html.indexOf(token) + token.length();
+            token = "</div>";
+            idxEnd = html.indexOf(token, idxStart);
+            s = html.substring(idxStart, idxEnd);
+            token = ",";
 
-		for (String str : s.split(",")) {
-			idxStart = str.indexOf("<a");
-			token = "</a>";
-			idxEnd = str.indexOf(token, idxStart) + token.length();
-			String tag = str.substring(idxStart, idxEnd);
+            for (String str : s.split(",")) {
+                idxStart = str.indexOf("<a");
+                token = "</a>";
+                idxEnd = str.indexOf(token, idxStart) + token.length();
+                String tag = str.substring(idxStart, idxEnd);
 
-			lstTags.add(parseURLBean(tag));
-		}
+                lstTags.add(parseURLBean(tag));
+            }
+        }catch (Exception e){}
+
 		bean.setLstTags(lstTags);
 
 		//Get imageServer link

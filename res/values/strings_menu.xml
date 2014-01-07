@@ -16,6 +16,7 @@
 	    <item>Back</item>
 	    <item>Sort by&#8230; Newest</item>
 	    <item>Sort by&#8230; English</item>
+        <item>Sort by&#8230; Japanese</item>
 	    <item>Sort by&#8230; Tags</item>
 	    <item>Sort by&#8230; Artist</item>
 	    <item>Most Controversial</item>
@@ -27,6 +28,7 @@
 	    <item>Back</item>
 	    <item>Sort by&#8230; Newest</item>
 	    <item>Sort by&#8230; English</item>
+        <item>Sort by&#8230; Japanese</item>
 	    <item>Sort by&#8230; Tags</item>
 	    <item>Sort by&#8230; Series</item>
 	    <item>Sort by&#8230; Artist</item>
@@ -39,17 +41,19 @@
 	    <item></item>
 	    <item>http://www.fakku.net/manga/newest</item>
 	    <item>http://www.fakku.net/manga/english</item>
+        <item>http://www.fakku.net/manga/japanese</item>
 	    <item>http://www.fakku.net/manga/tags</item>
 	    <item>http://www.fakku.net/manga/artists</item>
 	    <item>http://www.fakku.net/manga/controversial</item>
 	    <item>http://www.fakku.net/manga/favorites</item>
 	    <item>http://www.fakku.net/manga/popular</item>
-	    <item>http://www.fakku.net/manga/random</item>	    	    
+	    <item>http://www.fakku.net/manga/random</item>
 	</string-array>
 	<string-array name="url_browse_doujinshis">
 	    <item></item>
 	    <item>http://www.fakku.net/doujinshi/newest</item>
 	    <item>http://www.fakku.net/doujinshi/english</item>
+        <item>http://www.fakku.net/doujinshi/japanese</item>
 	    <item>http://www.fakku.net/doujinshi/tags</item>
 	    <item>http://www.fakku.net/doujinshi/series</item>
 	    <item>http://www.fakku.net/doujinshi/artists</item>

@@ -1,7 +1,6 @@
 package com.fakkudroid;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -9,11 +8,10 @@ import android.preference.Preference;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.androidexplorer.AndroidExplorerActivity;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.util.Helper;
-import com.larswerkman.colorpicker.ColorPickerActivity;
+import com.larswerkman.holocolorpicker.ColorPickerActivity;
 
 import org.apache.commons.io.FileUtils;
 

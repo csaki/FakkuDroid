@@ -1,4 +1,4 @@
-package com.larswerkman.colorpicker;
+package com.larswerkman.holocolorpicker;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.fakkudroid.*;
 import com.fakkudroid.R;
 import com.fakkudroid.util.Constants;
 

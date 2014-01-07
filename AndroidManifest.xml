@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fakkudroid"
-    android:versionCode="36"
-    android:versionName="2.7.1" >
+    android:versionCode="37"
+    android:versionName="2.7.2" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -25,12 +25,10 @@
         </activity>
         <activity
                 android:name="com.fakkudroid.ViewerMangaActivity"
-                android:label="@string/title_activity_gallery_swipe"
                 android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
             android:name="com.fakkudroid.GallerySwipeActivity"
-            android:label="@string/title_activity_gallery_swipe"
             android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
@@ -39,7 +37,7 @@
                 android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
-                android:name="com.larswerkman.colorpicker.ColorPickerActivity"
+                android:name="com.larswerkman.holocolorpicker.ColorPickerActivity"
                 android:label="@string/title_activity_color_picker"
                 android:theme="@style/Theme.Sherlock" >
         </activity>
