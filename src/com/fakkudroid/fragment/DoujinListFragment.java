@@ -42,12 +42,12 @@ public class DoujinListFragment extends SherlockListFragment {
 	FakkuDroidApplication app;
 	LinkedList<DoujinBean> llDoujin;
 	DoujinListAdapter da;
-	String url = Constants.SITEROOT;;
+	String url = Constants.SITEROOT;
 	int numPage = 1;
 	private View mFormView;
 	private View mStatusView;
 	private View view;
-	boolean related = false;
+	boolean related;
 	private MainActivity mMainActivity;
     private boolean refresh;
 
@@ -161,15 +161,13 @@ public class DoujinListFragment extends SherlockListFragment {
 		TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
 		tvPage.setText("Page " + numPage);
 		if (related)
-			Helper.executeAsyncTask(new DownloadCatalog(), app.getCurrent()
-								.urlRelated(numPage));
-		else 
-			Helper.executeAsyncTask(new DownloadCatalog(), app.getUrl(numPage, url));
+			Helper.executeAsyncTask(new DownloadCatalog(), app.getRelatedUrl(numPage, url));
+        else
+            Helper.executeAsyncTask(new DownloadCatalog(), app.getUrl(numPage, url));
 	}
 
 	public void setUrl(String url) {
         refresh = true;
-		related = false;
 		numPage = 1;
 		this.url = url;
 	}
@@ -295,8 +293,6 @@ public class DoujinListFragment extends SherlockListFragment {
 			}
 			if (llDoujin == null)
 				llDoujin = new LinkedList<DoujinBean>();
-			if (related)
-				llDoujin.add(0, app.getCurrent());
 			return llDoujin.size();
 		}
 

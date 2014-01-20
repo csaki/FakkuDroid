@@ -19,15 +19,17 @@ public class WebViewImageLayout extends RelativeLayout{
     String backgroundColor;
 	ProgressBar bar;
 	NoZoomControlWebView wb;
-	
+    boolean showZoomButtons;
+
 	private WebViewImageLayout(Context context){
 		super(context);
 	}
 	
-	public WebViewImageLayout(String imageFile, String backgroundColor, Context context){
+	public WebViewImageLayout(String imageFile, String backgroundColor, Context context, boolean showZoomButtons){
 		super(context);
 		this.imageFile = imageFile;
         this.backgroundColor = backgroundColor;
+        this.showZoomButtons = showZoomButtons;
 		init();
 	}
 
@@ -38,6 +40,7 @@ public class WebViewImageLayout extends RelativeLayout{
 		bar.setMax(100);
 		
 		wb = new NoZoomControlWebView(getContext());
+        wb.init(getContext(), showZoomButtons);
 		
 		this.bar.setProgress(0);
 

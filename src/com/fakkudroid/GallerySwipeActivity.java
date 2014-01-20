@@ -26,6 +26,7 @@ import com.actionbarsherlock.view.Window;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -45,7 +46,7 @@ public class GallerySwipeActivity extends SherlockActivity {
 	ViewPager mViewPager;
 	Toast toast;
 	GalleryPagerAdapter adapter;
-	boolean showPageNumber;
+	boolean showPageNumber, showZoomButtons, hideMenuButton;
 	int readingMode, volumeButtons;
     String backgroundColor;
 
@@ -58,6 +59,9 @@ public class GallerySwipeActivity extends SherlockActivity {
 		setContentView(R.layout.activity_gallery_swipe);
 
 		configSettings();
+        ImageButton menuButton = (ImageButton)findViewById(R.id.menuButton);
+        if(hideMenuButton)
+            menuButton.setVisibility(View.GONE);
 
 		app = (FakkuDroidApplication) getApplication();
 		adapter = new GalleryPagerAdapter(this);
@@ -111,6 +115,8 @@ public class GallerySwipeActivity extends SherlockActivity {
 			break;
 		}
 		showPageNumber = prefs.getBoolean("page_number_checkbox", true);
+        showZoomButtons = prefs.getBoolean("show_zoom_buttons_checkbox", false);
+        hideMenuButton = prefs.getBoolean("hide_menu_button_checkbox", false);
         volumeButtons = Integer.parseInt(prefs.getString("volume_button_list", "" + Constants.VOLUME_BUTTONS_NONE));
 		readingMode = Integer.parseInt(prefs
 				.getString("reading_mode_list", "0"));
@@ -280,11 +286,11 @@ public class GallerySwipeActivity extends SherlockActivity {
 					WebViewImageLayout wv = null;
 					if (!myFile.exists())
 						wv = new WebViewImageLayout(strImageFile,backgroundColor,
-								GallerySwipeActivity.this);
+								GallerySwipeActivity.this, showZoomButtons);
 					else
 						wv = new WebViewImageLayout("file://"
 								+ myFile.getAbsolutePath(),backgroundColor,
-								GallerySwipeActivity.this);
+								GallerySwipeActivity.this, showZoomButtons);
 					views.add(wv);
 				}
 			} else
@@ -294,11 +300,11 @@ public class GallerySwipeActivity extends SherlockActivity {
 					WebViewImageLayout wv = null;
 					if (!myFile.exists())
 						wv = new WebViewImageLayout(strImageFile,backgroundColor,
-								GallerySwipeActivity.this);
+								GallerySwipeActivity.this, showZoomButtons);
 					else
 						wv = new WebViewImageLayout("file://"
 								+ myFile.getAbsolutePath(),backgroundColor,
-								GallerySwipeActivity.this);
+								GallerySwipeActivity.this, showZoomButtons);
 					views.add(wv);
 				}
 		}

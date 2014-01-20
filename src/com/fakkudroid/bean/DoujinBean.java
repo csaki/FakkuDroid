@@ -3,6 +3,7 @@ package com.fakkudroid.bean;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.graphics.Bitmap;
@@ -27,18 +28,11 @@ public class DoujinBean {
 	private String date;
 	private List<URLBean> lstTags;
 	private boolean addedInFavorite, completed;
-	private String timeAgo;
 	private transient Bitmap titleBitmap, pageBitmap;
 	private String imageServer;
 	private String urlDownload;
-
-	public String getTimeAgo() {
-		return timeAgo;
-	}
-
-	public void setTimeAgo(String timeAgo) {
-		this.timeAgo = timeAgo;
-	}
+    private LinkedList<CommentBean> lstTopComments;
+    private LinkedList<CommentBean> lstRecentComments;
 
 	public String getId() {
 		int idxStart = url.lastIndexOf("/") + 1;
@@ -49,19 +43,6 @@ public class DoujinBean {
 	public String urlFavorite(String urlFavorite) {
 
 		return urlFavorite.replace("@id",getId()) ;
-	}
-
-	public String urlComments(int page) {
-		int idxStart = url.lastIndexOf("/");
-		idxStart = url.substring(0, idxStart).lastIndexOf("/") + 1;
-
-		return Constants.SITECOMMENTS.replace("@id", url.substring(idxStart))
-				.replace("@page", page * 30 + "");
-	}
-
-	public String urlRelated(int nroPage) {
-		return url + "/related"
-				+ ((nroPage - 1) * 10);
 	}
 
 	public boolean isAddedInFavorite() {
@@ -325,5 +306,22 @@ public class DoujinBean {
 
     public boolean isTitleLoaded(){
         return titleBitmap!=null;
+    }
+
+    public String getRelatedUrl(){
+        String relatedUrl = url.replaceAll(Constants.SITEROOT, Constants.SITEROOT + "/related");
+        return relatedUrl;
+    }
+    public LinkedList<CommentBean> getLstTopComments() {
+        return lstTopComments;
+    }
+    public void setLstTopComments(LinkedList<CommentBean> lstTopComments) {
+        this.lstTopComments = lstTopComments;
+    }
+    public LinkedList<CommentBean> getLstRecentComments() {
+        return lstRecentComments;
+    }
+    public void setLstRecentComments(LinkedList<CommentBean> lstRecentComments) {
+        this.lstRecentComments = lstRecentComments;
     }
 }

@@ -40,16 +40,19 @@ public class FakkuDroidApplication extends Application {
 	public void setCurrent(DoujinBean current) {
 		this.current = current;
 	}
-	
+
 	public String getTitle(int nroPage, String title){
 		return title + " #" + nroPage;
 	}
 	public String getUrl(int nroPage, String url) {
-		if (nroPage > 1) {
-			return url + Constants.PAGE + nroPage;
-		}
-		return url;
-	}
+        if (nroPage > 1) {
+            return url + Constants.PAGE + nroPage;
+        }
+        return url;
+    }
+    public String getRelatedUrl(int nroPage, String url) {
+        return url + "/" + (--nroPage*10);
+    }
 	public String getUrlFavorite(int numPage, String user) {
 		return Helper.escapeURL(Constants.SITEFAVORITE.replace("@user", user.toLowerCase()).replace("@numpage", numPage + ""));
 	}

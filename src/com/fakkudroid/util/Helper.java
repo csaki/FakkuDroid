@@ -27,13 +27,18 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 
 import android.annotation.SuppressLint;
@@ -329,12 +334,44 @@ public class Helper {
 	public static String limitString(String s, int maxSize) {
 		return limitString(s, maxSize, "");
 	}
+    public static String getHTML(String url) throws IOException {
+        url = escapeURL(url);
 
-	public static String getHTML(String url) throws IOException {
+        HttpClient client = new DefaultHttpClient();
+        HttpGet request = new HttpGet(url);
+        HttpResponse response = client.execute(request);
+        int code = response.getStatusLine().getStatusCode();
+
+        if(code!=200)
+            System.out.print(code);
+
+        String html = "";
+        InputStream in = response.getEntity().getContent();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        StringBuilder str = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            str.append(line);
+        }
+        in.close();
+        html = str.toString();
+        return html;
+    }
+
+	public static String getHTMLCORS(String url) throws IOException {
 		url = escapeURL(url);
 
 		HttpClient client = new DefaultHttpClient();
+        ((AbstractHttpClient) client)
+            .addRequestInterceptor(new HttpRequestInterceptor() {
+                public void process(final HttpRequest request,
+                                    final HttpContext context) throws HttpException,
+                        IOException {
+                    request.setHeader(HTTP.TARGET_HOST, "www.fakku.net");
+                }
+        });
 		HttpGet request = new HttpGet(url);
+        request.setHeader("Referer", "http://www.fakku.net");
 		HttpResponse response = client.execute(request);
         int code = response.getStatusLine().getStatusCode();
 

@@ -1,24 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
-    <ListView
-        android:id="@android:id/list"
+    <RelativeLayout
+        android:id="@+id/view_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:background="@android:color/white"
-        android:scrollbars="horizontal" >
-    </ListView>
+        android:visibility="gone">
 
-    <TextView
-        android:id="@android:id/empty"
+        <LinearLayout
+            android:id="@+id/ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal" >
+
+            <view
+                android:id="@+id/btnPreviousPage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                class="com.fakkudroid.component.ActionImageButton"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/previous_page"
+                android:onClick="previousPage"
+                android:scaleType="fitXY"
+                android:src="@drawable/navigation_previous_item" />
+
+            <TextView
+                android:id="@+id/tvPage"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="0.6"
+                android:gravity="center"
+                android:text="@string/page_1"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:onClick="changePage"
+                android:clickable="true"
+                android:textColor="@color/main_color" />
+
+            <view
+                android:id="@+id/btnNextPage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                class="com.fakkudroid.component.ActionImageButton"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/next_page"
+                android:onClick="nextPage"
+                android:scaleType="fitXY"
+                android:src="@drawable/navigation_next_item" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_above="@+id/ll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:background="@android:color/white"
+            android:scrollbars="horizontal" >
+        </ListView>
+
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_above="@+id/ll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_data"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/view_status"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="@string/no_data"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:background="@android:color/white">
+
+        <view
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            class="com.fakkudroid.component.GifWebView"
+            android:gravity="center"
+            />
+
+    </RelativeLayout>
 
 </RelativeLayout>

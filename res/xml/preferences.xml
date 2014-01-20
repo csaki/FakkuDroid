@@ -72,6 +72,14 @@
             android:defaultValue="true"
             android:key="page_number_checkbox"
             android:title="@string/pref_title_page_number" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="show_zoom_buttons_checkbox"
+            android:title="@string/pref_title_show_zoom_buttons" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="hide_menu_button_checkbox"
+            android:title="@string/pref_title_hide_menu_buttons" />
 
         <ListPreference
             android:defaultValue="0"

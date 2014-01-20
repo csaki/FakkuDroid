@@ -9,6 +9,8 @@
 	<string name="pref_title_force_screen_orientation">Force Screen Orientation</string>
 	<string name="pref_title_volume_button">Use volume buttons</string>
 	<string name="pref_description_volume_button">Use volume buttons as zoom buttons or change page buttons</string>
+    <string name="pref_title_show_zoom_buttons">Show zoom buttons</string>
+    <string name="pref_title_hide_menu_buttons">Hide menu button</string>
 	<string name="pref_title_page_number">Show page number</string>
 	<string name="pref_title_reading_mode">Reading mode</string>
 	<string name="pref_title_perfect_viewer">Use Perfect Viewer</string>

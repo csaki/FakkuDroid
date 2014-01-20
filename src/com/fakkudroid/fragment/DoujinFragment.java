@@ -611,4 +611,8 @@ public class DoujinFragment extends SherlockFragment {
 
         return false;
     }
+
+    public DoujinBean getCurrentBean() {
+        return currentBean;
+    }
 }

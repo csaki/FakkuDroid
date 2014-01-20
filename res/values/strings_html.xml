@@ -9,6 +9,7 @@
 	    			<script type=\"text/javascript\">
 	    				$(window).load(function() {resizeAll(@width,@height);});
 	    				$(window).bind(\'resize\', resizeWindow);
+
 	    				function resizeWindow(e) {
 	    					if(first){
 	    						if(japaneseMode)
@@ -47,7 +48,7 @@
 	    							
 	    				}	
 	    			</script>
-	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\"/>
+	    			<img class=\"resized\" src = \"@url\" style=\"padding:0px;\" />
 	    		</body>
 	    	</html>
 	    ]]>	    

@@ -4,7 +4,6 @@ public class Constants {
 
 	public static String SITEADDFAVORITE = "http://www.fakku.net/favorites/@id/add/";
 	public static String SITEREMOVEFAVORITE = "http://www.fakku.net/favorites/@id/remove/";
-	public static String SITERELATED = "http://www.fakku.net/get/related/";
 	public static String SITELOGIN = "http://www.fakku.net/login/submit";
 	public static String SITEDOWNLOAD = "http://fakkudroid.blogspot.com/2013/01/download-apk.html";
 	public static String SITEROOT = "http://www.fakku.net";
@@ -22,22 +21,7 @@ public class Constants {
 	public static String SITEMANGA = "http://www.fakku.net/manga"; 
 	
 	//Menu Doujinshi
-	public static String SITEDOUJINSHI = "http://www.fakku.net/doujinshi"; 
-	
-	//Menu Sort
-	public static String SORTNEWEST = "/newest"; 
-	public static String SORTENGLISH = "/english"; 
-	public static String SORTTAGS = "/tags"; 
-	public static String SORTARTIST = "/artists"; 
-	public static String SORTSERIES = "/series"; 
-	
-	//Menu Most
-	public static String MOSTCONTROVERSIAL = "/controversial";
-	public static String MOSTFAVORITES = "/favorites";
-	public static String MOSTPOPULAR = "/popular"; 
-	
-	//Menu Random
-	public static String RANDOM = "/random"; 
+	public static String SITEDOUJINSHI = "http://www.fakku.net/doujinshi";
 	
 	//Settings
 	public static final int RIGHT_LEFT_MODE = 0;
@@ -59,7 +43,7 @@ public class Constants {
     public static final int VOLUME_BUTTONS_ZOOM= 1;
     public static final int VOLUME_BUTTONS_CHANGE_PAGE = 2;
 	
-	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.7.2";
+	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.8.1";
 
 	public static final int WIDTH_STANDARD = 119;
 	public static final int HEIGHT_STANDARD = 163;

@@ -15,25 +15,28 @@ import android.widget.ZoomButtonsController;
 public class NoZoomControlWebView extends WebView {
 
     private ZoomButtonsController zoom_controll = null;
+    private boolean showZoomButtons;
 
     public NoZoomControlWebView(Context context) {
         super(context);
-        init(context);
     }
 
     public NoZoomControlWebView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context);
     }
 
     public NoZoomControlWebView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
     }
 
+
     @SuppressLint("SetJavaScriptEnabled")
-    private void init(Context context) {
-        disableControls();
+    public void init(Context context, boolean showZoomButtons) {
+        this.showZoomButtons = showZoomButtons;
+        if(!showZoomButtons)
+            disableControls();
+        else
+            enableControls();
         getSettings().setJavaScriptEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
         setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
@@ -52,6 +55,17 @@ public class NoZoomControlWebView extends WebView {
         } else {
             // Use the reflection magic to make it work on earlier APIs
             getControlls();
+        }
+    }
+    /**
+     * Disable the controls
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void enableControls(){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            // Use the API 11+ calls to disable the controls
+            this.getSettings().setBuiltInZoomControls(true);
+            this.getSettings().setDisplayZoomControls(true);
         }
     }
 
@@ -81,7 +95,7 @@ public class NoZoomControlWebView extends WebView {
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         super.onTouchEvent(ev);
-        if (zoom_controll != null){
+        if (!showZoomButtons&&zoom_controll != null){
             // Hide the controlls AFTER they where made visible by the default implementation.
             zoom_controll.setVisible(false);
         }
