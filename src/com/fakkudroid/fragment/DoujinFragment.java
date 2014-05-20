@@ -1,17 +1,9 @@
 package com.fakkudroid.fragment;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.http.client.ClientProtocolException;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,8 +19,8 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,12 +37,19 @@ import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.core.DataBaseHandler;
-import com.fakkudroid.exception.ExceptionNotLoggedIn;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
+import com.fakkudroid.exception.ExceptionNotLoggedIn;
 import com.fakkudroid.service.DownloadManagerService;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.http.client.ClientProtocolException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class DoujinFragment extends SherlockFragment {
 
@@ -61,6 +60,7 @@ public class DoujinFragment extends SherlockFragment {
     private View view;
     private DoujinBean currentBean;
     boolean alreadyDownloaded = false;
+    boolean quickDownload = false;
     private ProgressBar progressBar;
 
     public void setMainActivity(MainActivity mainActivity) {
@@ -75,6 +75,8 @@ public class DoujinFragment extends SherlockFragment {
             currentBean = new DoujinBean();
             currentBean.setUrl(getActivity().getIntent().getStringExtra(MainActivity.INTENT_VAR_URL));
         }
+
+        quickDownload = getActivity().getIntent().getBooleanExtra(MainActivity.INTENT_VAR_QUICK_DOWNLOAD, false);
     }
 
     @Override
@@ -164,7 +166,7 @@ public class DoujinFragment extends SherlockFragment {
         }
     }
 
-    public void download(View view) {
+    public void download(boolean quick) {
         app.setCurrent(currentBean);
         if (!alreadyDownloaded) {
             if (DownloadManagerService.started) {
@@ -182,7 +184,7 @@ public class DoujinFragment extends SherlockFragment {
                 getActivity().startService(new Intent(getActivity(), DownloadManagerService.class));
                 Helper.executeAsyncTask(new UpdateStatus());
             }
-        } else {
+        } else if (!quick){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage(R.string.ask_delete)
                     .setPositiveButton(android.R.string.yes,
@@ -216,6 +218,17 @@ public class DoujinFragment extends SherlockFragment {
                                 }
                             }).setNegativeButton(android.R.string.no, null)
                     .create().show();
+        }
+
+        if (quick) {
+            mMainActivity.quickDownloadDone();
+
+            if (alreadyDownloaded)
+            {
+                Toast.makeText(getActivity(),
+                        getResources().getString(R.string.quick_download_already),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -524,6 +537,10 @@ public class DoujinFragment extends SherlockFragment {
                 if (bean != null && bean.getTitle() != null) {
                     setComponents();
                     showProgress(false);
+
+                    if (quickDownload)
+                        download(true);
+
                 } else {
                     Toast.makeText(getActivity(),
                             getResources().getString(R.string.no_data),
@@ -575,6 +592,7 @@ public class DoujinFragment extends SherlockFragment {
                 btnDownload.setContentDescription(getResources().getString(
                         R.string.delete));
             }
+
         }
 
     }
