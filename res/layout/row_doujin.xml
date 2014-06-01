@@ -73,7 +73,18 @@
                 android:layout_height="wrap_content"
                 android:text="@string/fail_load_artist_doujin"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
+            <Button
+                android:id="@+id/btnQuickDownload"
+                android:padding="12dp"
+                android:layout_marginTop="12dp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FF4500"
+                android:text="Quick download"/>
         </LinearLayout>
+
     </RelativeLayout>
 
     <TextView

@@ -1,13 +1,5 @@
 package com.fakkudroid.fragment;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.http.client.ClientProtocolException;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
@@ -35,6 +27,14 @@ import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
+
+import org.apache.http.client.ClientProtocolException;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class DoujinListFragment extends SherlockListFragment {
 
@@ -175,6 +175,7 @@ public class DoujinListFragment extends SherlockListFragment {
 	private void setData() {
 		da = new DoujinListAdapter(this.getActivity(), R.layout.row_doujin, 0,
 				llDoujin, related);
+        da.doujinListFragment = this;
 		this.setListAdapter(da);
         refresh = false;
 	}
@@ -182,12 +183,27 @@ public class DoujinListFragment extends SherlockListFragment {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
 		DoujinBean data = llDoujin.get(position);
+        Intent itMain = intentForDoujin(data);
+        getActivity().startActivityForResult(itMain, 1);
+	}
+
+    private Intent intentForDoujin(DoujinBean data) {
+
         Intent itMain = new Intent(mMainActivity, MainActivity.class);
         itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN);
         itMain.putExtra(MainActivity.INTENT_VAR_URL, data.getUrl());
         itMain.putExtra(MainActivity.INTENT_VAR_TITLE, data.getTitle());
+
+        return itMain;
+    }
+
+    public void quickDownload(int position)
+    {
+        DoujinBean data = llDoujin.get(position);
+        Intent itMain = intentForDoujin(data);
+        itMain.putExtra(MainActivity.INTENT_VAR_QUICK_DOWNLOAD, true);
         getActivity().startActivityForResult(itMain, 1);
-	}
+    }
 
 	/**
 	 * Shows the progress UI and hides the login form.
@@ -309,7 +325,7 @@ public class DoujinListFragment extends SherlockListFragment {
                     }
                 }
 				setData();
-				showProgress(false);	
+				showProgress(false);
 			}
 		}
 	}

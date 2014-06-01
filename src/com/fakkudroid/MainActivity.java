@@ -58,6 +58,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     public final static String INTENT_VAR_USER = "intentVarUser";
     public final static String INTENT_VAR_CURRENT_CONTENT = "intentVarCurrentContent";
     public final static String INTENT_VAR_IS_RELATED = "intentVarIsRelated";
+    public static final String INTENT_VAR_QUICK_DOWNLOAD = "intentQuickDownload";
 
     public static final int DOUJIN_LIST = 1;
     public static final int DOWNLOADS = 2;
@@ -458,6 +459,10 @@ public class MainActivity extends SherlockFragmentActivity implements
         startActivityForResult(itMain, 1);
     }
 
+    public void quickDownloadDone() {
+        super.onBackPressed();
+    }
+
     class CheckerVersion extends AsyncTask<String, Float, VersionBean> {
 
         @Override
@@ -572,7 +577,7 @@ public class MainActivity extends SherlockFragmentActivity implements
     }
 
     public void download(View view) {
-        frmDoujinFragment.download(view);
+        frmDoujinFragment.download(false);
     }
 
     public void read(View view) {
