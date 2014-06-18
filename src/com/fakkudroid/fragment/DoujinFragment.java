@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +35,8 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.fakkudroid.GallerySwipeActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
+import com.fakkudroid.asynctask.DownloadAsyncTask;
+import com.fakkudroid.asynctask.ReadAsyncTask;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
@@ -60,7 +64,6 @@ public class DoujinFragment extends SherlockFragment {
     private View view;
     private DoujinBean currentBean;
     boolean alreadyDownloaded = false;
-    boolean quickDownload = false;
     private ProgressBar progressBar;
 
     public void setMainActivity(MainActivity mainActivity) {
@@ -75,8 +78,6 @@ public class DoujinFragment extends SherlockFragment {
             currentBean = new DoujinBean();
             currentBean.setUrl(getActivity().getIntent().getStringExtra(MainActivity.INTENT_VAR_URL));
         }
-
-        quickDownload = getActivity().getIntent().getBooleanExtra(MainActivity.INTENT_VAR_QUICK_DOWNLOAD, false);
     }
 
     @Override
@@ -153,38 +154,14 @@ public class DoujinFragment extends SherlockFragment {
     }
 
     public void read(View view) {
-        app.setCurrent(currentBean);
-        SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (preferenceManager.getBoolean("perfect_viewer_checkbox", false) && alreadyDownloaded) {
-            List<String> lstFiles = app.getCurrent().getImagesFiles();
-            File dir = Helper.getDir(app.getCurrent().getId(), getActivity());
-            File myFile = new File(dir, lstFiles.get(0));
-            Helper.openPerfectViewer(myFile.getAbsolutePath(), getActivity());
-        } else {
-            Intent it = new Intent(getActivity(), GallerySwipeActivity.class);
-            this.startActivity(it);
-        }
+        Helper.executeAsyncTask(new ReadAsyncTask(getActivity(),alreadyDownloaded), currentBean);
     }
 
-    public void download(boolean quick) {
-        app.setCurrent(currentBean);
+    public void download() {
         if (!alreadyDownloaded) {
-            if (DownloadManagerService.started) {
-                if (!DownloadManagerService.DoujinMap.exists(app.getCurrent())) {
-                    Toast.makeText(getActivity(),
-                            getResources().getString(R.string.in_queue),
-                            Toast.LENGTH_SHORT).show();
-                    DownloadManagerService.DoujinMap.add(app.getCurrent());
-                } else {
-                    Toast.makeText(getActivity(),
-                            getResources().getString(R.string.already_queue),
-                            Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                getActivity().startService(new Intent(getActivity(), DownloadManagerService.class));
-                Helper.executeAsyncTask(new UpdateStatus());
-            }
-        } else if (!quick){
+            Helper.executeAsyncTask(new DownloadAsyncTask(getActivity()),currentBean);
+            Helper.executeAsyncTask(new UpdateStatus());
+        } else{
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage(R.string.ask_delete)
                     .setPositiveButton(android.R.string.yes,
@@ -218,17 +195,6 @@ public class DoujinFragment extends SherlockFragment {
                                 }
                             }).setNegativeButton(android.R.string.no, null)
                     .create().show();
-        }
-
-        if (quick) {
-            mMainActivity.quickDownloadDone();
-
-            if (alreadyDownloaded)
-            {
-                Toast.makeText(getActivity(),
-                        getResources().getString(R.string.quick_download_already),
-                        Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
@@ -503,13 +469,7 @@ public class DoujinFragment extends SherlockFragment {
             DoujinBean bean = beans[0];
 
             try {
-                //if(bean.getUrl().toLowerCase().endsWith("random"))
-                    FakkuConnection.parseHTMLDoujin(bean);
-               /* else{
-                    if(!bean.getUrl().contains(Constants.SITEAPI))
-                        bean.setUrl(bean.getUrl().replace(Constants.SITEROOT, Constants.SITEAPI));
-                    FakkuConnection.parseJsonDoujin(bean);
-                }*/
+                FakkuConnection.parseHTMLDoujin(bean);
             } catch (Exception e) {
                 bean = null;
                 Helper.logError(this, e.getMessage(), e);
@@ -538,9 +498,6 @@ public class DoujinFragment extends SherlockFragment {
                     setComponents();
                     showProgress(false);
 
-                    if (quickDownload)
-                        download(true);
-
                 } else {
                     Toast.makeText(getActivity(),
                             getResources().getString(R.string.no_data),
@@ -552,6 +509,7 @@ public class DoujinFragment extends SherlockFragment {
             }
         }
     }
+
 
     class UpdateStatus extends AsyncTask<Boolean, Integer, Boolean> {
 

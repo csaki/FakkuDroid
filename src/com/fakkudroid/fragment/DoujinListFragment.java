@@ -22,7 +22,9 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.adapter.DoujinListAdapter;
+import com.fakkudroid.asynctask.DownloadAsyncTask;
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Constants;
@@ -199,10 +201,27 @@ public class DoujinListFragment extends SherlockListFragment {
 
     public void quickDownload(int position)
     {
-        DoujinBean data = llDoujin.get(position);
-        Intent itMain = intentForDoujin(data);
-        itMain.putExtra(MainActivity.INTENT_VAR_QUICK_DOWNLOAD, true);
-        getActivity().startActivityForResult(itMain, 1);
+        DoujinBean bean = llDoujin.get(position);
+        boolean alreadyDownloaded = verifyAlreadyDownloaded(bean);
+        if (alreadyDownloaded)
+        {
+            Toast.makeText(getActivity(),
+                    getResources().getString(R.string.quick_download_already),
+                    Toast.LENGTH_SHORT).show();
+        }else{
+            Helper.executeAsyncTask(new DownloadAsyncTask(getActivity()), bean);
+        }
+    }
+
+    public boolean verifyAlreadyDownloaded(DoujinBean bean) {
+        try {
+            DataBaseHandler db = new DataBaseHandler(this.getActivity());
+            return db.getDoujinBean(bean.getId()) != null;
+        } catch (Exception e) {
+            Helper.logError(this, "Error verifing if exists doujin in the db.", e);
+        }
+
+        return false;
     }
 
 	/**

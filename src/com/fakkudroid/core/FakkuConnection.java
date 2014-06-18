@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import static org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -21,16 +20,13 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import android.util.Log;
-
 import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.exception.ExceptionNotLoggedIn;
-import com.fakkudroid.json.FakkuContent;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
 import com.google.gson.Gson;
@@ -278,39 +274,6 @@ public class FakkuConnection {
 
 		return result;
 	}
-/*
-    public static DoujinBean parseJsonDoujin(DoujinBean result) throws IOException {
-        FakkuContent fakkuContent = null;
-        String url = result.getUrl();
-        String html = Helper.getHTML(url);
-
-        Gson gson = new Gson();
-        fakkuContent = gson.fromJson(html, FakkuContent.class);
-
-        if(fakkuContent!=null){
-            result.setUrl(url);
-            result.setQtyPages(fakkuContent.getPages());
-            result.setQtyFavorites(fakkuContent.getFavorites());
-            result.setUrlImageTitle(Constants.SITEROOT + fakkuContent.getCover());
-            result.setUrlImagePage(Constants.SITEROOT + fakkuContent.getSample());
-            result.setTitle(fakkuContent.getName());
-            result.setDescription(fakkuContent.getDescription());
-            if(cookiesStore!=null){
-                String htmlComplete = Helper.getHTML(url, cookiesStore);
-                result.setAddedInFavorite(!html.contains("Add To Favorites"));
-            }
-            result.setDate(Helper.formatterDate(new Date(fakkuContent.getDate())));
-            result.setSerie(fakkuContent.getSeries().parseURLBean());
-            result.setArtist(fakkuContent.getArtists().parseURLBean());
-            result.setTranslator(fakkuContent.getTranslators().parseURLBean());
-            result.setLstTags(fakkuContent.getTags().parseListURLBean());
-            result.setUploader(fakkuContent.parseUploader());
-            result.setLanguage(fakkuContent.parseLanguage());
-            result.setImageServer(fakkuContent.imageServer());
-        }
-
-        return result;
-    }*/
 
 	public static void parseHTMLDoujin(DoujinBean bean)
 			throws IOException {
@@ -420,22 +383,27 @@ public class FakkuConnection {
         }catch(Exception e){}
 
 		//Get imageServer link
-		html = Helper.getHTMLCORS(bean.getUrl() + "/read#page=1");
-
-        Helper.logInfo("parseHTMLDoujin / imageServer : " + bean.getUrl() + "/read#page=1", html);
-
-		String token = "function imgpath(x)";
-		int idxStart = html.indexOf(token, 0) + token.length();
-		token = "return";
-		idxStart = html.indexOf(token, idxStart) + token.length();
-        token = "'";
-        idxStart = html.indexOf(token, idxStart) + token.length();
-		int idxEnd = html.indexOf(token, idxStart) + token.length();
-		String s = html.substring(idxStart, idxEnd-1);
-		bean.setImageServer(s);
 		
         bean.setCompleted(true);
 	}
+
+    public static String imageServerUrl(String url) throws IOException{
+        String result = null;
+
+        String html = Helper.getHTMLCORS(url + "/read#page=1");
+
+        Helper.logInfo("parseHTMLDoujin / imageServer : " + url + "/read#page=1", html);
+
+        String token = "function imgpath(x)";
+        int idxStart = html.indexOf(token, 0) + token.length();
+        token = "return";
+        idxStart = html.indexOf(token, idxStart) + token.length();
+        token = "'";
+        idxStart = html.indexOf(token, idxStart) + token.length();
+        int idxEnd = html.indexOf(token, idxStart) + token.length();
+        result = html.substring(idxStart, idxEnd-1);
+        return result;
+    }
 
 	public static LinkedList<URLBean> parseHTMLSeriesList(String url)
 			throws IOException {
