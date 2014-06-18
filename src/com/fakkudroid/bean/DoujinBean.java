@@ -31,8 +31,8 @@ public class DoujinBean {
 	private transient Bitmap titleBitmap, pageBitmap;
 	private String imageServer;
 	private String urlDownload;
-    private LinkedList<CommentBean> lstTopComments;
-    private LinkedList<CommentBean> lstRecentComments;
+    private transient LinkedList<CommentBean> lstTopComments;
+    private transient LinkedList<CommentBean> lstRecentComments;
 
 	public String getId() {
 		int idxStart = url.lastIndexOf("/") + 1;

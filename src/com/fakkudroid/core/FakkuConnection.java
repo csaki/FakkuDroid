@@ -17,6 +17,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import android.util.Log;
 
@@ -119,120 +123,57 @@ public class FakkuConnection {
 
 		String html = Helper.getHTMLCORS(url);
 
-		return parseHTMLtoComments(html);
+        Document doc = Jsoup.parse(html);
+
+		return parseHTMLtoComments(doc.select("div.comment-row"));
 	}
 
-    public static LinkedList<CommentBean> parseHTMLtoComments(String html){
+    public static LinkedList<CommentBean> parseHTMLtoComments(Elements comments){
         LinkedList<CommentBean> result = new LinkedList<CommentBean>();
 
-        String token = "<div class=\"comment- comment-row\">|<div class=\"comment-reply comment-row\">|<div class=\"comment-tree comment-row\">";
-        html = html.replaceAll("<div class=\"comment- comment-row",
-                "<div class=\"comment- comment-row\">manga");
-        html = html.replaceAll("<div class=\"comment-reply comment-row",
-                "<div class=\"comment-reply comment-row\">reply");
-        html = html.replaceAll("<div class=\"comment-tree comment-row",
-                "<div class=\"comment-tree comment-row\">tree");
-        String[] sections = html.split(token);
-
-        for (int i = 1; i < sections.length; i++) {
-            String section = sections[i];
+        for (Element comment:comments){
             int level = 0;
-            if (section.startsWith("manga")) {
-                level = 0;
-            } else if (section.startsWith("reply")) {
-                level = 1;
-            } else if (section.startsWith("tree")) {
+            if(comment.hasClass("comment-tree")){
                 level = 2;
-            } else {
+            }else if(comment.hasClass("comment-reply")){
+                level = 1;
+            }else if(comment.hasClass("comment-")){
+                level = 0;
+            }else{
                 continue;
             }
+
             CommentBean c = new CommentBean();
             c.setLevel(level);
 
-            token = "<a id=\"";
-            String value = "";
-            int idxStart = section.indexOf(token) + token.length();
-            int idxEnd = section.indexOf("\"", idxStart);
-            value = section.substring(idxStart, idxEnd);
-
-            c.setId(value);
-
+            c.setId(comment.select("a").first().id());
             URLBean user = new URLBean();
-
-            token = "<a href=\"";
-            idxStart = section.indexOf(token) + token.length();
-            idxEnd = section.indexOf("\"", idxStart);
-            value = section.substring(idxStart, idxEnd);
-
-            user.setUrl(Constants.SITEROOT + value);
-
-            token = ">";
-            idxStart = section.indexOf(token, idxStart) + token.length();
-            idxEnd = section.indexOf("<", idxStart);
-            value = section.substring(idxStart, idxEnd);
-            value = unescapeHtml4(value);
-
-            user.setDescription(value);
+            Element userCreator = comment.select("[itemprop=creator]").first();
+            user.setUrl(Constants.SITEROOT + userCreator.attr("href"));
+            user.setDescription(userCreator.text());
 
             c.setUser(user);
 
-            token = "<span itemprop=\"commentTime\">";
-            idxStart = section.indexOf(token) + token.length();
-            idxEnd = section.indexOf("<", idxStart);
-            value = section.substring(idxStart, idxEnd);
 
-            c.setDate(value);
+            c.setDate(comment.select("[itemprop=commentTime]").first().text());
 
-            idxStart = section.indexOf("class=\"rank\"");
+            Element likeA = comment.select("a.arrow").select(".like").first();
+            Element disLikeA = comment.select("a.arrow").select(".dislike").first();
 
-            token = "href=\"";
-            idxStart = section.indexOf(token, idxStart) + token.length();
-            idxEnd = section.indexOf("\"", idxStart);
-            value = section.substring(idxStart, idxEnd);
+            c.setUrlLike(likeA.attr("href"));
+            c.setUrlDislike(disLikeA.attr("href"));
 
-            c.setUrlLike(Constants.SITEROOT + value);
-
-            token = "href=\"";
-            idxStart = section.indexOf(token, idxStart) + token.length();
-            idxEnd = section.indexOf("\"", idxStart);
-            value = section.substring(idxStart, idxEnd);
-
-            c.setUrlDislike(Constants.SITEROOT + value);
-
-            if (section.contains("class=\"arrow selected like\"")) {
+            if(likeA.hasClass("selected")) {
                 c.setSelectLike(1);
-            } else if (section.contains("class=\"arrow selected dislike\"")) {
+            }else if(disLikeA.hasClass("selected")) {
                 c.setSelectLike(-1);
             }
 
-            token = "<i class=\"plus\">";
-            if (!section.contains(token)) {
-                token = "<i class=\"minus\">";
-            }
-            if (!section.contains(token)) {
-                token = "<i class=\"score plus\">";
-            }
-            if (!section.contains(token)) {
-                token = "<i class=\"score minus\">";
-            }
-            if (section.contains(token)) {
-                idxStart = section.indexOf(token) + token.length();
-                idxEnd = section.indexOf(" ", idxStart);
-                value = section.substring(idxStart, idxEnd);
+            Element rank = comment.select("i").first();
+            if(rank!=null)
+                c.setRank(Integer.parseInt(rank.text().replace("+","").replace(" points","")));
 
-                if (value.startsWith("+"))
-                    c.setRank(Integer.parseInt(value.substring(1)));
-                else
-                    c.setRank(Integer.parseInt(value));
-            }
-
-            token = "comment_text\" itemprop=\"commentText\">";
-            idxStart = section.indexOf(token) + token.length();
-            idxEnd = section.indexOf("</div>", idxStart);
-            value = section.substring(idxStart, idxEnd);
-
-            c.setComment(value);
-
+            c.setComment(comment.select("div.comment_text").first().text());
             result.add(c);
         }
 
@@ -257,97 +198,54 @@ public class FakkuConnection {
 
         Helper.logInfo("parseHTMLCatalog : " + url, html);
 
-		String token = "content-row manga|content-row doujinshi";
-		String[] sections = html.split(token);
-		for (int i = 1; i < sections.length; i++) {
-			String section = sections[i];
+        Document doc = Jsoup.parse(html);
 
-			DoujinBean bean = new DoujinBean();
+        Elements elements = doc.select(".content-row");
+		for (Element e : elements) {
+            if(e.hasClass("manga")||e.hasClass("doujinshi")){
+                DoujinBean bean = new DoujinBean();
 
-			int idxStart = -1;
-			int idxEnd = -1;
-			String s = "";
+                // url
+                bean.setUrl(Constants.SITEROOT + e.select("a").first().attr("href"));
 
-			// url
-			token = "<a href=\"";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
-			bean.setUrl(Constants.SITEROOT + s);
+                // Images
+                Elements elementsAux = e.select("img");
+                bean.setUrlImageTitle(elementsAux.select(".cover").first().attr("src"));
 
-			// Images
-			token = "src=\"";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
-			bean.setUrlImageTitle(s);
+                // Look for the next image tag
+                bean.setUrlImagePage(elementsAux.select(".sample").first().attr("src"));
 
-			// Look for the next image tag
-            token = "<img class=\"sample\"";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			token = "src=\"";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
-			bean.setUrlImagePage(s);
+                // title
+                bean.setTitle(e.select(".content-title").first().text());
 
-			// title
-			token = "title=\"";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
-            s = unescapeHtml4(s);
-			bean.setTitle(s);
+                elementsAux = e.select(".row").select("a");
+                // serie
+                bean.setSerie(parseURLBean(elementsAux.get(0)));
+                // language
+                bean.setLanguage(parseURLBean(elementsAux.get(1)));
+                // artist
+                bean.setArtist(parseURLBean(elementsAux.get(2)));
+                // translator
+                bean.setTranslator(parseURLBean(elementsAux.get(3)));
 
-			// serie
-			token = "<h3>Series:</h3>";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			idxStart = section.indexOf("<a", idxStart);
-			token = "</a>";
-			idxEnd = section.indexOf(token, idxStart) + token.length();
-			s = section.substring(idxStart, idxEnd);
-			bean.setSerie(parseURLBean(s.trim()));
+                // description
+                bean.setDescription(e.select(".short").first().text().substring(14));
 
-			// artist
-			token = "<h3>Artist:</h3>";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			idxStart = section.indexOf("<a", idxStart);
-			token = "</a>";
-			idxEnd = section.indexOf(token, idxStart) + token.length();
-			s = section.substring(idxStart, idxEnd);
-			bean.setArtist(parseURLBean(s.trim()));
+                // tags
+                List<URLBean> lstTags = new ArrayList<URLBean>();
 
-			// description
-			token = "<h3>Description:</h3>";
-			idxStart = section.indexOf(token, idxStart) + token.length();
-			idxEnd = section.indexOf("</div>", idxStart);
-			s = section.substring(idxStart, idxEnd);
-			bean.setDescription(s);
+                try {
+                    elementsAux = e.select(".short").select("a");
 
-			// tags
-			List<URLBean> lstTags = new ArrayList<URLBean>();
+                    for (Element tag : elementsAux) {
+                        lstTags.add(parseURLBean(tag));
+                    }
+                }catch (Exception ex){}
 
-            try {
-                token = "Tags:";
-                idxStart = section.indexOf(token) + token.length();
-                token = "</div>";
-                idxEnd = section.indexOf(token, idxStart);
-                s = section.substring(idxStart, idxEnd);
-                token = ",";
+                bean.setLstTags(lstTags);
 
-                for (String str : s.split(",")) {
-                    idxStart = str.indexOf("<a");
-                    token = "</a>";
-                    idxEnd = str.indexOf(token, idxStart) + token.length();
-                    String tag = str.substring(idxStart, idxEnd);
-
-                    lstTags.add(parseURLBean(tag));
-                }
-            }catch (Exception e){}
-
-			bean.setLstTags(lstTags);
-
-			result.add(bean);
+                result.add(bean);
+            }
 		}
 
 		return result;
@@ -359,43 +257,21 @@ public class FakkuConnection {
 
 		String html = Helper.getHTMLCORS(url);
 
+        Document doc = Jsoup.parse(html);
+
         Helper.logInfo("parseHTMLFavorite : " + url, html);
 
-		String token = "<div class=\"favorite ";
-		String[] sections = html.split(token);
-		for (int i = 1; i < sections.length; i++) {
-			String section = sections[i];
-
+        Elements favorites = doc.select(".favorite");
+		for (Element favorite : favorites) {
 			DoujinBean bean = new DoujinBean();
 
-			int idxStart = -1;
-			int idxEnd = -1;
-
 			// Images
-			String s = "";
-			token = "src=\"";
-			idxStart = section.indexOf(token) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
+            Element img = favorite.select("img").first();
+			bean.setUrlImageTitle(img.attr("src"));
 
-			bean.setUrlImageTitle(s);
+			bean.setTitle(img.attr("alt"));
 
-			s = "";
-			token = "alt=\"";
-			idxStart = section.indexOf(token) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
-			s = section.substring(idxStart, idxEnd);
-            s = unescapeHtml4(s);
-
-			bean.setTitle(s);
-
-			s = "";
-			token = "href=\"";
-			idxStart = section.indexOf(token) + token.length();
-			idxEnd = section.indexOf("\"", idxStart);
-			s = Constants.SITEROOT + section.substring(idxStart, idxEnd);
-
-			bean.setUrl(s);
+			bean.setUrl(Constants.SITEROOT + favorite.select(".cover").first().attr("href"));
 
 			result.add(bean);
 		}
@@ -444,170 +320,103 @@ public class FakkuConnection {
 
         Helper.logInfo("parseHTMLDoujin : " + url, html);
 
-		bean.setAddedInFavorite(!html.contains("Add To Favorites"));
+        Document doc = Jsoup.parse(html);
+
+        bean.setAddedInFavorite(!html.contains("Add To Favorites"));
 
 		// Qty Pages
-		String token = "</b> pages";
-		int idxStart = html.indexOf(token);
-		token = "<b>";
-		idxStart = html.substring(0, idxStart).lastIndexOf(token)
-				+ token.length();
-		int idxEnd = html.indexOf("<", idxStart);
-		String s = html.substring(idxStart, idxEnd);
 
+        Element el = doc.select("div.small").first().select("b").first();
 		int c = 0;
 		try {
-			c = Integer.parseInt(s.replace(",", "").trim());
-		} catch (Exception e) {
-
-		}
+			c = Integer.parseInt(el.text());
+		} catch (Exception e) {}
 
 		bean.setQtyPages(c);
 
 		// Qty favorites
-		token = " favorites,";
-		idxStart = html.indexOf(token);
-		token = ">";
-		idxStart = html.lastIndexOf(token, idxStart) + token.length();
-		token = " favorites,";
-		idxEnd = html.indexOf(token, idxStart);
-		s = html.substring(idxStart, idxEnd);
+        el = doc.select("div.small").first().select("div.left").first();
 
-		c = Integer.parseInt(s.replace(",", "").trim());
-
+        String aux = el.text();
+        aux = aux.replace("\n","");
+        c = aux.indexOf(' ');
+        if(c!=-1)
+            aux = aux.substring(0, c).trim();
+        try {
+            c = Integer.parseInt(aux);
+        }catch (Exception e){
+            c = 0;
+        }
 		bean.setQtyFavorites(c);
 
 		// URL
-		token = "<div class=\"wrap\">";
-		idxStart = html.indexOf(token) + token.length();
-		token = "<a href=\"";
-		idxStart = html.indexOf(token, idxStart) + token.length();
-		idxEnd = html.indexOf("\"", idxStart);
+        el = doc.select("ul.content-navigation").first().select("a").first();
+		aux = Constants.SITEROOT + el.select("a").first().attr("href");
+		bean.setUrl(aux);
 
-		s = html.substring(idxStart, idxEnd);
-		s = Constants.SITEROOT + s;
-		idxEnd = s.lastIndexOf("/");
-		s = s.substring(0, idxEnd);
-		bean.setUrl(s);
-
+        el = doc.select("div.images").first();
 		// Images
-		token = "<img ";
-		idxStart = html.indexOf(token) + token.length();
-		token = "src=\"";
-		idxStart = html.indexOf(token, idxStart) + token.length();
-		idxEnd = html.indexOf("\"", idxStart);
-		s = html.substring(idxStart, idxEnd);
+		aux = el.select("img.cover").first().attr("src");
+		bean.setUrlImageTitle(aux);
 
-		bean.setUrlImageTitle(s);
-
-		token = "<img class=\"sample\"";
-		idxStart = html.indexOf(token, idxStart) + token.length();
-		token = "src=\"";
-		idxStart = html.indexOf(token, idxStart) + token.length();
-		idxEnd = html.indexOf("\"", idxStart);
-		s = html.substring(idxStart, idxEnd);
-		bean.setUrlImagePage(s);
+        aux = el.select("img.sample").first().attr("src");
+		bean.setUrlImagePage(aux);
 
 		// title
-		token = "<h1 itemprop=\"name\">";
-		idxStart = html.indexOf(token) + token.length();
-		idxEnd = html.indexOf("<", idxStart);
-		s = html.substring(idxStart, idxEnd);
-        s = unescapeHtml4(s);
-		bean.setTitle(s);
+        el = doc.select("h1").first();
+        aux = el.text();
+		bean.setTitle(aux);
 
 		// serie
-		token = "<div class=\"left\">Series:";
-		idxStart = html.indexOf(token, idxStart) + token.length();
-		idxStart = html.indexOf("<a", idxStart);
-		token = "</a>";
-		idxEnd = html.indexOf(token, idxStart) + token.length();
-		s = html.substring(idxStart, idxEnd);
-		bean.setSerie(parseURLBean(s.trim()));
+        el = doc.select("div#right").first();
+
+        Elements elements = el.select("a");
+		bean.setSerie(parseURLBean(elements.get(0)));
 
 		// language
-		token = "Language:";
-		idxStart = html.indexOf(token) + token.length();
-		idxStart = html.indexOf("<a", idxStart);
-		token = "</a>";
-		idxEnd = html.indexOf(token, idxStart) + token.length();
-		s = html.substring(idxStart, idxEnd);
-		bean.setLanguage(parseURLBean(s.trim()));
+		bean.setLanguage(parseURLBean(elements.get(1)));
 
 		// artist
-		token = "<div class=\"left\">Artist:";
-		idxStart = html.indexOf(token) + token.length();
-		idxStart = html.indexOf("<a", idxStart);
-		token = "</a>";
-		idxEnd = html.indexOf(token, idxStart) + token.length();
-		s = html.substring(idxStart, idxEnd);
-		bean.setArtist(parseURLBean(s.trim()));
+		bean.setArtist(parseURLBean(elements.get(2)));
+
+        // translator
+        bean.setTranslator(parseURLBean(elements.get(3)));
+
+        // Uploaded by
+        bean.setUploader(parseUserBean(elements.get(4)));
+
+        // date
+        bean.setDate(el.select("div.small").first().select("div.right").first().select("b").first().text());
 
 		// description
-		token = "<b>Description:</b>";
-		idxStart = html.indexOf(token) + token.length();
-		idxEnd = html.indexOf("</div>", idxStart);
-		s = html.substring(idxStart, idxEnd);
-		bean.setDescription(s.trim());
-
-		// translator
-		token = "Translator: ";
-		idxStart = html.indexOf(token) + token.length();
-		idxStart = html.indexOf("<a", idxStart);
-		token = "</a>";
-		idxEnd = html.indexOf(token, idxStart) + token.length();
-		s = html.substring(idxStart, idxEnd);
-		bean.setTranslator(parseURLBean(s.trim()));
-
-		// Uploaded by
-		token = "uploaded by";
-		idxStart = html.indexOf(token) + token.length();
-		idxStart = html.indexOf("<a", idxStart);
-		token = "</a>";
-		idxEnd = html.indexOf(token, idxStart) + token.length();
-		s = html.substring(idxStart, idxEnd);
-		bean.setUploader(parseUserBean(s.trim()));
-
-		// date
-		token = "<b>";
-		idxStart = html.indexOf(token, idxStart) + token.length();
-		token = "</b>";
-		idxEnd = html.indexOf(token, idxStart);
-		s = html.substring(idxStart, idxEnd);
-		bean.setDate(s);
+        el = el.select("[itemprop=description]").first();
+		bean.setDescription(el.text().substring(14));
 
 		// tags
         List<URLBean> lstTags = new ArrayList<URLBean>();
 
         try{
-            token = "Tags:";
-            idxStart = html.indexOf(token) + token.length();
-            token = "</div>";
-            idxEnd = html.indexOf(token, idxStart);
-            s = html.substring(idxStart, idxEnd);
-            token = ",";
+            elements = doc.select("[itemprop=keywords]").first().select("a");
 
-            for (String str : s.split(",")) {
-                idxStart = str.indexOf("<a");
-                token = "</a>";
-                idxEnd = str.indexOf(token, idxStart) + token.length();
-                String tag = str.substring(idxStart, idxEnd);
-
-                lstTags.add(parseURLBean(tag));
+            for (Element a : elements) {
+                lstTags.add(parseURLBean(a));
             }
         }catch (Exception e){}
 
 		bean.setLstTags(lstTags);
 
         try{
-            token = "sub-header";
-            int idx1 = html.indexOf(token);
-            idx1 = html.indexOf(token,idx1+token.length());
-            int idx2 = html.indexOf(token,idx1+token.length());
-            String htmlTopComments = html.substring(idx1, idx2);
-            String htmlRecentComments = html.substring(idx2);
-            bean.setLstTopComments(parseHTMLtoComments(htmlTopComments));
-            bean.setLstRecentComments(parseHTMLtoComments(htmlRecentComments));
+            Elements comments = doc.select("div.comment-row");
+            Elements topComments = new Elements();
+            Elements recentComments = new Elements();
+            for (Element comment : comments){
+                if(comment.parent().hasClass("ajax-container")){
+                    recentComments.add(comment);
+                }else
+                    topComments.add(comment);
+            }
+            bean.setLstTopComments(parseHTMLtoComments(topComments));
+            bean.setLstRecentComments(parseHTMLtoComments(recentComments));
         }catch(Exception e){}
 
 		//Get imageServer link
@@ -615,17 +424,16 @@ public class FakkuConnection {
 
         Helper.logInfo("parseHTMLDoujin / imageServer : " + bean.getUrl() + "/read#page=1", html);
 
-		token = "function imgpath(x)";
-		idxStart = html.indexOf(token, idxStart) + token.length();
+		String token = "function imgpath(x)";
+		int idxStart = html.indexOf(token, 0) + token.length();
 		token = "return";
 		idxStart = html.indexOf(token, idxStart) + token.length();
         token = "'";
         idxStart = html.indexOf(token, idxStart) + token.length();
-		idxEnd = html.indexOf(token, idxStart) + token.length();
-		s = html.substring(idxStart, idxEnd-1);
+		int idxEnd = html.indexOf(token, idxStart) + token.length();
+		String s = html.substring(idxStart, idxEnd-1);
 		bean.setImageServer(s);
 		
-
         bean.setCompleted(true);
 	}
 
@@ -662,45 +470,23 @@ public class FakkuConnection {
 		return result;
 	}
 
-	private static URLBean parseURLBean(String a) {
+	private static URLBean parseURLBean(Element a) {
 		URLBean b = new URLBean();
-		String token = ">";
-		int idxStart = a.indexOf(token) + token.length();
-		token = "<";
-		int idxEnd = a.indexOf(token, idxStart);
-		String s = a.substring(idxStart, idxEnd);
-        s = unescapeHtml4(s);
 
-		b.setDescription(s.trim());
-
-		token = "href=\"";
-		idxStart = a.indexOf(token) + token.length();
-		token = "\"";
-		idxEnd = a.indexOf(token, idxStart);
-		s = a.substring(idxStart, idxEnd);
-
-		b.setUrl(Constants.SITEROOT + s.trim());
+		b.setDescription(a.text());
+		b.setUrl(Constants.SITEROOT + a.attr("href"));
 
 		return b;
 	}
 
-    private static UserBean parseUserBean(String a) {
+    private static UserBean parseUserBean(Element a) {
         UserBean b = new UserBean();
-        String token = ">";
-        int idxStart = a.indexOf(token) + token.length();
-        token = "<";
-        int idxEnd = a.indexOf(token, idxStart);
-        String s = a.substring(idxStart, idxEnd);
-        s = unescapeHtml4(s);
-        b.setUser(s.trim());
+        b.setUser(a.text());
 
-        token = "href=\"";
-        idxStart = a.indexOf(token) + token.length();
-        token = "/users/";
-        idxStart = a.indexOf(token, idxStart) + token.length();
-        token = "\"";
-        idxEnd = a.indexOf(token, idxStart);
-        s = a.substring(idxStart, idxEnd);
+        String href = a.attr("href");
+        String token = "/users/";
+        int idxStart = href.indexOf(token) + token.length();
+        String s = href.substring(idxStart);
 
         b.setUrlUser(s.trim());
 
