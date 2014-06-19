@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,7 +50,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
             holder.ivTitle = (ImageView) convertView.findViewById(R.id.ivTitle);
             holder.ivPage = (ImageView) convertView.findViewById(R.id.ivPage);
             holder.ll = (LinearLayout) convertView.findViewById(R.id.ll);
-            holder.btnQuickDownload = (Button)convertView.findViewById(R.id.btnQuickDownload);
+            holder.btnQuickDownload = (ImageButton)convertView.findViewById(R.id.btnQuickDownload);
+            holder.btnQuickRead = (ImageButton)convertView.findViewById(R.id.btnQuickRead);
 
             convertView.setTag(holder);
 
@@ -91,15 +92,28 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
                     quickDownload((Integer) holder.btnQuickDownload.getTag());
                 }
             });
+            holder.btnQuickRead.setVisibility(View.VISIBLE);
+            holder.btnQuickRead.setTag(position);
+            holder.btnQuickRead.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    quickRead((Integer) holder.btnQuickRead.getTag());
+                }
+            });
         }
-        else
+        else {
             holder.btnQuickDownload.setVisibility(View.GONE);
-
+            holder.btnQuickRead.setVisibility(View.GONE);
+        }
         return convertView;
     }
 
     private void quickDownload(Integer tag) {
         doujinListFragment.quickDownload(tag);
+    }
+
+    private void quickRead(Integer tag) {
+        doujinListFragment.quickRead(tag);
     }
 
     static class ViewHolder {
@@ -108,7 +122,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
         TextView tvArtist;
         TextView tvTags;
         TextView tvDescription;
-        Button btnQuickDownload;
+        ImageButton btnQuickDownload;
+        ImageButton btnQuickRead;
         LinearLayout ll;
 
         ImageView ivTitle;

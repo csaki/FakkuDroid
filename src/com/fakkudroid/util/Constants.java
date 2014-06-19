@@ -43,7 +43,7 @@ public class Constants {
     public static final int VOLUME_BUTTONS_ZOOM= 1;
     public static final int VOLUME_BUTTONS_CHANGE_PAGE = 2;
 	
-	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.8.1";
+	public static final String SHOW_MESSAGE_HELP = "show_message_help_2.9.0";
 
 	public static final int WIDTH_STANDARD = 119;
 	public static final int HEIGHT_STANDARD = 163;

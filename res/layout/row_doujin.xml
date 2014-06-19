@@ -4,11 +4,13 @@
     android:layout_height="match_parent"
     android:padding="10dp"
     android:id="@+id/ll"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:descendantFocusability="blocksDescendants">
 
         <ImageView
             android:id="@+id/ivPage"
@@ -35,8 +37,34 @@
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/ivTitle"
             android:layout_alignParentLeft="true"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:descendantFocusability="blocksDescendants">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
+                <ImageButton
+                    android:id="@+id/btnQuickDownload"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:background="#FF4500"
+                    android:contentDescription="@string/download"
+                    android:src="@drawable/av_download"/>
+                <ImageButton
+                    android:id="@+id/btnQuickRead"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:layout_weight="0.5"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:background="#00CCFF"
+                    android:contentDescription="@string/read"
+                    android:src="@drawable/av_play"/>
+            </LinearLayout>
             <TextView
                 android:id="@+id/tvDoujin"
                 android:layout_width="wrap_content"
@@ -73,16 +101,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/fail_load_artist_doujin"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-            <Button
-                android:id="@+id/btnQuickDownload"
-                android:padding="12dp"
-                android:layout_marginTop="12dp"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="#FF4500"
-                android:text="Quick download"/>
+
         </LinearLayout>
 
     </RelativeLayout>

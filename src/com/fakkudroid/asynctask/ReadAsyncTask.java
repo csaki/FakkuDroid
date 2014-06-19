@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.fakkudroid.GallerySwipeActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.service.DownloadManagerService;
@@ -32,17 +33,16 @@ public class ReadAsyncTask extends AsyncTask<DoujinBean, Integer, DoujinBean> {
     Activity activity;
     boolean alreadyDownloaded;
 
-    public ReadAsyncTask(Activity activity, boolean alreadyDownloaded){
+    public ReadAsyncTask(Activity activity, boolean alreadyDownloaded) {
         this.activity = activity;
         this.alreadyDownloaded = alreadyDownloaded;
     }
 
     @Override
-    protected void onPreExecute()
-    {
+    protected void onPreExecute() {
         dialog = new ProgressDialog(activity);
         dialog.setTitle(R.string.app_name);
-        dialog.setMessage(activity.getString(R.string.loading));
+        dialog.setMessage(activity.getString(R.string.quickRead));
         dialog.setIcon(R.drawable.ic_launcher);
         dialog.setCancelable(false);
         dialog.setIndeterminate(true);
@@ -53,12 +53,16 @@ public class ReadAsyncTask extends AsyncTask<DoujinBean, Integer, DoujinBean> {
     protected DoujinBean doInBackground(DoujinBean... beans) {
         DoujinBean bean = beans[0];
         try {
-            if(bean.getImageServer()==null){
-                String urlServer = FakkuConnection.imageServerUrl(bean.getUrl());
-                bean.setImageServer(urlServer);
-            }
-            if(bean.getQtyPages()<=0){
-                FakkuConnection.parseHTMLDoujin(bean);
+            if (!alreadyDownloaded) {
+                if (bean.getQtyPages() <= 0) {
+                    FakkuConnection.parseHTMLDoujin(bean);
+                }
+                if (bean.getImageServer() == null) {
+                    String urlServer = FakkuConnection.imageServerUrl(bean.getUrl());
+                    bean.setImageServer(urlServer);
+                }
+            } else {
+                bean = new DataBaseHandler(activity).getDoujinBean(bean.getId());
             }
         } catch (IOException e) {
             return null;
@@ -69,11 +73,11 @@ public class ReadAsyncTask extends AsyncTask<DoujinBean, Integer, DoujinBean> {
     @Override
     protected void onPostExecute(DoujinBean result) {
         dialog.dismiss();
-        if(result==null){
+        if (result == null) {
             Toast.makeText(activity, "Error opening reader", Toast.LENGTH_SHORT).show();
             return;
         }
-        ((FakkuDroidApplication)activity.getApplication()).setCurrent(result);
+        ((FakkuDroidApplication) activity.getApplication()).setCurrent(result);
         SharedPreferences preferenceManager = PreferenceManager.getDefaultSharedPreferences(activity);
         if (preferenceManager.getBoolean("perfect_viewer_checkbox", false) && alreadyDownloaded) {
             List<String> lstFiles = result.getImagesFiles();

@@ -4,17 +4,13 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -32,10 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.fakkudroid.GallerySwipeActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
-import com.fakkudroid.asynctask.DownloadAsyncTask;
 import com.fakkudroid.asynctask.ReadAsyncTask;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.bean.URLBean;
@@ -53,7 +47,6 @@ import org.apache.http.client.ClientProtocolException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 public class DoujinFragment extends SherlockFragment {
 
@@ -74,7 +67,7 @@ public class DoujinFragment extends SherlockFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         app = (FakkuDroidApplication) getActivity().getApplication();
-        if(currentBean==null){
+        if (currentBean == null) {
             currentBean = new DoujinBean();
             currentBean.setUrl(getActivity().getIntent().getStringExtra(MainActivity.INTENT_VAR_URL));
         }
@@ -88,10 +81,10 @@ public class DoujinFragment extends SherlockFragment {
     @Override
     public void onStart() {
         super.onStart();
-        alreadyDownloaded = verifyAlreadyDownloaded();
-        if(!currentBean.isCompleted()){
+        alreadyDownloaded = DataBaseHandler.verifyAlreadyDownloaded(currentBean, getActivity());
+        if (!currentBean.isCompleted()) {
             Helper.executeAsyncTask(new CompleteDoujin(), currentBean);
-        }else{
+        } else {
             setComponents();
             showProgress(false);
         }
@@ -135,14 +128,16 @@ public class DoujinFragment extends SherlockFragment {
                                     itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.LOGIN);
                                     getActivity().startActivityForResult(itMain, 1);
                                 }
-                            })
+                            }
+                    )
                     .setNegativeButton(android.R.string.cancel,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog,
                                                     int id) {
                                     return;
                                 }
-                            }).create().show();
+                            }
+                    ).create().show();
         }
         app.setSettingBean(null);
         if (app.getSettingBean().isChecked())
@@ -154,14 +149,15 @@ public class DoujinFragment extends SherlockFragment {
     }
 
     public void read(View view) {
-        Helper.executeAsyncTask(new ReadAsyncTask(getActivity(),alreadyDownloaded), currentBean);
+        boolean alreadyDownloaded = DataBaseHandler.verifyAlreadyDownloaded(currentBean, getActivity());
+        Helper.executeAsyncTask(new ReadAsyncTask(getActivity(), alreadyDownloaded), currentBean);
     }
 
     public void download() {
         if (!alreadyDownloaded) {
-            Helper.executeAsyncTask(new DownloadAsyncTask(getActivity()),currentBean);
+            DownloadManagerService.downloadDoujin(currentBean, getActivity());
             Helper.executeAsyncTask(new UpdateStatus());
-        } else{
+        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage(R.string.ask_delete)
                     .setPositiveButton(android.R.string.yes,
@@ -190,10 +186,12 @@ public class DoujinFragment extends SherlockFragment {
                                             getActivity(),
                                             getResources().getString(
                                                     R.string.deleted),
-                                            Toast.LENGTH_SHORT).show();
+                                            Toast.LENGTH_SHORT
+                                    ).show();
                                     alreadyDownloaded = false;
                                 }
-                            }).setNegativeButton(android.R.string.no, null)
+                            }
+                    ).setNegativeButton(android.R.string.no, null)
                     .create().show();
         }
     }
@@ -265,10 +263,10 @@ public class DoujinFragment extends SherlockFragment {
         Bitmap bmpTitle = currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity()));
         Bitmap bmpPage = currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity()));
 
-        if(bmpTitle!=null)
+        if (bmpTitle != null)
             ivTitle.setImageBitmap(bmpTitle);
 
-        if(bmpPage!=null)
+        if (bmpPage != null)
             ivPage.setImageBitmap(bmpPage);
 
         tvUploader.setOnClickListener(new OnClickListener() {
@@ -277,8 +275,8 @@ public class DoujinFragment extends SherlockFragment {
             public void onClick(View v) {
                 Intent itMain = new Intent(mMainActivity, MainActivity.class);
                 itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.FAVORITES);
-                itMain.putExtra(MainActivity.INTENT_VAR_USER,currentBean.getUploader().getUser());
-                itMain.putExtra(MainActivity.INTENT_VAR_URL,currentBean.getUploader().getUrlUser());
+                itMain.putExtra(MainActivity.INTENT_VAR_USER, currentBean.getUploader().getUser());
+                itMain.putExtra(MainActivity.INTENT_VAR_URL, currentBean.getUploader().getUrlUser());
                 getActivity().startActivityForResult(itMain, 1);
             }
         });
@@ -305,7 +303,7 @@ public class DoujinFragment extends SherlockFragment {
 
         ImageButton btnAddToFavorite = (ImageButton) view
                 .findViewById(R.id.btnAddToFavorite);
-        alreadyDownloaded = verifyAlreadyDownloaded();
+        alreadyDownloaded = DataBaseHandler.verifyAlreadyDownloaded(currentBean, getActivity());
 
         if (currentBean != null) {
             if (currentBean.isAddedInFavorite()) {
@@ -437,14 +435,16 @@ public class DoujinFragment extends SherlockFragment {
                                         itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.LOGIN);
                                         getActivity().startActivityForResult(itMain, 1);
                                     }
-                                })
+                                }
+                        )
                         .setNegativeButton(android.R.string.cancel,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,
                                                         int id) {
                                         return;
                                     }
-                                }).create().show();
+                                }
+                        ).create().show();
             }
         }
     }
@@ -475,8 +475,8 @@ public class DoujinFragment extends SherlockFragment {
                 Helper.logError(this, e.getMessage(), e);
             }
 
-            try{
-                if(bean!=null){
+            try {
+                if (bean != null) {
                     File dir = Helper.getCacheDir(getActivity());
 
                     File myFile = new File(dir, bean.getFileImageTitle());
@@ -485,7 +485,7 @@ public class DoujinFragment extends SherlockFragment {
                     myFile = new File(dir, bean.getFileImagePage());
                     Helper.saveInStorage(myFile, bean.getUrlImagePage());
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 Helper.logError(this, e.getMessage(), e);
             }
 
@@ -543,8 +543,8 @@ public class DoujinFragment extends SherlockFragment {
                 return;
             }
             progressBar.setProgress(100);
-            alreadyDownloaded = verifyAlreadyDownloaded();
-            if(alreadyDownloaded){
+            alreadyDownloaded = DataBaseHandler.verifyAlreadyDownloaded(currentBean, getActivity());
+            if (alreadyDownloaded) {
                 ImageButton btnDownload = (ImageButton) view.findViewById(R.id.btnDownload);
                 btnDownload.setImageResource(R.drawable.content_discard);
                 btnDownload.setContentDescription(getResources().getString(
@@ -567,7 +567,7 @@ public class DoujinFragment extends SherlockFragment {
 
         @Override
         public void onClick(View v) {
-            if(urlBean!=null&&urlBean.getDescription()!=null&&!urlBean.getDescription().equals("")){
+            if (urlBean != null && urlBean.getDescription() != null && !urlBean.getDescription().equals("")) {
                 Intent itMain = new Intent(mMainActivity, MainActivity.class);
                 itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.DOUJIN_LIST);
                 itMain.putExtra(MainActivity.INTENT_VAR_URL, urlBean.getUrl());
@@ -575,17 +575,6 @@ public class DoujinFragment extends SherlockFragment {
                 getActivity().startActivityForResult(itMain, 1);
             }
         }
-    }
-
-    public boolean verifyAlreadyDownloaded() {
-        try {
-            DataBaseHandler db = new DataBaseHandler(this.getActivity());
-            return db.getDoujinBean(currentBean.getId()) != null;
-        } catch (Exception e) {
-            Helper.logError(this, "Error verifing if exists doujin in the db.", e);
-        }
-
-        return false;
     }
 
     public DoujinBean getCurrentBean() {

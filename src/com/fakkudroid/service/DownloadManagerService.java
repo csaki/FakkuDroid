@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -28,6 +29,7 @@ import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.core.DataBaseHandler;
+import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Helper;
 
@@ -70,7 +72,7 @@ public class DownloadManagerService extends Service {
         boolean error;
         int i;
 
-		public DownloadDoujin() {
+		DownloadDoujin() {
 			cancel = false;
             error = false;
             i = 0;
@@ -80,6 +82,12 @@ public class DownloadManagerService extends Service {
 
 		protected void onPreExecute() {
 			percent = 0;
+            Toast.makeText(
+                    DownloadManagerService.this,
+                    getResources().getString(
+                            R.string.starting_download).replace(
+                            "@doujin", bean.getTitle()),
+                    Toast.LENGTH_SHORT).show();
 			showNotification(0, R.string.downloading);
 		}
 
@@ -127,16 +135,24 @@ public class DownloadManagerService extends Service {
 
 		@Override
 		protected Integer doInBackground(String... args) {
+
+            try {
+                if(bean.getImageServer()==null){
+                    String urlServer = FakkuConnection.imageServerUrl(bean.getUrl());
+                    bean.setImageServer(urlServer);
+                }
+                if(bean.getQtyPages()<=0){
+                    FakkuConnection.parseHTMLDoujin(bean);
+                }
+            }catch (Exception e){
+                Helper.logError(this, e.getMessage(), e);
+                return R.string.download_error;
+            }
 			List<String> lstUrls = bean.getImages();
 			List<String> lstFiles = bean.getImagesFiles();
 			String folder = bean.getId();
 			final File dir = Helper.getDir(folder, getApplicationContext());
-//			boolean doujinAlreadyExists = dir.listFiles().length>3;
 			File cacheDir = Helper.getCacheDir(getApplicationContext());
-			
-			OutputStream output = null;
-			InputStream input = null;
-			File tempZip = new File(dir, bean.getId() + ".zip");
 			
 			// Copy thumb file to folder
 			File titleBitmap = new File(cacheDir, bean.getFileImageTitle());
@@ -147,7 +163,6 @@ public class DownloadManagerService extends Service {
 			} catch (Exception e) {
 				Helper.logError(this, e.getMessage(), e);
 			}
-
 			// Save data.json
 			try {
 				Helper.saveJsonDoujin(bean, dir);
@@ -288,4 +303,29 @@ public class DownloadManagerService extends Service {
 		}
 	}
 
+    public static void downloadDoujin(DoujinBean bean, Activity activity){
+        boolean alreadyDownloaded = DataBaseHandler.verifyAlreadyDownloaded(bean, activity);
+        if (alreadyDownloaded)
+        {
+            Toast.makeText(activity,
+                    activity.getResources().getString(R.string.quick_download_already),
+                    Toast.LENGTH_SHORT).show();
+        }else{
+            ((FakkuDroidApplication)activity.getApplication()).setCurrent(bean);
+            if (DownloadManagerService.started) {
+                if (!DownloadManagerService.DoujinMap.exists(bean)) {
+                    Toast.makeText(activity,
+                            activity.getString(R.string.in_queue),
+                            Toast.LENGTH_SHORT).show();
+                    DownloadManagerService.DoujinMap.add(bean);
+                } else {
+                    Toast.makeText(activity,
+                            activity.getString(R.string.already_queue),
+                            Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                activity.startService(new Intent(activity, DownloadManagerService.class));
+            }
+        }
+    }
 }

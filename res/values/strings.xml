@@ -38,6 +38,7 @@
     <string name="doujinshis">Doujinshi</string>
     <string name="random">Random</string>
     <string name="loading">Loading&#8230;</string>
+    <string name="quickRead">Opening to read&#8230;</string>
     <string name="search">Search</string>
     <string name="tile_tag">Tag rpc1</string>
     <string name="tile_serie">Series rpc1</string>

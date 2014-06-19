@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -263,4 +264,15 @@ public class DataBaseHandler extends SQLiteOpenHelper {
 		db.delete(TABLE_DOUJIN, KEY_ID + "=?", new String[] { id });
 		db.close(); // Closing database connection
 	}
+
+    public static boolean verifyAlreadyDownloaded(DoujinBean bean, Activity activity) {
+        try {
+            DataBaseHandler db = new DataBaseHandler(activity);
+            return db.getDoujinBean(bean.getId()) != null;
+        } catch (Exception e) {
+            Helper.logError(activity, "Error verifing if exists doujin in the db.", e);
+        }
+
+        return false;
+    }
 }
