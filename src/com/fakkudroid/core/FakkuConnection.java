@@ -1,6 +1,9 @@
 package com.fakkudroid.core;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -43,11 +46,12 @@ public class FakkuConnection {
 		cookiesStore = null;
 	}
 
-	public static boolean connect(String user, String password)
+	public static void connect(UserBean user)
 			throws ClientProtocolException, IOException {
-		if (cookiesStore != null)
-			return true;
-
+		if (cookiesStore != null) {
+            user.setChecked(true);
+            return;
+        }
 		boolean result = false;
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 
@@ -63,14 +67,13 @@ public class FakkuConnection {
 		}
 		Log.d(new FakkuConnection().getClass().toString(),
 				"Initial set of cookies:");
-		CookieStore cookies = httpclient.getCookieStore();
 
 		HttpPost httpost = new HttpPost(Constants.SITELOGIN);
 
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-		nvps.add(new BasicNameValuePair("username", user)); // set your own
+		nvps.add(new BasicNameValuePair("username", user.getUser())); // set your own
 															// username
-		nvps.add(new BasicNameValuePair("password", password)); // set your own
+		nvps.add(new BasicNameValuePair("password", user.getPassword())); // set your own
 																// password
 
 		httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
@@ -80,11 +83,8 @@ public class FakkuConnection {
 
 		Log.d(new FakkuConnection().getClass().toString(), "Login form get: "
 				+ response.getStatusLine());
-		if (entity != null) {
-			entity.consumeContent();
-		}
 
-		cookies = httpclient.getCookieStore();
+        CookieStore cookies = httpclient.getCookieStore();
 		if (cookies.getCookies().isEmpty()) {
 			Log.d(new FakkuConnection().getClass().toString(),
 					"Post logon cookies: None");
@@ -98,9 +98,26 @@ public class FakkuConnection {
 		}
 		if (!result)
 			cookiesStore = null;
-		else
-			cookiesStore = cookies;
-		return result;
+		else{
+            cookiesStore = cookies;
+            InputStream is = entity.getContent();
+
+            String html = "";
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder str = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                str.append(line);
+            }
+            is.close();
+            html = str.toString();
+
+            Document doc = Jsoup.parse(html);
+            String url = doc.select("a#user-menu-favorites").first().select("a").first().attr("href").substring(7);
+            url = url.substring(0, url.indexOf("/"));
+            user.setUrlUser(url);
+        }
+		user.setChecked(result);
 	}
 
 	public static void transaction(String url) throws ExceptionNotLoggedIn,
@@ -212,7 +229,7 @@ public class FakkuConnection {
                 bean.setUrlImagePage(elementsAux.select(".sample").first().attr("src"));
 
                 // title
-                bean.setTitle(e.select(".content-title").first().text());
+                bean.setTitle(e.select(".content-meta").first().select("h2").first().select("a").first().text());
 
                 elementsAux = e.select(".row").select("a");
                 // serie

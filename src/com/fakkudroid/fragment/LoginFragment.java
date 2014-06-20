@@ -210,13 +210,12 @@ public class LoginFragment extends SherlockFragment {
             boolean result = false;
 
             try {
-                result = FakkuConnection.connect(mUser, mPassword);
                 UserBean s = app.getSettingBean();
-
                 s.setUser(mUser);
                 s.setPassword(mPassword);
-                s.setUrlUser(null);
-                s.setChecked(result);
+
+                FakkuConnection.connect(s);
+                result = s.isChecked();
 
                 new DataBaseHandler(getActivity()).updateSetting(s);
                 app.setSettingBean(null);

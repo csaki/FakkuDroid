@@ -379,8 +379,8 @@ public class DoujinFragment extends SherlockFragment {
             boolean isConnected = false;
             if (app.getSettingBean().isChecked())
                 try {
-                    isConnected = FakkuConnection.connect(app.getSettingBean()
-                            .getUser(), app.getSettingBean().getPassword());
+                    FakkuConnection.connect(app.getSettingBean());
+                    isConnected = app.getSettingBean().isChecked();
                 } catch (ClientProtocolException e) {
                     Helper.logError(this, e.getMessage(), e);
                 } catch (IOException e) {
@@ -459,8 +459,7 @@ public class DoujinFragment extends SherlockFragment {
 
             if (app.getSettingBean().isChecked())
                 try {
-                    FakkuConnection.connect(app.getSettingBean().getUser(), app
-                            .getSettingBean().getPassword());
+                    FakkuConnection.connect(app.getSettingBean());
                 } catch (ClientProtocolException e) {
                     Helper.logError(this, e.getMessage(), e);
                 } catch (IOException e) {

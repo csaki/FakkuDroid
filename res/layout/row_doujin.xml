@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <ImageButton
+                <Button
                     android:id="@+id/btnQuickDownload"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
@@ -52,9 +52,8 @@
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:background="#FF4500"
-                    android:contentDescription="@string/download"
-                    android:src="@drawable/av_download"/>
-                <ImageButton
+                    android:text="D"/>
+                <Button
                     android:id="@+id/btnQuickRead"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
@@ -62,8 +61,7 @@
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:background="#00CCFF"
-                    android:contentDescription="@string/read"
-                    android:src="@drawable/av_play"/>
+                    android:text="R"/>
             </LinearLayout>
             <TextView
                 android:id="@+id/tvDoujin"

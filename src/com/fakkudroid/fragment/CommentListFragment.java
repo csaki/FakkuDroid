@@ -291,8 +291,8 @@ public class CommentListFragment extends SherlockListFragment {
             boolean isConnected = false;
             if (app.getSettingBean().isChecked())
                 try {
-                    isConnected = FakkuConnection.connect(app.getSettingBean()
-                            .getUser(), app.getSettingBean().getPassword());
+                    FakkuConnection.connect(app.getSettingBean());
+                    isConnected = app.getSettingBean().isChecked();
                 } catch (ClientProtocolException e) {
                     Helper.logError(this, e.getMessage(), e);
                 } catch (IOException e) {

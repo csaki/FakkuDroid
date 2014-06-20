@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,8 +50,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
             holder.ivTitle = (ImageView) convertView.findViewById(R.id.ivTitle);
             holder.ivPage = (ImageView) convertView.findViewById(R.id.ivPage);
             holder.ll = (LinearLayout) convertView.findViewById(R.id.ll);
-            holder.btnQuickDownload = (ImageButton)convertView.findViewById(R.id.btnQuickDownload);
-            holder.btnQuickRead = (ImageButton)convertView.findViewById(R.id.btnQuickRead);
+            holder.btnQuickDownload = (Button)convertView.findViewById(R.id.btnQuickDownload);
+            holder.btnQuickRead = (Button)convertView.findViewById(R.id.btnQuickRead);
 
             convertView.setTag(holder);
 
@@ -122,8 +122,8 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
         TextView tvArtist;
         TextView tvTags;
         TextView tvDescription;
-        ImageButton btnQuickDownload;
-        ImageButton btnQuickRead;
+        Button btnQuickDownload;
+        Button btnQuickRead;
         LinearLayout ll;
 
         ImageView ivTitle;
