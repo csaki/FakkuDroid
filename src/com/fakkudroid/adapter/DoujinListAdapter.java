@@ -15,6 +15,7 @@ import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.fragment.DoujinListFragment;
 import com.fakkudroid.util.Helper;
+import com.fakkudroid.util.ImageQuality;
 
 import java.util.LinkedList;
 
@@ -73,14 +74,10 @@ public class DoujinListAdapter extends ArrayAdapter<DoujinBean> {
         holder.tvTags.setText(s.getTags());
 
         if(s.isTitleLoaded()){
-            holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
-        }else{
-            holder.ivTitle.setImageResource(R.drawable.ic_launcher);
+            holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext()), ImageQuality.MEDIUM));
         }
         if(s.isPageLoaded()){
-            holder.ivPage.setImageBitmap(s.getBitmapImagePage(Helper.getCacheDir(getContext())));
-        }else{
-            holder.ivPage.setImageResource(R.drawable.ic_launcher);
+            holder.ivPage.setImageBitmap(s.getBitmapImagePage(Helper.getCacheDir(getContext()),ImageQuality.MEDIUM));
         }
 
         if (null != doujinListFragment) {

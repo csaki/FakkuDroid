@@ -30,6 +30,7 @@ import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.service.DownloadManagerService;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
+import com.fakkudroid.util.ImageQuality;
 
 import org.apache.http.client.ClientProtocolException;
 
@@ -270,7 +271,7 @@ public class DoujinListFragment extends SherlockListFragment {
                         myFile = new File(dir, bean.getFileImagePage());
                         Helper.saveInStorage(myFile, bean.getUrlImagePage());
 
-                        bean.loadImages(dir);
+                        bean.loadImages(dir, ImageQuality.MEDIUM);
                     } catch (Exception e) {
                         Helper.logError(this, e.getMessage(), e);
                     }

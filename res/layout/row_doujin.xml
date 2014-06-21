@@ -19,8 +19,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_launcher" />
+            android:scaleType="fitXY" />
         <ImageView
             android:id="@+id/ivTitle"
             android:layout_width="100dp"
@@ -28,8 +27,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@+id/ivPage"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_launcher" />
+            android:scaleType="fitXY" />
 
         <LinearLayout
             android:layout_width="wrap_content"

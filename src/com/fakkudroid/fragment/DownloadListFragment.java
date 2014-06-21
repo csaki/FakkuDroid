@@ -24,10 +24,8 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.fakkudroid.GallerySwipeActivity;
 import com.fakkudroid.MainActivity;
 import com.fakkudroid.R;
-import com.fakkudroid.ViewerMangaActivity;
 import com.fakkudroid.adapter.DownloadListAdapter;
 import com.fakkudroid.bean.DoujinBean;
-import com.fakkudroid.component.ImageStore;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Helper;
@@ -123,9 +121,16 @@ public class DownloadListFragment extends SherlockListFragment{
 		setData();
 	}
 	
-	private void setData() {		
-		DataBaseHandler db = new DataBaseHandler(this.getActivity());
-		LinkedList<DoujinBean> llDoujin = db.getDoujinList(numPage, query, !orderDate);
+	private void setData() {
+        LinkedList<DoujinBean> llDoujin;
+        try {
+            DataBaseHandler db = new DataBaseHandler(this.getActivity());
+            llDoujin = db.getDoujinList(numPage, query, !orderDate);
+        }catch (Exception e){
+            llDoujin = new LinkedList<DoujinBean>();
+            Toast.makeText(this.getActivity(),"Error > " + e.getMessage(), Toast.LENGTH_SHORT);
+        }
+
 
 		da = new DownloadListAdapter(this.getActivity(), R.layout.row_download, 0, llDoujin,
 				this);

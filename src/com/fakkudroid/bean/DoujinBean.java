@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
+import com.fakkudroid.util.ImageQuality;
 
 public class DoujinBean {
 
@@ -61,42 +62,42 @@ public class DoujinBean {
 		return getId() + "page.jpg";
 	}
 
-	public Bitmap getBitmapImageTitle(File dir) {
+	public Bitmap getBitmapImageTitle(File dir, ImageQuality imageQuality) {
 		if (titleBitmap == null) {
 			File titleFile = new File(dir, getFileImageTitle());
 			if (titleFile.exists())
 				titleBitmap = Helper.decodeSampledBitmapFromFile(
-						titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
-						Constants.HEIGHT_STANDARD);
+						titleFile.getAbsolutePath(), imageQuality.getWidth(),
+						imageQuality.getHeight());
 		}
 		return titleBitmap;
 	}
 
-	public Bitmap getBitmapImagePage(File dir) {
+	public Bitmap getBitmapImagePage(File dir, ImageQuality imageQuality) {
 		if (pageBitmap == null) {
 			File titlePage = new File(dir, getFileImagePage());
 			if (titlePage.exists())
 				pageBitmap = Helper.decodeSampledBitmapFromFile(
-						titlePage.getAbsolutePath(), Constants.WIDTH_STANDARD,
-						Constants.HEIGHT_STANDARD);
+						titlePage.getAbsolutePath(), imageQuality.getWidth(),
+                        imageQuality.getHeight());
 		}
 		return pageBitmap;
 	}
 
-	public void loadImages(File dir) {
+	public void loadImages(File dir, ImageQuality imageQuality) {
 		if (pageBitmap == null) {
 			File titlePage = new File(dir, getFileImagePage());
 			if (titlePage.exists())
 				pageBitmap = Helper.decodeSampledBitmapFromFile(
-						titlePage.getAbsolutePath(), Constants.WIDTH_STANDARD,
-						Constants.HEIGHT_STANDARD);
+						titlePage.getAbsolutePath(), imageQuality.getWidth(),
+                        imageQuality.getHeight());
 		}
 		if (titleBitmap == null) {
 			File titleFile = new File(dir, getFileImageTitle());
 			if (titleFile.exists())
 				titleBitmap = Helper.decodeSampledBitmapFromFile(
-						titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
-						Constants.HEIGHT_STANDARD);
+						titleFile.getAbsolutePath(), imageQuality.getWidth(),
+                        imageQuality.getHeight());
 		}
 	}
 

@@ -10,6 +10,7 @@ import com.fakkudroid.fragment.DownloadListFragment;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
 import com.fakkudroid.R;
+import com.fakkudroid.util.ImageQuality;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -106,8 +107,8 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 
 		if (!thumbFile.exists() && titleFile.exists()) {
 			Bitmap titleBitmap = Helper.decodeSampledBitmapFromFile(
-					titleFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
-					Constants.HEIGHT_STANDARD);
+					titleFile.getAbsolutePath(), ImageQuality.MEDIUM.getWidth(),
+					ImageQuality.MEDIUM.getHeight());
 			try {
 				Helper.saveBitmap(thumbFile, titleBitmap);
 			} catch (IOException e) {
@@ -115,8 +116,8 @@ public class DownloadListAdapter extends ArrayAdapter<DoujinBean> {
 			}
 		}
 
-            holder.image = Helper.decodeSampledBitmapFromFile(thumbFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
-                    Constants.HEIGHT_STANDARD);
+            holder.image = Helper.decodeSampledBitmapFromFile(thumbFile.getAbsolutePath(), ImageQuality.MEDIUM.getWidth(),
+                    ImageQuality.MEDIUM.getHeight());
         holder.ivTitle.setImageBitmap(holder.image);
 		return convertView;
 	}

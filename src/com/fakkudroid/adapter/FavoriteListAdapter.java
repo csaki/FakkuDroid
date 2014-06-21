@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.fakkudroid.R;
 import com.fakkudroid.bean.DoujinBean;
 import com.fakkudroid.util.Helper;
+import com.fakkudroid.util.ImageQuality;
 
 public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 
@@ -42,9 +43,7 @@ public class FavoriteListAdapter extends ArrayAdapter<DoujinBean> {
 		holder.tvDoujin.setText(Helper.limitString(s.getTitle(), 36, "..."));
 
         if(s.isTitleLoaded()){
-            holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext())));
-        }else{
-            holder.ivTitle.setImageResource(R.drawable.ic_launcher);
+            holder.ivTitle.setImageBitmap(s.getBitmapImageTitle(Helper.getCacheDir(getContext()), ImageQuality.MEDIUM));
         }
 		return convertView;
 	}

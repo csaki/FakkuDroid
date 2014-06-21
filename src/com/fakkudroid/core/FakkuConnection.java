@@ -242,7 +242,7 @@ public class FakkuConnection {
                 bean.setTranslator(parseURLBean(elementsAux.get(3)));
 
                 // description
-                bean.setDescription(e.select(".short").first().text().substring(14));
+                bean.setDescription(e.select(".short").first().text().substring(13));
 
                 // tags
                 List<URLBean> lstTags = new ArrayList<URLBean>();

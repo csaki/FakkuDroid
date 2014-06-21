@@ -41,6 +41,7 @@ import com.fakkudroid.exception.ExceptionNotLoggedIn;
 import com.fakkudroid.service.DownloadManagerService;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
+import com.fakkudroid.util.ImageQuality;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -260,8 +261,8 @@ public class DoujinFragment extends SherlockFragment {
         s = s.replace("?", currentBean.getTranslator().getDescription());
         tvTranslator.setText(Html.fromHtml(s));
 
-        Bitmap bmpTitle = currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity()));
-        Bitmap bmpPage = currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity()));
+        Bitmap bmpTitle = currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity()), ImageQuality.HIGH);
+        Bitmap bmpPage = currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity()), ImageQuality.HIGH);
 
         if (bmpTitle != null)
             ivTitle.setImageBitmap(bmpTitle);

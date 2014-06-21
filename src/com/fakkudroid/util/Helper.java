@@ -66,7 +66,7 @@ public class Helper {
 
 
     public static String LOG_FILE = "logFile.txt";
-    public  static File logFile;
+    public static File logFile;
     public static boolean writeLogFile;
 
 	public static File getCacheDir(Context context) {

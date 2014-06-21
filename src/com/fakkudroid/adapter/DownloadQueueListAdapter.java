@@ -10,6 +10,7 @@ import com.fakkudroid.service.DownloadManagerService;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
 import com.fakkudroid.R;
+import com.fakkudroid.util.ImageQuality;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -86,8 +87,8 @@ public class DownloadQueueListAdapter extends ArrayAdapter<DoujinBean> {
 		File dir = Helper.getCacheDir(getContext());
 		File thumbFile = new File(dir, s.getFileImageTitle());
 
-            holder.image = Helper.decodeSampledBitmapFromFile(thumbFile.getAbsolutePath(), Constants.WIDTH_STANDARD,
-                    Constants.HEIGHT_STANDARD);
+            holder.image = Helper.decodeSampledBitmapFromFile(thumbFile.getAbsolutePath(), ImageQuality.MEDIUM.getWidth(),
+                    ImageQuality.MEDIUM.getHeight());
         holder.ivTitle.setImageBitmap(holder.image);
 		if(s==DownloadManagerService.DoujinMap.next()){
 			holder.progressBar.setIndeterminate(false);

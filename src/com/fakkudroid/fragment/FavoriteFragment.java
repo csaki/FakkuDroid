@@ -35,6 +35,7 @@ import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
 import com.fakkudroid.util.Helper;
 import com.fakkudroid.R;
+import com.fakkudroid.util.ImageQuality;
 
 public class FavoriteFragment extends SherlockFragment implements
 		AdapterView.OnItemClickListener {
@@ -238,7 +239,7 @@ public class FavoriteFragment extends SherlockFragment implements
                         File myFile = new File(dir, bean.getFileImageTitle());
                         Helper.saveInStorage(myFile, bean.getUrlImageTitle());
 
-                        bean.loadImages(dir);
+                        bean.loadImages(dir, ImageQuality.MEDIUM);
                     } catch (Exception e) {
                         Helper.logError(this, e.getMessage(), e);
                     }
