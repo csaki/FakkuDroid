@@ -100,22 +100,27 @@ public class FakkuConnection {
 			cookiesStore = null;
 		else{
             cookiesStore = cookies;
-            InputStream is = entity.getContent();
 
-            String html = "";
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            StringBuilder str = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                str.append(line);
+            InputStream is = null;
+            try {
+                is = entity.getContent();
+                String html = "";
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                StringBuilder str = new StringBuilder();
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    str.append(line);
+                }
+                html = str.toString();
+
+                Document doc = Jsoup.parse(html);
+                String url = doc.select("a#user-menu-favorites").first().select("a").first().attr("href").substring(7);
+                url = url.substring(0, url.indexOf("/"));
+                user.setUrlUser(url);
+            }catch (Exception ex){}finally {
+                if(is!=null)
+                    is.close();
             }
-            is.close();
-            html = str.toString();
-
-            Document doc = Jsoup.parse(html);
-            String url = doc.select("a#user-menu-favorites").first().select("a").first().attr("href").substring(7);
-            url = url.substring(0, url.indexOf("/"));
-            user.setUrlUser(url);
         }
 		user.setChecked(result);
 	}
@@ -173,8 +178,8 @@ public class FakkuConnection {
             Element likeA = comment.select("a.arrow").select(".like").first();
             Element disLikeA = comment.select("a.arrow").select(".dislike").first();
 
-            c.setUrlLike(likeA.attr("href"));
-            c.setUrlDislike(disLikeA.attr("href"));
+            c.setUrlLike(Constants.SITEROOT + likeA.attr("href"));
+            c.setUrlDislike(Constants.SITEROOT + disLikeA.attr("href"));
 
             if(likeA.hasClass("selected")) {
                 c.setSelectLike(1);
@@ -186,7 +191,7 @@ public class FakkuConnection {
             if(rank!=null)
                 c.setRank(Integer.parseInt(rank.text().replace("+","").replace(" points","")));
 
-            c.setComment(comment.select("div.comment_text").first().text());
+            c.setComment(comment.select("div.comment_text").first().html());
             result.add(c);
         }
 
@@ -223,7 +228,9 @@ public class FakkuConnection {
 
                 // Images
                 Elements elementsAux = e.select("img");
-                bean.setUrlImageTitle(elementsAux.select(".cover").first().attr("src"));
+                String aux = elementsAux.select(".cover").first().attr("src");
+                bean.setUrlImageTitle(aux);
+                bean.setImageServer(aux.split("/thumbs/")[0]+"/images/");
 
                 // Look for the next image tag
                 bean.setUrlImagePage(elementsAux.select(".sample").first().attr("src"));
@@ -231,24 +238,29 @@ public class FakkuConnection {
                 // title
                 bean.setTitle(e.select(".content-meta").first().select("h2").first().select("a").first().text());
 
-                elementsAux = e.select(".row").select("a");
+                elementsAux = e.select("div.left").select("a");
                 // serie
                 bean.setSerie(parseURLBean(elementsAux.get(0)));
-                // language
-                bean.setLanguage(parseURLBean(elementsAux.get(1)));
                 // artist
-                bean.setArtist(parseURLBean(elementsAux.get(2)));
+                bean.setArtist(parseURLBean(elementsAux.get(1)));
+
+                elementsAux = e.select("div.right").select("a");
+                // language
+                bean.setLanguage(parseURLBean(elementsAux.get(0)));
                 // translator
-                bean.setTranslator(parseURLBean(elementsAux.get(3)));
+                if(elementsAux.size()>1)
+                    bean.setTranslator(parseURLBean(elementsAux.get(1)));
 
                 // description
-                bean.setDescription(e.select(".short").first().text().substring(13));
+                Element description = e.select(".row.short.small").first();
+                description.select("h3").remove();
+                bean.setDescription(description.html());
 
                 // tags
                 List<URLBean> lstTags = new ArrayList<URLBean>();
 
                 try {
-                    elementsAux = e.select(".short").select("a");
+                    elementsAux = e.select(".row.short.small").last().select("a");
 
                     for (Element tag : elementsAux) {
                         lstTags.add(parseURLBean(tag));
@@ -284,7 +296,9 @@ public class FakkuConnection {
 
 			bean.setTitle(img.attr("alt"));
 
-			bean.setUrl(Constants.SITEROOT + favorite.select(".cover").first().attr("href"));
+            String aux = favorite.select(".cover").first().attr("href");
+			bean.setUrl(Constants.SITEROOT + aux);
+            bean.setImageServer(aux.split("/thumbs/")[0]+"/images/");
 
 			result.add(bean);
 		}
@@ -304,86 +318,64 @@ public class FakkuConnection {
 
         bean.setAddedInFavorite(!html.contains("Add To Favorites"));
 
-		// Qty Pages
+        Elements elements = doc.select(".row");
+        int idx = 0;
 
-        Element el = doc.select("div.small").first().select("b").first();
-		int c = 0;
+        //Series
+        Element el = elements.get(idx++).select("a").first();
+        bean.setSerie(parseURLBean(el));
+        //Artist
+        el = elements.get(idx++).select("a").first();
+        bean.setArtist(parseURLBean(el));
+        //Translator
+        if(elements.size()==8){
+            el = elements.get(idx++).select("a").first();
+            bean.setTranslator(parseURLBean(el));
+        }
+        //Uploader
+        el = elements.get(idx).select("a").first();
+        bean.setUploader(parseUserBean(el));
+        el = elements.get(idx++).select(".right").first();
+        el.select("a").remove();
+        bean.setDate(el.text());
+        //Language
+        el = elements.get(idx++).select("a").first();
+        bean.setLanguage(parseURLBean(el));
+		// Qty Pages
+        el = elements.get(idx++).select(".right").first();
+        int c = 0;
 		try {
-			c = Integer.parseInt(el.text());
+			c = Integer.parseInt(el.text().split(" ")[0]);
 		} catch (Exception e) {}
 
 		bean.setQtyPages(c);
 
-		// Qty favorites
-        el = doc.select("div.small").first().select("div.left").first();
+        el = elements.get(idx++).select(".right").first();
+        bean.setDescription(el.html());
 
-        String aux = el.text();
-        aux = aux.replace("\n","");
-        c = aux.indexOf(' ');
-        if(c!=-1)
-            aux = aux.substring(0, c).trim();
-        try {
-            c = Integer.parseInt(aux);
-        }catch (Exception e){
-            c = 0;
-        }
-		bean.setQtyFavorites(c);
-
-		// URL
-        el = doc.select("ul.content-navigation").first().select("a").first();
-		aux = Constants.SITEROOT + el.select("a").first().attr("href");
-		bean.setUrl(aux);
-
-        el = doc.select("div.images").first();
-		// Images
-		aux = el.select("img.cover").first().attr("src");
-		bean.setUrlImageTitle(aux);
-
-        aux = el.select("img.sample").first().attr("src");
-		bean.setUrlImagePage(aux);
-
-		// title
-        el = doc.select("h1").first();
-        aux = el.text();
-		bean.setTitle(aux);
-
-		// serie
-        el = doc.select("div#right").first();
-
-        Elements elements = el.select("a");
-		bean.setSerie(parseURLBean(elements.get(0)));
-
-		// language
-		bean.setLanguage(parseURLBean(elements.get(1)));
-
-		// artist
-		bean.setArtist(parseURLBean(elements.get(2)));
-
-        // translator
-        bean.setTranslator(parseURLBean(elements.get(3)));
-
-        // Uploaded by
-        bean.setUploader(parseUserBean(elements.get(4)));
-
-        // date
-        bean.setDate(el.select("div.small").first().select("div.right").first().select("b").first().text());
-
-		// description
-        el = el.select("[itemprop=description]").first();
-		bean.setDescription(el.text().substring(14));
-
-		// tags
+        // tags
         List<URLBean> lstTags = new ArrayList<URLBean>();
 
         try{
-            elements = doc.select("[itemprop=keywords]").first().select("a");
+            elements = elements.get(idx++).select("a");
 
-            for (Element a : elements) {
-                lstTags.add(parseURLBean(a));
+            for (int i = 0; i<=elements.size()-2;i++){
+                lstTags.add(parseURLBean(elements.get(i)));
             }
         }catch (Exception e){}
 
-		bean.setLstTags(lstTags);
+        bean.setLstTags(lstTags);
+
+		// URL
+        el = doc.select(".breadcrumbs a").last();
+		String aux = Constants.SITEROOT + el.attr("href");
+		bean.setUrl(aux);
+        bean.setTitle(el.text());
+
+		// Image
+		aux = doc.select("img.cover").first().attr("src");
+        bean.setUrlImageTitle(aux);
+		bean.setImageServer(aux.split("/thumbs/")[0]+"/images/");
 
         try{
             Elements comments = doc.select("div.comment-row");
@@ -399,8 +391,6 @@ public class FakkuConnection {
             bean.setLstRecentComments(parseHTMLtoComments(recentComments));
         }catch(Exception e){}
 
-		//Get imageServer link
-		
         bean.setCompleted(true);
 	}
 

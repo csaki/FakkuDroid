@@ -312,6 +312,8 @@ public class DoujinListFragment extends SherlockListFragment {
                 Helper.logError(this, e.getMessage(), e);
             } catch (URISyntaxException e) {
                 Helper.logError(this, e.getMessage(), e);
+            } catch (Exception e) {
+                Helper.logError(this, e.getMessage(), e);
             }
             if (llDoujin == null)
                 llDoujin = new LinkedList<DoujinBean>();

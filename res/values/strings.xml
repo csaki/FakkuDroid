@@ -25,7 +25,7 @@
     <string name="label_description_row">Description:</string>
 
     <string name="content_uploader">uploaded by rpc1, rpc2</string>
-    <string name="content_pages">rpc1 pages, rpc2 favorites</string>
+    <string name="content_pages">rpc1 pages</string>
 
     <string name="label_tags">Tags:</string>
     <string name="button_refresh">Refresh</string>

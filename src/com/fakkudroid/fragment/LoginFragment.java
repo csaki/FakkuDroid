@@ -215,16 +215,18 @@ public class LoginFragment extends SherlockFragment {
                 s.setPassword(mPassword);
 
                 FakkuConnection.connect(s);
-                result = s.isChecked();
 
-                new DataBaseHandler(getActivity()).updateSetting(s);
-                app.setSettingBean(null);
                 SharedPreferences prefs = PreferenceManager
                         .getDefaultSharedPreferences(getActivity());
-                prefs.edit().putString("url_user", null).commit();
+                prefs.edit().putString("url_user", s.getUrlUser()).commit();
+                new DataBaseHandler(getActivity()).updateSetting(s);
+                app.setSettingBean(s);
+                result = s.isChecked();
             } catch (ClientProtocolException e) {
                 Helper.logError(this, e.getMessage(), e);
             } catch (IOException e) {
+                Helper.logError(this, e.getMessage(), e);
+            } catch (Exception e) {
                 Helper.logError(this, e.getMessage(), e);
             }
 

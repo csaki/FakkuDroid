@@ -156,15 +156,6 @@
                         android:scaleType="fitXY"
                         android:scrollbars="none"
                         android:src="@drawable/loading" />
-
-                    <ImageView
-                        android:id="@+id/ivPage"
-                        android:layout_width="150dp"
-                        android:layout_height="210dp"
-                        android:layout_marginLeft="2dp"
-                        android:scaleType="fitXY"
-                        android:scrollbars="none"
-                        android:src="@drawable/loading" />
                 </LinearLayout>
 
                 <LinearLayout

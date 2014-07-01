@@ -207,7 +207,6 @@ public class DoujinFragment extends SherlockFragment {
         TextView tvDoujin = (TextView) view.findViewById(R.id.tvDoujin);
         TextView tvArtist = (TextView) view.findViewById(R.id.tvArtist);
         ImageView ivTitle = (ImageView) view.findViewById(R.id.ivTitle);
-        ImageView ivPage = (ImageView) view.findViewById(R.id.ivPage);
         TextView tvSerie = (TextView) view.findViewById(R.id.tvSerie);
         TextView tvQtyPages = (TextView) view
                 .findViewById(R.id.tvQtyPages);
@@ -223,7 +222,6 @@ public class DoujinFragment extends SherlockFragment {
         String s = getResources().getString(R.string.content_pages);
 
         s = s.replace("rpc1", "" + currentBean.getQtyPages());
-        s = s.replace("rpc2", "" + currentBean.getQtyFavorites());
 
         tvQtyPages.setText(s);
 
@@ -258,17 +256,13 @@ public class DoujinFragment extends SherlockFragment {
         tvLanguage.setText(Html.fromHtml(s));
 
         s = getResources().getString(R.string.label_translator);
-        s = s.replace("?", currentBean.getTranslator().getDescription());
+        s = s.replace("?", currentBean.getTranslator()==null?"":currentBean.getTranslator().getDescription());
         tvTranslator.setText(Html.fromHtml(s));
 
         Bitmap bmpTitle = currentBean.getBitmapImageTitle(Helper.getCacheDir(getActivity()), ImageQuality.HIGH);
-        Bitmap bmpPage = currentBean.getBitmapImagePage(Helper.getCacheDir(getActivity()), ImageQuality.HIGH);
 
         if (bmpTitle != null)
             ivTitle.setImageBitmap(bmpTitle);
-
-        if (bmpPage != null)
-            ivPage.setImageBitmap(bmpPage);
 
         tvUploader.setOnClickListener(new OnClickListener() {
 
@@ -481,9 +475,6 @@ public class DoujinFragment extends SherlockFragment {
 
                     File myFile = new File(dir, bean.getFileImageTitle());
                     Helper.saveInStorage(myFile, bean.getUrlImageTitle());
-
-                    myFile = new File(dir, bean.getFileImagePage());
-                    Helper.saveInStorage(myFile, bean.getUrlImagePage());
                 }
             } catch (Exception e) {
                 Helper.logError(this, e.getMessage(), e);

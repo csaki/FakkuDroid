@@ -22,7 +22,6 @@ public class DoujinBean {
 	private String urlImageTitle;
 	private String url;
 	private int qtyPages;
-	private int qtyFavorites;
 	private URLBean language;
 	private URLBean translator;
 	private transient UserBean uploader;
@@ -165,14 +164,6 @@ public class DoujinBean {
 		this.description = description;
 	}
 
-	public int getQtyFavorites() {
-		return qtyFavorites;
-	}
-
-	public void setQtyFavorites(int qtyFavorites) {
-		this.qtyFavorites = qtyFavorites;
-	}
-
 	public URLBean getLanguage() {
 		return language;
 	}
@@ -215,10 +206,9 @@ public class DoujinBean {
 
 	public List<String> getImages() {
 		List<String> result = new ArrayList<String>();
-		String urlImage = imageServer;
 		for (int i = 1; i <= qtyPages; i++) {
 			Formatter fmt = new Formatter();
-			result.add(urlImage + fmt.format("%03d", i) + ".jpg");
+			result.add(imageServer + fmt.format("%03d", i) + ".jpg");
 			fmt.close();
 		}
 		return result;
@@ -229,16 +219,6 @@ public class DoujinBean {
 		for (int i = 1; i <= qtyPages; i++) {
 			Formatter fmt = new Formatter();
 			result.add(fmt.format("%03d", i) + ".jpg");
-			fmt.close();
-		}
-		return result;
-	}
-
-	public List<String> getOldImagesFiles() {
-		List<String> result = new ArrayList<String>();
-		for (int i = 1; i <= qtyPages; i++) {
-			Formatter fmt = new Formatter();
-			result.add(fmt.format("%03d", i) + ".fakku");
 			fmt.close();
 		}
 		return result;
@@ -271,8 +251,7 @@ public class DoujinBean {
 		return "DoujinBean [title=" + title + ", serie=" + serie + ", artist="
 				+ artist + ", description=" + description + ", urlImagePage="
 				+ urlImagePage + ", urlImageTitle=" + urlImageTitle + ", url="
-				+ url + ", qtyPages=" + qtyPages + ", qtyFavorites="
-				+ qtyFavorites + ", language=" + language + ", translator="
+				+ url + ", qtyPages=" + qtyPages + ", language=" + language + ", translator="
 				+ translator + ", uploader=" + uploader + ", date=" + date
 				+ ", lstTags=" + lstTags + "]";
 	}
