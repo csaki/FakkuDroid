@@ -22,6 +22,23 @@ public class PasswordActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_password);
+		
+		EditText etPassword = (EditText) findViewById(R.id.etPassword);
+                etPassword.setOnKeyListener(new View.OnKeyListener() {
+            		@Override
+            		public boolean onKey(View view, int i, KeyEvent keyEvent) {
+        		if (keyEvent.getAction() == KeyEvent.ACTION_DOWN){
+                    		switch (i){
+                        		case KeyEvent.KEYCODE_ENTER:
+                            		checkPassword();
+                            		return true;
+                       		default:
+                            		break;
+                    	}
+                }
+                return false;
+            }
+        });
 
 		createFolders();
 		
