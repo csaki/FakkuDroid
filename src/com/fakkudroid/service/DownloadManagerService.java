@@ -142,7 +142,7 @@ public class DownloadManagerService extends Service {
                     bean.setImageServer(urlServer);
                 }
                 if(bean.getQtyPages()<=0){
-                    FakkuConnection.parseHTMLDoujin(bean);
+                    FakkuConnection.parseJSONDoujin(bean);
                 }
             }catch (Exception e){
                 Helper.logError(this, e.getMessage(), e);

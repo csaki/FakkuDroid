@@ -49,9 +49,9 @@ public class CommentListFragment extends SherlockListFragment {
     private View mFormView;
     private View mStatusView;
     private View view;
-    int numPage;
+    int numPage = 1, pages;
     int index = -1;
-    String url, urlDoujin;
+    String url;
     private boolean listCharged;
     private CommentListAdapter da;
     private DoujinBean currentBean;
@@ -67,8 +67,7 @@ public class CommentListFragment extends SherlockListFragment {
         app = (FakkuDroidApplication) getActivity().getApplication();
 
         if (url == null) {
-            urlDoujin = getActivity().getIntent().getStringExtra(MainActivity.INTENT_VAR_URL);
-            url = urlDoujin.replaceAll(Constants.SITEROOT, Constants.SITEROOT + "/comments");
+            url = getActivity().getIntent().getStringExtra(MainActivity.INTENT_VAR_URL) + "/comments";
         }
     }
 
@@ -99,17 +98,17 @@ public class CommentListFragment extends SherlockListFragment {
 
     public void nextPage(View view) {
         index = -1;
-        numPage++;
-        loadComments();
-        String txt = "Top Comments";
-        if (numPage > 0) {
-            txt = "Page " + numPage;
+        if (numPage + 1 > pages) {
+            CharSequence text = "There aren't more pages.";
+            Toast toast = Toast.makeText(this.getActivity(), text, Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            numPage++;
+            loadComments();
+            String txt = "Page " + numPage;
+            Toast toast = Toast.makeText(this.getActivity(), txt, Toast.LENGTH_SHORT);
+            toast.show();
         }
-        CharSequence text = txt;
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(this.getActivity(), text, duration);
-        toast.show();
     }
 
     public void previousPage(View view) {
@@ -123,11 +122,24 @@ public class CommentListFragment extends SherlockListFragment {
         } else {
             numPage--;
             loadComments();
-            String txt = "Top Comments";
-            if (numPage > 0) {
-                txt = "Page " + numPage;
-            }
-            CharSequence text = txt;
+            String txt = "Page " + numPage;
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(this.getActivity(), txt, duration);
+            toast.show();
+        }
+    }
+
+    public void changePage(int page) {
+        index = -1;
+        if (page > pages) {
+            CharSequence text = "Error : Total pages = " + pages + ".";
+            Toast toast = Toast.makeText(this.getActivity(), text, Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            numPage = page;
+            loadComments();
+            CharSequence text = "Page " + numPage;
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(this.getActivity(), text, duration);
@@ -135,37 +147,14 @@ public class CommentListFragment extends SherlockListFragment {
         }
     }
 
-    public void changePage(int page) {
-        index = -1;
-        numPage = page;
-        loadComments();
-        CharSequence text = "Page " + numPage;
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(this.getActivity(), text, duration);
-        toast.show();
-    }
-
     public void loadComments() {
         currentBean = mMainActivity.getCurrentBean();
-        if(currentBean!=null){
+        if (currentBean != null) {
             TextView tvPage = (TextView) view.findViewById(R.id.tvPage);
-            String txt = "Top Comments";
-            if (numPage > 0) {
-                txt = "Page " + numPage;
-            }
+            String txt = "Page " + numPage;
             tvPage.setText(txt);
-            if (numPage < 2) {
-                if (numPage == 0) {
-                    llComments = currentBean.getLstTopComments();
-                } else {
-                    llComments = currentBean.getLstRecentComments();
-                }
-                setData();
-            } else {
-                String urlComments = url + "/" + ((numPage - 1) * 30);
-                Helper.executeAsyncTask(new DownloadComments(), urlComments);
-            }
+            String urlComments = url + "/page/" + numPage;
+            Helper.executeAsyncTask(new DownloadComments(), urlComments);
         }
 
         listCharged = true;
@@ -191,13 +180,15 @@ public class CommentListFragment extends SherlockListFragment {
                                     itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.LOGIN);
                                     getActivity().startActivityForResult(itMain, 1);
                                 }
-                            })
+                            }
+                    )
                     .setNegativeButton(android.R.string.cancel,
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     return;
                                 }
-                            }).create().show();
+                            }
+                    ).create().show();
         }
         app.setSettingBean(null);
         if (app.getSettingBean().isChecked()) {
@@ -207,8 +198,8 @@ public class CommentListFragment extends SherlockListFragment {
 
     private void setData() {
         showProgress(false);
-        if(llComments==null)
-            llComments=new LinkedList<CommentBean>();
+        if (llComments == null)
+            llComments = new LinkedList<CommentBean>();
         da = new CommentListAdapter(this.getActivity(), R.layout.row_comment, 0, llComments, this);
         this.setListAdapter(da);
     }
@@ -358,14 +349,16 @@ public class CommentListFragment extends SherlockListFragment {
                                         itMain.putExtra(MainActivity.INTENT_VAR_CURRENT_CONTENT, MainActivity.LOGIN);
                                         getActivity().startActivityForResult(itMain, 1);
                                     }
-                                })
+                                }
+                        )
                         .setNegativeButton(android.R.string.cancel,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog,
                                                         int id) {
                                         return;
                                     }
-                                }).create().show();
+                                }
+                        ).create().show();
             }
         }
     }

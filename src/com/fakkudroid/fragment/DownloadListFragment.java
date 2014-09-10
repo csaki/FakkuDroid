@@ -35,7 +35,7 @@ public class DownloadListFragment extends SherlockListFragment{
     private MainActivity mMainActivity;
 	private FakkuDroidApplication app;
 	DownloadListAdapter da;
-	static int numPage = 1;
+    private int numPage = 1;
 	private String query = "";
 	private View view;
     private boolean orderDate;

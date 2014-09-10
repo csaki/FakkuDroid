@@ -31,8 +31,7 @@ public class DoujinBean {
 	private transient Bitmap titleBitmap, pageBitmap;
 	private String imageServer;
 	private String urlDownload;
-    private transient LinkedList<CommentBean> lstTopComments;
-    private transient LinkedList<CommentBean> lstRecentComments;
+    private transient LinkedList<CommentBean> lstComments;
 
 	public String getId() {
 		int idxStart = url.lastIndexOf("/") + 1;
@@ -289,19 +288,15 @@ public class DoujinBean {
     }
 
     public String getRelatedUrl(){
-        String relatedUrl = url.replaceAll(Constants.SITEROOT, Constants.SITEROOT + "/related");
+        String relatedUrl = url + "/related";
         return relatedUrl;
     }
-    public LinkedList<CommentBean> getLstTopComments() {
-        return lstTopComments;
+
+    public LinkedList<CommentBean> getLstComments() {
+        return lstComments;
     }
-    public void setLstTopComments(LinkedList<CommentBean> lstTopComments) {
-        this.lstTopComments = lstTopComments;
-    }
-    public LinkedList<CommentBean> getLstRecentComments() {
-        return lstRecentComments;
-    }
-    public void setLstRecentComments(LinkedList<CommentBean> lstRecentComments) {
-        this.lstRecentComments = lstRecentComments;
+
+    public void setLstComments(LinkedList<CommentBean> lstComments) {
+        this.lstComments = lstComments;
     }
 }

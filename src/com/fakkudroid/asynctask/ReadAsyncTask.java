@@ -55,7 +55,7 @@ public class ReadAsyncTask extends AsyncTask<DoujinBean, Integer, DoujinBean> {
         try {
             if (!alreadyDownloaded) {
                 if (bean.getQtyPages() <= 0) {
-                    FakkuConnection.parseHTMLDoujin(bean);
+                    FakkuConnection.parseJSONDoujin(bean);
                 }
                 if (bean.getImageServer() == null) {
                     String urlServer = FakkuConnection.imageServerUrl(bean.getUrl());

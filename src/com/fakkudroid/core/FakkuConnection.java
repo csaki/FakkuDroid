@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -23,82 +26,89 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import android.util.Log;
+
 import com.fakkudroid.bean.CommentBean;
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.bean.DoujinListBean;
 import com.fakkudroid.bean.URLBean;
 import com.fakkudroid.bean.UserBean;
 import com.fakkudroid.bean.VersionBean;
 import com.fakkudroid.exception.ExceptionNotLoggedIn;
+import com.fakkudroid.json.Attribute;
+import com.fakkudroid.json.Content;
+import com.fakkudroid.json.JSONListResult;
+import com.fakkudroid.json.JSONContentResult;
 import com.fakkudroid.util.Constants;
 import com.fakkudroid.util.Helper;
 import com.google.gson.Gson;
 
 public class FakkuConnection {
 
-	private static CookieStore cookiesStore = null;
+    private static CookieStore cookiesStore = null;
 
-	public static boolean isConnected() {
-		return cookiesStore != null;
-	}
+    public static boolean isConnected() {
+        return cookiesStore != null;
+    }
 
-	public static void disconnect() {
-		cookiesStore = null;
-	}
+    public static void disconnect() {
+        cookiesStore = null;
+    }
 
-	public static void connect(UserBean user)
-			throws ClientProtocolException, IOException {
-		if (cookiesStore != null) {
+    public static void connect(UserBean user)
+            throws ClientProtocolException, IOException {
+        if (cookiesStore != null) {
             user.setChecked(true);
             return;
         }
-		boolean result = false;
-		DefaultHttpClient httpclient = new DefaultHttpClient();
+        boolean result = false;
+        DefaultHttpClient httpclient = new DefaultHttpClient();
 
-		HttpGet httpget = new HttpGet(Constants.SITELOGIN);
+        HttpGet httpget = new HttpGet(Constants.SITELOGIN);
 
-		HttpResponse response = httpclient.execute(httpget);
-		HttpEntity entity = response.getEntity();
+        HttpResponse response = httpclient.execute(httpget);
+        HttpEntity entity = response.getEntity();
 
-		Log.d(new FakkuConnection().getClass().toString(), "Login form get: "
-				+ response.getStatusLine());
-		if (entity != null) {
-			entity.consumeContent();
-		}
-		Log.d(new FakkuConnection().getClass().toString(),
-				"Initial set of cookies:");
+        Log.d(new FakkuConnection().getClass().toString(), "Login form get: "
+                + response.getStatusLine());
+        if (entity != null) {
+            entity.consumeContent();
+        }
+        Log.d(new FakkuConnection().getClass().toString(),
+                "Initial set of cookies:");
 
-		HttpPost httpost = new HttpPost(Constants.SITELOGIN);
+        HttpPost httpost = new HttpPost(Constants.SITELOGIN);
 
-		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-		nvps.add(new BasicNameValuePair("username", user.getUser())); // set your own
-															// username
-		nvps.add(new BasicNameValuePair("password", user.getPassword())); // set your own
-																// password
+        List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+        nvps.add(new BasicNameValuePair("username", user.getUser())); // set your own
+        // username
+        nvps.add(new BasicNameValuePair("password", user.getPassword())); // set your own
+        // password
 
-		httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 
-		response = httpclient.execute(httpost);
-		entity = response.getEntity();
+        response = httpclient.execute(httpost);
+        entity = response.getEntity();
 
-		Log.d(new FakkuConnection().getClass().toString(), "Login form get: "
-				+ response.getStatusLine());
+        Log.d(new FakkuConnection().getClass().toString(), "Login form get: "
+                + response.getStatusLine());
 
         CookieStore cookies = httpclient.getCookieStore();
-		if (cookies.getCookies().isEmpty()) {
-			Log.d(new FakkuConnection().getClass().toString(),
-					"Post logon cookies: None");
-		} else {
-			for (int i = 0; i < cookies.getCookies().size(); i++) {
-				if (cookies.getCookies().get(i).getName()
-						.equalsIgnoreCase("fakku_sid")) {
-					result = true;
-				}
-			}
-		}
-		if (!result)
-			cookiesStore = null;
-		else{
+        if (cookies.getCookies().isEmpty()) {
+            Log.d(new FakkuConnection().getClass().toString(),
+                    "Post logon cookies: None");
+        } else {
+            for (int i = 0; i < cookies.getCookies().size(); i++) {
+                if (cookies.getCookies().get(i).getName()
+                        .equalsIgnoreCase("fakku_sid")) {
+                    result = true;
+                }
+            }
+        }
+        if (!result)
+            cookiesStore = null;
+        else {
             cookiesStore = cookies;
 
             InputStream is = null;
@@ -117,47 +127,48 @@ public class FakkuConnection {
                 String url = doc.select("a#user-menu-favorites").first().select("a").first().attr("href").substring(7);
                 url = url.substring(0, url.indexOf("/"));
                 user.setUrlUser(url);
-            }catch (Exception ex){}finally {
-                if(is!=null)
+            } catch (Exception ex) {
+            } finally {
+                if (is != null)
                     is.close();
             }
         }
-		user.setChecked(result);
-	}
+        user.setChecked(result);
+    }
 
-	public static void transaction(String url) throws ExceptionNotLoggedIn,
-			IOException {
-		if (cookiesStore == null)
-			throw new ExceptionNotLoggedIn();
+    public static void transaction(String url) throws ExceptionNotLoggedIn,
+            IOException {
+        if (cookiesStore == null)
+            throw new ExceptionNotLoggedIn();
 
-		String html = Helper.getHTML(url, cookiesStore);
+        String html = Helper.getHTML(url, cookiesStore);
 
-		if (html.contains("Please enter your username and password to login"))
-			throw new ExceptionNotLoggedIn();
-	}
+        if (html.contains("Please enter your username and password to login"))
+            throw new ExceptionNotLoggedIn();
+    }
 
-	public static LinkedList<CommentBean> parseComments(String url) throws IOException,
-			URISyntaxException {
+    public static LinkedList<CommentBean> parseComments(String url) throws IOException,
+            URISyntaxException {
 
-		String html = Helper.getHTMLCORS(url);
+        String html = Helper.getHTML(url);
 
         Document doc = Jsoup.parse(html);
 
-		return parseHTMLtoComments(doc.select("div.comment-row"));
-	}
+        return parseHTMLtoComments(doc.select("div.comment-row"));
+    }
 
-    public static LinkedList<CommentBean> parseHTMLtoComments(Elements comments){
+    public static LinkedList<CommentBean> parseHTMLtoComments(Elements comments) {
         LinkedList<CommentBean> result = new LinkedList<CommentBean>();
 
-        for (Element comment:comments){
+        for (Element comment : comments) {
             int level = 0;
-            if(comment.hasClass("comment-tree")){
+            if (comment.hasClass("comment-tree")) {
                 level = 2;
-            }else if(comment.hasClass("comment-reply")){
+            } else if (comment.hasClass("comment-reply")) {
                 level = 1;
-            }else if(comment.hasClass("comment-")){
+            } else if (comment.hasClass("comment-")) {
                 level = 0;
-            }else{
+            } else {
                 continue;
             }
 
@@ -181,15 +192,15 @@ public class FakkuConnection {
             c.setUrlLike(Constants.SITEROOT + likeA.attr("href"));
             c.setUrlDislike(Constants.SITEROOT + disLikeA.attr("href"));
 
-            if(likeA.hasClass("selected")) {
+            if (likeA.hasClass("selected")) {
                 c.setSelectLike(1);
-            }else if(disLikeA.hasClass("selected")) {
+            } else if (disLikeA.hasClass("selected")) {
                 c.setSelectLike(-1);
             }
 
             Element rank = comment.select("i").first();
-            if(rank!=null)
-                c.setRank(Integer.parseInt(rank.text().replace("+","").replace(" points","")));
+            if (rank != null)
+                c.setRank(Integer.parseInt(rank.text().replace("+", "").replace(" points", "")));
 
             c.setComment(comment.select("div.comment_text").first().html());
             result.add(c);
@@ -198,203 +209,137 @@ public class FakkuConnection {
         return result;
     }
 
-	public static VersionBean getLastversion() throws IOException {
-		VersionBean result = null;
-		String html = Helper.getHTML(Constants.UPDATE_SERVICE);
-		if (!html.equals("null")) {
-			Gson gson = new Gson();
-			result = gson.fromJson(html, VersionBean.class);
-		}
-		return result;
-	}
+    public static VersionBean getLastversion() throws IOException {
+        VersionBean result = null;
+        String html = Helper.getHTML(Constants.UPDATE_SERVICE);
+        if (!html.equals("null")) {
+            Gson gson = new Gson();
+            result = gson.fromJson(html, VersionBean.class);
+        }
+        return result;
+    }
 
-	public static LinkedList<DoujinBean> parseHTMLCatalog(String url)
-			throws IOException, URISyntaxException {
-		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
+    public static DoujinListBean parseJSONCatalog(String url)
+            throws IOException, URISyntaxException {
+        DoujinListBean result = new DoujinListBean();
+        LinkedList<DoujinBean> list = new LinkedList<DoujinBean>();
 
-		String html = Helper.getHTMLCORS(url);
+        result.setLstDoujin(list);
 
-        Helper.logInfo("parseHTMLCatalog : " + url, html);
+        String html = Helper.getHTML(url);
 
-        Document doc = Jsoup.parse(html);
+        JSONListResult jsonResult = new Gson().fromJson(html, JSONListResult.class);
 
-        Elements elements = doc.select(".content-row");
-		for (Element e : elements) {
-            if(e.hasClass("manga")||e.hasClass("doujinshi")){
+        Helper.logInfo("parseJSONCatalog : " + url, html);
+
+        List<Content> contents = jsonResult.getContent() == null ? (jsonResult.getIndex() == null ? jsonResult.getRelated() : jsonResult.getIndex()) : jsonResult.getContent();
+        for (Content content : contents) {
+            if (content.isContent()) {
                 DoujinBean bean = new DoujinBean();
+                bean.setUrl(content.getContent_url().replace("www.fakku.net/", "api.fakku.net/"));
+                bean.setUrlImageTitle(content.getContent_images().getCover());
+                bean.setUrlImagePage(content.getContent_images().getSample());
+                bean.setTitle(content.getContent_name());
+                bean.setSerie(parseURLBean(content.getContent_series()));
+                bean.setArtist(parseURLBean(content.getContent_artists()));
 
-                // url
-                bean.setUrl(Constants.SITEROOT + e.select("a").first().attr("href"));
+                URLBean urlBean = new URLBean();
+                urlBean.setDescription(content.getContent_language());
+                urlBean.setUrl(Constants.SITEROOT + "/" + content.getContent_category() + "/" + content.getContent_language());
+                bean.setLanguage(urlBean);
 
-                // Images
-                Elements elementsAux = e.select("img");
-                String aux = elementsAux.select(".cover").first().attr("src");
-                bean.setUrlImageTitle(aux);
-                bean.setImageServer(aux.split("/thumbs/")[0]+"/images/");
+                UserBean userBean = new UserBean();
+                userBean.setUser(content.getContent_poster());
+                userBean.setUrlUser(content.getContent_poster_url());
+                bean.setUploader(userBean);
 
-                // Look for the next image tag
-                bean.setUrlImagePage(elementsAux.select(".sample").first().attr("src"));
+                bean.setTranslator(parseURLBean(content.getContent_translators()));
+                bean.setDescription(content.getContent_description());
 
-                // title
-                bean.setTitle(e.select(".content-meta").first().select("h2").first().select("a").first().text());
-
-                elementsAux = e.select("div.left").select("a");
-                // serie
-                bean.setSerie(parseURLBean(elementsAux.get(0)));
-                // artist
-                bean.setArtist(parseURLBean(elementsAux.get(1)));
-
-                elementsAux = e.select("div.right").select("a");
-                // language
-                bean.setLanguage(parseURLBean(elementsAux.get(0)));
-                // translator
-                if(elementsAux.size()>1)
-                    bean.setTranslator(parseURLBean(elementsAux.get(1)));
-
-                // description
-                Element description = e.select(".row.short.small").first();
-                description.select("h3").remove();
-                bean.setDescription(description.html());
-
-                // tags
-                List<URLBean> lstTags = new ArrayList<URLBean>();
-
-                try {
-                    elementsAux = e.select(".row.short.small").last().select("a");
-
-                    for (Element tag : elementsAux) {
-                        lstTags.add(parseURLBean(tag));
-                    }
-                }catch (Exception ex){}
-
-                bean.setLstTags(lstTags);
-
-                result.add(bean);
+                bean.setLstTags(parseURLBeans(content.getContent_tags(), content.getContent_category()));
+                bean.setQtyPages(content.getContent_pages());
+                bean.setImageServer(content.getContent_images().getCover().replaceAll("/thumbs/.*", "").replaceAll("https", "http") + "/images/");
+                list.add(bean);
             }
-		}
+        }
+        result.setPages(jsonResult.getPages());
+        return result;
+    }
 
-		return result;
-	}
+    public static LinkedList<DoujinBean> parseHTMLFavorite(String url)
+            throws IOException, URISyntaxException {
+        LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
 
-	public static LinkedList<DoujinBean> parseHTMLFavorite(String url)
-			throws IOException, URISyntaxException {
-		LinkedList<DoujinBean> result = new LinkedList<DoujinBean>();
-
-		String html = Helper.getHTMLCORS(url);
+        String html = Helper.getHTML(url);
 
         Document doc = Jsoup.parse(html);
 
         Helper.logInfo("parseHTMLFavorite : " + url, html);
 
-        Elements favorites = doc.select(".favorite");
-		for (Element favorite : favorites) {
-			DoujinBean bean = new DoujinBean();
+        Elements favorites = doc.select(".book");
+        for (Element favorite : favorites) {
+            DoujinBean bean = new DoujinBean();
 
-			// Images
+            // Images
             Element img = favorite.select("img").first();
-			bean.setUrlImageTitle(img.attr("src"));
+            bean.setUrlImageTitle(img.attr("src"));
 
-			bean.setTitle(img.attr("alt"));
+            bean.setTitle(img.attr("alt"));
 
             String aux = favorite.select(".cover").first().attr("href");
-			bean.setUrl(Constants.SITEROOT + aux);
-            bean.setImageServer(aux.split("/thumbs/")[0]+"/images/");
+            bean.setUrl(Constants.SITEROOT + aux);
+            bean.setImageServer(aux.split("/thumbs/")[0] + "/images/");
 
-			result.add(bean);
-		}
-
-		return result;
-	}
-
-	public static void parseHTMLDoujin(DoujinBean bean)
-			throws IOException {
-		String url = bean.getUrl();
-
-		String html = Helper.getHTML(url, cookiesStore);
-
-        Helper.logInfo("parseHTMLDoujin : " + url, html);
-
-        Document doc = Jsoup.parse(html);
-
-        bean.setAddedInFavorite(!html.contains("Add To Favorites"));
-
-        Elements elements = doc.select(".row");
-        int idx = 0;
-
-        //Series
-        Element el = elements.get(idx++).select("a").first();
-        bean.setSerie(parseURLBean(el));
-        //Artist
-        el = elements.get(idx++).select("a").first();
-        bean.setArtist(parseURLBean(el));
-        //Translator
-        if(elements.size()==8){
-            el = elements.get(idx++).select("a").first();
-            bean.setTranslator(parseURLBean(el));
+            result.add(bean);
         }
-        //Uploader
-        el = elements.get(idx).select("a").first();
-        bean.setUploader(parseUserBean(el));
-        el = elements.get(idx++).select(".right").first();
-        el.select("a").remove();
-        bean.setDate(el.text());
+
+        return result;
+    }
+
+    public static void parseJSONDoujin(DoujinBean bean)
+            throws IOException {
+        String url = bean.getUrl();
+
+        String html = Helper.getHTML(url);
+
+        Content content = new Gson().fromJson(html, JSONContentResult.class).getContent();
+
+
+        bean.setSerie(parseURLBean(content.getContent_series()));
+        bean.setArtist(parseURLBean(content.getContent_artists()));
+        bean.setTranslator(parseURLBean(content.getContent_translators()));
+        UserBean userBean = new UserBean();
+        userBean.setUser(content.getContent_poster());
+        userBean.setUrlUser(content.getContent_poster_url());
+        bean.setUploader(userBean);
+
+        Date date = new Date(content.getContent_date() * 1000);
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy");
+        bean.setDate(sdf.format(date));
         //Language
-        el = elements.get(idx++).select("a").first();
-        bean.setLanguage(parseURLBean(el));
-		// Qty Pages
-        el = elements.get(idx++).select(".right").first();
-        int c = 0;
-		try {
-			c = Integer.parseInt(el.text().split(" ")[0]);
-		} catch (Exception e) {}
+        URLBean urlBean = new URLBean();
+        urlBean.setDescription(content.getContent_language());
+        urlBean.setUrl(Constants.SITEROOT + "/" + content.getContent_category() + "/" + content.getContent_language());
+        bean.setLanguage(urlBean);
+        // Qty Pages
 
-		bean.setQtyPages(c);
+        bean.setQtyPages(content.getContent_pages());
+        bean.setDescription(content.getContent_description());
 
-        el = elements.get(idx++).select(".right").first();
-        bean.setDescription(el.html());
+        bean.setLstTags(parseURLBeans(content.getContent_tags(), content.getContent_category()));
 
-        // tags
-        List<URLBean> lstTags = new ArrayList<URLBean>();
+        // URL
+        bean.setUrl(content.getContent_url().replace("www.fakku", "api.fakku"));
+        bean.setTitle(content.getContent_name());
 
-        try{
-            elements = elements.get(idx++).select("a");
-
-            for (int i = 0; i<=elements.size()-2;i++){
-                lstTags.add(parseURLBean(elements.get(i)));
-            }
-        }catch (Exception e){}
-
-        bean.setLstTags(lstTags);
-
-		// URL
-        el = doc.select(".breadcrumbs a").last();
-		String aux = Constants.SITEROOT + el.attr("href");
-		bean.setUrl(aux);
-        bean.setTitle(el.text());
-
-		// Image
-		aux = doc.select("img.cover").first().attr("src");
-        bean.setUrlImageTitle(aux);
-		bean.setImageServer(aux.split("/thumbs/")[0]+"/images/");
-
-        try{
-            Elements comments = doc.select("div.comment-row");
-            Elements topComments = new Elements();
-            Elements recentComments = new Elements();
-            for (Element comment : comments){
-                if(comment.parent().hasClass("ajax-container")){
-                    recentComments.add(comment);
-                }else
-                    topComments.add(comment);
-            }
-            bean.setLstTopComments(parseHTMLtoComments(topComments));
-            bean.setLstRecentComments(parseHTMLtoComments(recentComments));
-        }catch(Exception e){}
+        // Image
+        bean.setUrlImageTitle(content.getContent_images().getCover());
+        bean.setImageServer(content.getContent_images().getCover().replaceAll("/thumbs/.*", "") + "/images/");
 
         bean.setCompleted(true);
-	}
+    }
 
-    public static String imageServerUrl(String url) throws IOException{
+    public static String imageServerUrl(String url) throws IOException {
         String result = null;
 
         String html = Helper.getHTMLCORS(url + "/read#page=1");
@@ -408,51 +353,75 @@ public class FakkuConnection {
         token = "'";
         idxStart = html.indexOf(token, idxStart) + token.length();
         int idxEnd = html.indexOf(token, idxStart) + token.length();
-        result = html.substring(idxStart, idxEnd-1);
+        result = html.substring(idxStart, idxEnd - 1);
         return result;
     }
 
-	public static LinkedList<URLBean> parseHTMLSeriesList(String url)
-			throws IOException {
-		LinkedList<URLBean> result = new LinkedList<URLBean>();
-		String html = Helper.getHTMLCORS(url);
+    public static LinkedList<URLBean> parseHTMLSeriesList(String url)
+            throws IOException {
+        LinkedList<URLBean> result = new LinkedList<URLBean>();
+        String html = Helper.getHTMLCORS(url);
 
-		String token = "attribute-row";
-		String[] sections = html.split(token);
+        String token = "attribute-row";
+        String[] sections = html.split(token);
 
-		for (int i = 1; i < sections.length; i++) {
-			String section = sections[i];
-			token = "href=\"";
+        for (int i = 1; i < sections.length; i++) {
+            String section = sections[i];
+            token = "href=\"";
 
-			int idxStart = section.indexOf(token) + token.length();
-			int idxEnd = section.indexOf("\"", idxStart);
+            int idxStart = section.indexOf(token) + token.length();
+            int idxEnd = section.indexOf("\"", idxStart);
 
-			URLBean b = new URLBean();
-			b.setUrl(Constants.SITEROOT + section.substring(idxStart, idxEnd));
+            URLBean b = new URLBean();
+            b.setUrl(Constants.SITEROOT + section.substring(idxStart, idxEnd));
 
-			token = ">";
+            token = ">";
 
-			idxStart = section.indexOf(token) + token.length();
-			idxEnd = section.indexOf("<", idxStart);
+            idxStart = section.indexOf(token) + token.length();
+            idxEnd = section.indexOf("<", idxStart);
 
-			b.setDescription(section.substring(idxStart, idxEnd));
+            b.setDescription(section.substring(idxStart, idxEnd));
 
-			Log.i("HTMLParser", b.toString());
+            Log.i("HTMLParser", b.toString());
 
-			result.add(b);
-		}
+            result.add(b);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	private static URLBean parseURLBean(Element a) {
-		URLBean b = new URLBean();
+    private static List<URLBean> parseURLBeans(List<Attribute> attributes, String category) {
+        List<URLBean> urlBeans = new ArrayList<URLBean>();
+        if (attributes != null)
+            for (Attribute attribute : attributes) {
+                URLBean b = new URLBean();
+                b.setDescription(attribute.getAttribute());
+                b.setUrl(Constants.SITEROOT + "/" + category + attribute.getAttribute_link());
+                urlBeans.add(b);
+            }
+        return urlBeans;
+    }
 
-		b.setDescription(a.text());
-		b.setUrl(Constants.SITEROOT + a.attr("href"));
+    private static URLBean parseURLBean(List<Attribute> attributes) {
+        URLBean b = new URLBean();
+        if (attributes != null && attributes.size() > 0 && attributes.get(0) != null) {
+            b.setDescription(attributes.get(0).getAttribute());
+            b.setUrl(Constants.SITEROOT + attributes.get(0).getAttribute_link());
+        } else {
+            b.setDescription("");
+            b.setUrl("");
+        }
+        return b;
+    }
 
-		return b;
-	}
+    private static URLBean parseURLBean(Element a) {
+        URLBean b = new URLBean();
+
+        b.setDescription(a.text());
+        b.setUrl(Constants.SITEROOT + a.attr("href"));
+
+        return b;
+    }
 
     private static UserBean parseUserBean(Element a) {
         UserBean b = new UserBean();

@@ -84,8 +84,16 @@ public class MainActivity extends SherlockFragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         app = (FakkuDroidApplication) getApplication();
+
+        int tempCurrentContent = getIntent().getIntExtra(INTENT_VAR_CURRENT_CONTENT, -1);
+        if (tempCurrentContent != -1)
+            currentContent = tempCurrentContent;
+
+        if (currentContent == DOUJIN) {
+            setContentView(R.layout.activity_main_doujin);
+        }else
+            setContentView(R.layout.activity_main);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -105,19 +113,13 @@ public class MainActivity extends SherlockFragmentActivity implements
         fragmentManager.beginTransaction().replace(R.id.menu_frame, frmMenu)
                 .commit();
 
-        Fragment frmCurrent = null;
-
-        int tempCurrentContent = getIntent().getIntExtra(INTENT_VAR_CURRENT_CONTENT, -1);
-        if (tempCurrentContent != -1)
-            currentContent = tempCurrentContent;
-
         if (currentContent == DOUJIN_LIST) {
             boolean isRelated = getIntent().getBooleanExtra(INTENT_VAR_IS_RELATED, false);
             frmDoujinList = new DoujinListFragment();
             frmDoujinList.setMainActivity(this);
             frmDoujinList.setRelated(isRelated);
             String url = getIntent().getStringExtra(INTENT_VAR_URL);
-            url = url == null ? Constants.SITEROOT : url;
+            url = url == null ? Constants.SITEINDEX : url;
             frmDoujinList.setUrl(url);
 
             String title = getIntent().getStringExtra(INTENT_VAR_TITLE);
@@ -192,8 +194,6 @@ public class MainActivity extends SherlockFragmentActivity implements
                 if(currentContent==DOUJIN){
                     if(frmCommentListFragment!=null&&frmCommentListFragment.isListCharged())
                         frmCommentListFragment.loadComments();
-                }else{
-                    mDrawerLayout.closeDrawer(Gravity.END);
                 }
             }
         };
@@ -319,7 +319,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                                     title = strSearch + ": " + query.trim();
                                 } else {
                                     title = getResources().getString(R.string.app_name);
-                                    url = Constants.SITEROOT;
+                                    url = Constants.SITEINDEX;
                                 }
                                 Intent itMain = new Intent(MainActivity.this, MainActivity.class);
                                 itMain.putExtra(INTENT_VAR_CURRENT_CONTENT, DOUJIN_LIST);
@@ -393,7 +393,7 @@ public class MainActivity extends SherlockFragmentActivity implements
                 title = strSearch + ": " + query.trim();
             } else {
                 title = getResources().getString(R.string.app_name);
-                url = Constants.SITEROOT;
+                url = Constants.SITEINDEX;
             }
             Intent itMain = new Intent(this, MainActivity.class);
             itMain.putExtra(INTENT_VAR_CURRENT_CONTENT, DOUJIN_LIST);
@@ -558,6 +558,8 @@ public class MainActivity extends SherlockFragmentActivity implements
                                     frmDoujinList.changePage(page);
                                 } else if (currentContent == FAVORITES) {
                                     frmFavorite.changePage(page);
+                                } else if (currentContent == DOUJIN) {
+                                    frmCommentListFragment.changePage(page);
                                 } else if (currentContent == DOWNLOADS) {
                                     frmDownloadListFragment.changePage(page);
                                 }

@@ -9,6 +9,7 @@ import com.fakkudroid.util.Helper;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -30,7 +31,7 @@ public class PasswordActivity extends Activity {
         		if (keyEvent.getAction() == KeyEvent.ACTION_DOWN){
                     		switch (i){
                         		case KeyEvent.KEYCODE_ENTER:
-                            		checkPassword();
+                            		checkPassword(null);
                             		return true;
                        		default:
                             		break;

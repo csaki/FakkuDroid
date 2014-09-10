@@ -108,7 +108,7 @@ public class DoujinFragment extends SherlockFragment {
 
     public void viewInBrowser(View view) {
         Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
-        viewBrowser.setData(Uri.parse(currentBean.getUrl()));
+        viewBrowser.setData(Uri.parse(currentBean.getUrl().replace("api.fakku","www.fakku")));
         this.startActivity(viewBrowser);
     }
 
@@ -463,7 +463,7 @@ public class DoujinFragment extends SherlockFragment {
             DoujinBean bean = beans[0];
 
             try {
-                FakkuConnection.parseHTMLDoujin(bean);
+                FakkuConnection.parseJSONDoujin(bean);
             } catch (Exception e) {
                 bean = null;
                 Helper.logError(this, e.getMessage(), e);

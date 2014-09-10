@@ -24,6 +24,7 @@ import com.fakkudroid.R;
 import com.fakkudroid.adapter.DoujinListAdapter;
 import com.fakkudroid.asynctask.ReadAsyncTask;
 import com.fakkudroid.bean.DoujinBean;
+import com.fakkudroid.bean.DoujinListBean;
 import com.fakkudroid.core.DataBaseHandler;
 import com.fakkudroid.core.FakkuConnection;
 import com.fakkudroid.core.FakkuDroidApplication;
@@ -42,18 +43,19 @@ import java.util.List;
 
 public class DoujinListFragment extends SherlockListFragment {
 
-    int index = -1;
-    FakkuDroidApplication app;
-    LinkedList<DoujinBean> llDoujin;
-    DoujinListAdapter da;
-    String url = Constants.SITEROOT;
-    int numPage = 1;
+    private int index = -1;
+    private FakkuDroidApplication app;
+    private LinkedList<DoujinBean> llDoujin;
+    private DoujinListAdapter da;
+    private String url = Constants.SITEROOT;
+    private int numPage = 1, pages = 1;
     private View mFormView;
     private View mStatusView;
     private View view;
     boolean related;
     private MainActivity mMainActivity;
     private boolean refresh;
+
 
     public void setMainActivity(MainActivity mainActivity) {
         mMainActivity = mainActivity;
@@ -106,22 +108,24 @@ public class DoujinListFragment extends SherlockListFragment {
 
     public void nextPage(View view) {
         index = -1;
-        numPage++;
-        loadPage();
-        CharSequence text = "Page " + numPage;
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(this.getActivity(), text, duration);
-        toast.show();
+        if(numPage+1>pages){
+            CharSequence text = "There aren't more pages.";
+            Toast toast = Toast.makeText(this.getActivity(), text,  Toast.LENGTH_SHORT);
+            toast.show();
+        }else{
+            numPage++;
+            loadPage();
+            CharSequence text = "Page " + numPage;
+            Toast toast = Toast.makeText(this.getActivity(), text, Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     public void previousPage(View view) {
         index = -1;
         if (numPage - 1 == 0) {
             CharSequence text = "There aren't more pages.";
-            int duration = Toast.LENGTH_SHORT;
-
-            Toast toast = Toast.makeText(this.getActivity(), text, duration);
+            Toast toast = Toast.makeText(this.getActivity(), text,  Toast.LENGTH_SHORT);
             toast.show();
         } else {
             numPage--;
@@ -136,18 +140,24 @@ public class DoujinListFragment extends SherlockListFragment {
 
     public void changePage(int page) {
         index = -1;
-        numPage = page;
-        loadPage();
-        CharSequence text = "Page " + numPage;
-        int duration = Toast.LENGTH_SHORT;
+        if(page>pages){
+            CharSequence text = "Error : Total pages = "+pages+".";
+            Toast toast = Toast.makeText(this.getActivity(), text,  Toast.LENGTH_SHORT);
+            toast.show();
+        }else{
+            numPage = page;
+            loadPage();
+            CharSequence text = "Page " + numPage;
+            int duration = Toast.LENGTH_SHORT;
 
-        Toast toast = Toast.makeText(this.getActivity(), text, duration);
-        toast.show();
+            Toast toast = Toast.makeText(this.getActivity(), text, duration);
+            toast.show();
+        }
     }
 
     public void viewInBrowser(View view) {
         Intent viewBrowser = new Intent(Intent.ACTION_VIEW);
-        viewBrowser.setData(Uri.parse(app.getUrl(numPage, url)));
+        viewBrowser.setData(Uri.parse(app.getUrl(numPage, url.replace("api.fakku","www.fakku"))));
         this.startActivity(viewBrowser);
     }
 
@@ -305,7 +315,10 @@ public class DoujinListFragment extends SherlockListFragment {
             try {
                 Log.i(DownloadCatalog.class.toString(), "URL Catalog: "
                         + urls[0]);
-                llDoujin = FakkuConnection.parseHTMLCatalog(urls[0]);
+
+                DoujinListBean doujinListBean = FakkuConnection.parseJSONCatalog(urls[0]);
+                llDoujin = doujinListBean.getLstDoujin();
+                numPage = doujinListBean.getPages();
             } catch (ClientProtocolException e) {
                 Helper.logError(this, e.getMessage(), e);
             } catch (IOException e) {
